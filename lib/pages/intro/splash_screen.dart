@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(seconds:6 ), // Total duration of 6 seconds
+      duration: const Duration(seconds: 6), // Total duration of 6 seconds
       vsync: this,
     );
 
@@ -51,9 +51,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     Future.delayed(const Duration(seconds: 6), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => IntroPageView(onNextTap: () {
-          // Define what happens when the Next button is tapped
-        })),
+        MaterialPageRoute(builder: (context) => const IntroPageView()),
       );
     });
   }

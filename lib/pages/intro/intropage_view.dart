@@ -1,7 +1,7 @@
 import 'package:propertysmart2/export/file_exports.dart';
 
 class IntroPageView extends StatelessWidget {
-  const IntroPageView({super.key, required Null Function() onNextTap});
+  const IntroPageView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,15 +15,15 @@ class IntroPageView extends StatelessWidget {
           controller: model.pageController,
           children: [
             FirstIntro(onConfirmTap: () {
-              model.navigateToView(context, const EstateListingView());
+              model.navigateToView(context, const LoginScreen());
             }),
-//            SecondIntro(onNextTap: () {
- //             model.pageNavigator(2);
-   //         }),
-     //       ThirdIntro(onConfirmTap: () {
-       //       model.navigateToView(context, const EstateListingView());
-              //Navigator.push(context, MaterialPageRoute(builder: builder))
-         //   })
+            // Uncomment and update other intros as needed
+            // SecondIntro(onNextTap: () {
+            //   model.pageNavigator(2);
+            // }),
+            // ThirdIntro(onConfirmTap: () {
+            //   model.navigateToView(context, const EstateListingView());
+            // }),
           ],
         );
       },

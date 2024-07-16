@@ -42,7 +42,7 @@ class TextInputField extends StatelessWidget {
              ),
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey,  // Hint text color
+                color: Colors.black,  // Hint text color
                 fontSize: 16,        // Hint text size
           ), 
              ),

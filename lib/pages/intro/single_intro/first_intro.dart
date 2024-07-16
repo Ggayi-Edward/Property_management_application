@@ -1,15 +1,16 @@
 import 'package:propertysmart2/export/file_exports.dart';
-
+import 'package:flutter/material.dart';
 
 class FirstIntro extends StatelessWidget {
-  final Function() onConfirmTap;
+  final VoidCallback onConfirmTap;
+
   const FirstIntro({super.key, required this.onConfirmTap});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(140.0), // Adjust the height as needed
+        preferredSize: const Size.fromHeight(140.0),
         child: AppBar(
           flexibleSpace: Container(
             decoration: const BoxDecoration(
@@ -37,7 +38,7 @@ class FirstIntro extends StatelessWidget {
             ),
           ),
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(64), // Adjust the height as needed
+            preferredSize: const Size.fromHeight(64),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -60,7 +61,7 @@ class FirstIntro extends StatelessWidget {
           ),
         ),
       ),
-      drawer: const CustomDrawer(), // Add the CustomDrawer here
+      drawer: const CustomDrawer(),
       body: Stack(
         children: [
           Positioned.fill(
