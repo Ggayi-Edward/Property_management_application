@@ -11,54 +11,61 @@ class ForgotPassword extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Stack(
       children: [
-        SizedBox(height: size.height * 0.1,
-        ),
+        SizedBox(height: size.height * 0.1),
         BackgroundImage(image: 'assets/images/background2.jpg'),
         Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: AppBar( 
-          backgroundColor:Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon:Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-            ) 
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+              ),
             ),
-            title: Text( 
+            title: Text(
               'Forgot Password',
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,),
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
-            ),
-            body: Column(children: [
-              SizedBox(
-                 width: size.width * 0.8,
-                 child: Text('Enter your email we will send the instruction te reset your password',
-                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: size.width * 0.8,
+                  child: Text(
+                    'Enter your email and we will send the instructions to reset your password',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-              ),
-
-              TextInputField(icon:Icons.mail, 
-               hint: 'Email', 
-              inputType: TextInputType.emailAddress, 
-              inputAction: TextInputAction.done,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              RoundedButton(buttonName: 'Send')
-            ],
+                ),
+                SizedBox(height: 20),
+                TextInputField(
+                  icon: Icons.mail,
+                  hint: 'Email',
+                  inputType: TextInputType.emailAddress,
+                  inputAction: TextInputAction.done,
+                ),
+                SizedBox(height: 20),
+                RoundedButton(buttonName: 'Send'),
+              ],
             ),
+          ),
         ),
       ],
     );

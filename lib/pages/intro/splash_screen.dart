@@ -83,8 +83,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   child: Image.asset(
                     'assets/images/splashscreen.png',
                     fit: BoxFit.contain,
-                    width: 300,
-                    height: 300,
+                    width: 340,
+                    height: 340,
                   ),
                 ),
               ),
