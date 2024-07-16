@@ -1,7 +1,7 @@
 import 'package:propertysmart2/export/file_exports.dart';
 
 class IntroPageView extends StatelessWidget {
-  const IntroPageView({Key? key, required Null Function() onNextTap}) : super(key: key);
+  const IntroPageView({super.key, required Null Function() onNextTap});
 
   @override
   Widget build(BuildContext context) {

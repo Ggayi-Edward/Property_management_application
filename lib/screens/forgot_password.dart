@@ -31,16 +31,16 @@ class ForgotPassword extends StatelessWidget {
             title: Text( 
               'Forgot Password',
               style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,),
             ),
             centerTitle: true,
             ),
             body: Column(children: [
-              Container(
+              SizedBox(
                  width: size.width * 0.8,
-                 child: Text('Enter your email we will send the instruction te reet your password',
+                 child: Text('Enter your email we will send the instruction te reset your password',
                  style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,

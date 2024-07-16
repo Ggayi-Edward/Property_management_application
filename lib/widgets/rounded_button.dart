@@ -18,8 +18,12 @@ class RoundedButton extends StatelessWidget {
     return Container(
       height: size.height * 0.08,
       width: size.width * 0.8,
-      decoration: BoxDecoration(borderRadius:BorderRadius.circular(16),
-      color:Colors.lightBlue),
+      decoration: BoxDecoration(borderRadius:BorderRadius.circular(25),
+              gradient: LinearGradient(
+                colors: [Color(0xFF304FFE), Colors.lightBlueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0.3, 1.0],),),
       child: TextButton(
          onPressed: () {},
          style: TextButton.styleFrom(
@@ -28,9 +32,9 @@ class RoundedButton extends StatelessWidget {
       child: Text(
         buttonName,
         style: TextStyle(
-        color: Colors.black,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
       ),
     ),
     ),

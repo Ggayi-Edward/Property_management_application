@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
 
 class FirstIntro extends StatelessWidget {
   final Function() onConfirmTap;
-  const FirstIntro({Key? key, required this.onConfirmTap}) : super(key: key);
+  const FirstIntro({super.key, required this.onConfirmTap});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ class FirstIntro extends StatelessWidget {
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Search...',
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -61,7 +60,7 @@ class FirstIntro extends StatelessWidget {
           ),
         ),
       ),
-      drawer: CustomDrawer(), // Add the CustomDrawer here
+      drawer: const CustomDrawer(), // Add the CustomDrawer here
       body: Stack(
         children: [
           Positioned.fill(
@@ -94,7 +93,7 @@ class FirstIntro extends StatelessWidget {
                                 Colors.lightBlueAccent,
                               ],
                             ).createShader(
-                              Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
+                              const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
                             ),
                           shadows: const <Shadow>[
                             Shadow(
@@ -123,7 +122,7 @@ class FirstIntro extends StatelessWidget {
                             color: Colors.black.withOpacity(0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: Offset(0, 3), // changes position of shadow
+                            offset: const Offset(0, 3), // changes position of shadow
                           ),
                         ],
                       ),

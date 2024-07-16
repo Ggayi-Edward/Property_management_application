@@ -14,3 +14,5 @@ export 'package:propertysmart2/pages/estate_listing/widgets/estate_nav.dart';
 export 'package:propertysmart2/pages/estate_details/estate_details_viewmodel.dart';
 export 'package:propertysmart2/pages/estate_details/estate_detail_view.dart';
 export 'package:propertysmart2/constants/drawer.dart';
+export 'package:propertysmart2/screens/login_screen.dart';
+export 'package:propertysmart2/screens/create_new_account.dart';

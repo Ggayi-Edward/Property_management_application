@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
@@ -7,10 +6,10 @@ class EstateCard extends StatelessWidget {
   final double imageHeight;
 
   const EstateCard({
-    Key? key,
+    super.key,
     required this.estate,
     required this.imageHeight,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +70,7 @@ class EstateCard extends StatelessWidget {
 }
 
 class EstateListingView extends StatefulWidget {
-  const EstateListingView({Key? key}) : super(key: key);
+  const EstateListingView({super.key});
 
   @override
   _EstateListingViewState createState() => _EstateListingViewState();
@@ -144,7 +143,7 @@ class _EstateListingViewState extends State<EstateListingView> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
@@ -156,7 +155,7 @@ class _EstateListingViewState extends State<EstateListingView> {
               ),
             ),
           ),
-          drawer: CustomDrawer(), // Add the CustomDrawer here
+          drawer: const CustomDrawer(), // Add the CustomDrawer here
           body: _buildEstateGrid(),
         );
       },

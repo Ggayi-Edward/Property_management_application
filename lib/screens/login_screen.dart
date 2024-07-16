@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final Function() onNextTap;
+  const LoginScreen({super.key,required this.onNextTap});
 
    @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class LoginScreen extends StatelessWidget {
                 child: Center(
                   child: Text('Property Smart',
                       style: TextStyle(
-                        color: Colors.lightBlue,
+                        color: Color(0xFF304FFE),
                         fontSize: 55,
                         fontWeight: FontWeight.bold),
                        
@@ -43,7 +44,7 @@ class LoginScreen extends StatelessWidget {
                 inputAction: TextInputAction.next,
               ),
             PasswordInput(
-               icon: Icons.mail,
+               icon: Icons.lock,
                 hint: 'Password',
                 inputType:TextInputType.emailAddress,
                 inputAction: TextInputAction.next,
@@ -78,7 +79,7 @@ class LoginScreen extends StatelessWidget {
           ],
           ), 
            GestureDetector(
-            onTap: () => Navigator.pushNamed(context,'CreateNewAccount'),
+            onTap: onNextTap(),
              child: Container(
               decoration:
                BoxDecoration(border:

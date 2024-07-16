@@ -27,22 +27,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _controller,
-      curve: Interval(0.0, 0.25, curve: Curves.easeIn), // First 1.5 seconds for fade-in
+      curve: const Interval(0.0, 0.25, curve: Curves.easeIn), // First 1.5 seconds for fade-in
     ));
 
     _fadeOutAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
       parent: _controller,
-      curve: Interval(0.75, 1.0, curve: Curves.easeOut), // Last 1.5 seconds for fade-out
+      curve: const Interval(0.75, 1.0, curve: Curves.easeOut), // Last 1.5 seconds for fade-out
     ));
 
     _scaleUpAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(CurvedAnimation(
       parent: _controller,
-      curve: Interval(0.0, 0.25, curve: Curves.easeInOut), // First 1.5 seconds for scaling up
+      curve: const Interval(0.0, 0.25, curve: Curves.easeInOut), // First 1.5 seconds for scaling up
     ));
 
     _scaleDownAnimation = Tween<double>(begin: 1.0, end: 0.5).animate(CurvedAnimation(
       parent: _controller,
-      curve: Interval(0.75, 1.0, curve: Curves.easeInOut), // Last 1.5 seconds for scaling down
+      curve: const Interval(0.75, 1.0, curve: Curves.easeInOut), // Last 1.5 seconds for scaling down
     ));
 
     _controller.forward();
@@ -85,8 +85,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   child: Image.asset(
                     'assets/images/splashscreen.png',
                     fit: BoxFit.contain,
-                    width: 290,
-                    height: 290,
+                    width: 300,
+                    height: 300,
                   ),
                 ),
               ),

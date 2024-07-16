@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ControlReactor extends StatelessWidget {
   final Widget child;
 
-  const ControlReactor({Key? key, required this.child}) : super(key: key);
+  const ControlReactor({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:propertysmart2/export/file_exports.dart';
 
 class EstateNav extends StatelessWidget {
-  const EstateNav({Key? key}) : super(key: key);
+  const EstateNav({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +14,10 @@ class EstateNav extends StatelessWidget {
         ),
         color: Colors.black,
       ),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           SizedBox(
             width: 24,
           ),

@@ -19,13 +19,13 @@ class BackgroundImage extends StatelessWidget {
       end: Alignment.center,
       colors: [Colors.black, Colors.transparent],
     ).createShader(rect),
-    blendMode: BlendMode.darken,
+    blendMode: BlendMode.lighten,
     child:Container(
       decoration: BoxDecoration(
            image: DecorationImage(
         image: AssetImage(image),
         fit: BoxFit.cover,colorFilter: ColorFilter.mode(Colors.black54,
-        BlendMode.darken),
+        BlendMode.lighten),
         ),
       ),
     ),);
