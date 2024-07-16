@@ -1,3 +1,5 @@
+// App-level build.gradle file
+
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -22,6 +24,9 @@ def flutterVersionName = localProperties.getProperty("flutter.versionName")
 if (flutterVersionName == null) {
     flutterVersionName = "1.0"
 }
+
+// Apply Google services plugin
+apply plugin: "com.google.gms.google-services"
 
 android {
     namespace = "com.example.propertysmart2"
@@ -55,4 +60,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // Add other dependencies here
 }
