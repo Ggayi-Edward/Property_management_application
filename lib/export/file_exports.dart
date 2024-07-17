@@ -16,3 +16,7 @@ export 'package:propertysmart2/pages/estate_details/estate_detail_view.dart';
 export 'package:propertysmart2/constants/drawer.dart';
 export 'package:propertysmart2/screens/login_screen.dart';
 export 'package:propertysmart2/screens/create_new_account.dart';
+export 'package:propertysmart2/widgets/text_input_field.dart';
+export 'package:propertysmart2/widgets/password_input.dart';
+export 'package:fluttertoast/fluttertoast.dart';
+export 'package:firebase_auth/firebase_auth.dart';
