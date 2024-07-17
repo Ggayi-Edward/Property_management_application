@@ -10,7 +10,7 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
-      options: FirebaseOptions(
+      options: const FirebaseOptions(
         apiKey: "AIzaSyCXQ4B81sO45QqDW0GAMAyNclVu9UqDNzw",
         appId: "1:508998199848:web:6903991d1471ab8bbfe31d",
         messagingSenderId: "508998199848",
@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
         'CreateAccount': (context) => const CreateNewAccount(),
         'ForgotPassword': (context) => const ForgotPassword(),
         'IntroPageView': (context) => const IntroPageView(),
-
         // Other routes can be added here
       },
     );

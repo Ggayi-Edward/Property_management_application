@@ -1,62 +1,33 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:propertysmart2/export/file_exports.dart';
 
-class FirebaseAuthServices {
+class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Sign Up with Email and Password
-  Future<User?> signUpWithEmailAndPassword(String email, String password) async {
-    try {
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return credential.user;
-    } catch (e) {
-      print("some error occured");
-      return null;
-    }
-  }
-
-  // Sign In with Email and Password
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return credential.user;
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return userCredential.user;
     } catch (e) {
-      print("some error occured");
+      print(e);
       return null;
     }
   }
 
-  // Sign Out
+  Future<User?> signUpWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      return userCredential.user;
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
   Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-    } catch (e) {
-      print(e.toString());
-    }
+    await _auth.signOut();
   }
 
-  // Get Current User
-  User? getCurrentUser() {
-    try {
-      return _auth.currentUser;
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
-
-  // Reset Password
-  Future<void> sendPasswordResetEmail(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-    } catch (e) {
-      print(e.toString());
-    }
+  Future<User?> getCurrentUser() async {
+    return _auth.currentUser;
   }
 }
