@@ -113,7 +113,7 @@ class CreateNewAccount extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap:() {
-                          Navigator.pushNamed(context, '/');
+                          Navigator.pushNamed(context, 'LoginScreen');
                         },
                         child: Text('Login',
                           style:TextStyle(

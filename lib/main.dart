@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         'CreateAccount': (context) => const CreateNewAccount(),
         'ForgotPassword': (context) => const ForgotPassword(),
         'IntroPageView': (context) => const IntroPageView(),
+
         // Other routes can be added here
       },
     );
