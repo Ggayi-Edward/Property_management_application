@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 
 class TextInputField extends StatelessWidget {
   const TextInputField({
-    
+    required this.controller,
     required this.icon,
     required this.hint,
     required this.inputType,
     required this.inputAction,
+    super.key,
+  });
 
-    super.key,});
+  final TextEditingController controller;
   final IconData icon;
   final String hint;
   final TextInputType inputType;
@@ -30,7 +32,8 @@ class TextInputField extends StatelessWidget {
         ),
         child: Center(
           child: TextField(
-             decoration:InputDecoration(
+            controller: controller, // Added controller here
+            decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -38,23 +41,21 @@ class TextInputField extends StatelessWidget {
                   icon,
                   size: 20,
                   color: Colors.white,
+                ),
               ),
-             ),
               hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.black,  // Hint text color
                 fontSize: 16,        // Hint text size
-          ), 
-             ),
-            //TextField(
-            keyboardType: inputType, 
+              ),
+            ),
+            keyboardType: inputType,
             textInputAction: inputAction,
             style: TextStyle(
-            color: Colors.black,  // Text color
-            fontSize: 16,
-        ),
-            
-             ),
+              color: Colors.black,  // Text color
+              fontSize: 16,
+            ),
+          ),
         ),
       ),
     );

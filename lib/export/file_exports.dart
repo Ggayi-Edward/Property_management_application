@@ -20,3 +20,4 @@ export 'package:propertysmart2/widgets/text_input_field.dart';
 export 'package:propertysmart2/widgets/password_input.dart';
 export 'package:fluttertoast/fluttertoast.dart';
 export 'package:firebase_auth/firebase_auth.dart';
+export 'package:propertysmart2/utilities/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
