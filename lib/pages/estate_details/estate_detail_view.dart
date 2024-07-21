@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/pages/estate_details/ContactAgentPage.dart';
 import 'package:stacked/stacked.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -242,35 +243,51 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                   child: Center(
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        gradient: const LinearGradient(
-                          colors: [Colors.blue, Colors.lightBlueAccent],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueAccent.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            gradient: const LinearGradient(
+                              colors: [Colors.blue, Colors.lightBlueAccent],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blueAccent.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Checkout',
-                          style: TextStyle(
-                            color: Colors.white, // Font color
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18, // Font size
+                          child: const Center(
+                            child: Text(
+                              'Checkout',
+                              style: TextStyle(
+                                color: Colors.white, // Font color
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18, // Font size
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ContactAgentPage()),
+                            );
+                          },
+                          child: const Text(
+                            'Contact Agent',
+                            style: TextStyle(color:Colors.green),),
+                        ),
+                      ],
                     ),
                   ),
                 ),
