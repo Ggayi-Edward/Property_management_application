@@ -4,7 +4,6 @@ import 'package:stacked/stacked.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class EstateDetailsView extends StatefulWidget {
   final EstateModel estate;
   const EstateDetailsView({Key? key, required this.estate}) : super(key: key);
@@ -30,8 +29,8 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                 flexibleSpace: FlexibleSpaceBar(
                   background: ClipPath(
                     clipper: UpwardArcClipper(),
-                    child: Image.network(
-                      widget.estate.image,
+                    child: Image.asset(
+                      widget.estate.image, // Replace with Image.asset
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -147,7 +146,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                         Row(
                           children: [
                             const Icon(
-                              FontAwesomeIcons.swimmer,
+                              FontAwesomeIcons.personSwimming,
                               size: 16,
                             ),
                             const SizedBox(width: 6),
@@ -197,7 +196,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20.0),
                             child: Image.asset(
-                              widget.estate.roomImages[index],
+                              widget.estate.roomImages[index], // Replace with Image.asset
                               fit: BoxFit.cover,
                               width: MediaQuery.of(context).size.width * 0.8,
                               height: 200,
@@ -311,7 +310,7 @@ class FullImageView extends StatelessWidget {
       appBar: AppBar(),
       body: Center(
         child: Image.asset(
-          imageUrl,
+          imageUrl, // Replace with Image.asset
           fit: BoxFit.contain,
         ),
       ),

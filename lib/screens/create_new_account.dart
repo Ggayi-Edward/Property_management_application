@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 
 class CreateNewAccount extends StatefulWidget {
@@ -35,7 +36,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_message),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 3),
           backgroundColor: Colors.red,
         ),
       );
@@ -55,7 +56,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Account created successfully!'),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 3),
           backgroundColor: Colors.green,
         ),
       );
@@ -85,7 +86,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
     Size size = MediaQuery.of(context).size;
     return Stack(
       children: [
-        BackgroundImage(image: 'assets/images/background3.jpg'),
+        BackgroundImage(image: 'assets/images/background6.jfif'),
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
@@ -94,45 +95,24 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
                 SizedBox(
                   height: size.width * 0.1,
                 ),
-                Stack(
-                  children: [
-                    Center(
-                      child: ClipOval(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 6,
-                            sigmaY: 6,
-                          ),
-                          child: CircleAvatar(
-                            radius: size.width * 0.14,
-                            backgroundColor: Colors.grey[500]?.withOpacity(0.5),
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: size.width * 0.1,
-                            ),
-                          ),
-                        ),
+                Center(
+                  child: ClipOval(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 6,
+                        sigmaY: 6,
                       ),
-                    ),
-                    Positioned(
-                      top: size.height * 0.08,
-                      left: size.width * 0.56,
-                      child: Container(
-                        height: size.width * 0.12,
-                        width: size.width * 0.12,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
+                      child: CircleAvatar(
+                        radius: size.width * 0.14,
+                        backgroundColor: Colors.grey[500]?.withOpacity(0.5),
                         child: Icon(
-                          Icons.arrow_upward,
+                          FontAwesomeIcons.userPlus,
                           color: Colors.white,
+                          size: size.width * 0.1,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
                 SizedBox(
                   height: size.width * 0.1,

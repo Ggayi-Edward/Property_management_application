@@ -27,7 +27,7 @@ class TextInputField extends StatelessWidget {
         height: size.height * 0.08,
         width: size.width * 0.8,
         decoration: BoxDecoration(
-          color: Colors.grey[700]?.withOpacity(0.5),
+          color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Center(
@@ -40,7 +40,7 @@ class TextInputField extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 20,
-                  color: Colors.white,
+                  color: Colors.grey,
                 ),
               ),
               hintText: hint,
