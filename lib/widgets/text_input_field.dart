@@ -9,6 +9,7 @@ class TextInputField extends StatelessWidget {
     required this.hint,
     required this.inputType,
     required this.inputAction,
+    this.maxLines = 3,
     super.key,
   });
 
@@ -17,6 +18,7 @@ class TextInputField extends StatelessWidget {
   final String hint;
   final TextInputType inputType;
   final TextInputAction inputAction;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class TextInputField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
-        height: size.height * 0.08,
+        height: size.height * 0.09,
         width: size.width * 0.8,
         decoration: BoxDecoration(
           color: Colors.grey[700]?.withOpacity(0.5),
