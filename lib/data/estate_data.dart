@@ -11,7 +11,7 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Bugolobi, Kampala',
-      price: 12000000.0,
+      price: 1200.0,
       title: 'Rehoboth Park And Gardens Phase 2 Extension 2',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
