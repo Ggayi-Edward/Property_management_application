@@ -82,9 +82,9 @@ class EstateData {
         'bathrooms': 3,
         'swimmingPool': true,
       },
-      location: 'Munyonyo, Kampala',
-      price: 2000000.0,
-      title: 'Grandview Park & Gardens Phase 1 Extension',
+      location: 'Makindye, Kampala',
+      price: 2300.0,
+      title: 'Grandview Apartments',
       roomImages: [
         'assets/images/houses/rooms/bathroom4.jfif',
         'assets/images/houses/rooms/bedroom4.jfif',
