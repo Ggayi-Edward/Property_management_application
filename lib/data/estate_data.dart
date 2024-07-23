@@ -94,6 +94,24 @@ class EstateData {
       ],
     ),
     EstateModel(
+      image: 'assets/images/houses/kyabanyorohouse.jpeg',
+      availability: {
+        'wifi': false,
+        'bedrooms': 4,
+        'bathrooms': 3,
+        'swimmingPool': false,
+      },
+      location: 'Mbuya, Kampala',
+      price: 3000.0,
+      title: 'Elizabeth Apartments',
+      roomImages: [
+        'assets/images/houses/rooms/bathroom5.jfif',
+        'assets/images/houses/rooms/kitchen5.jfif',
+        'assets/images/houses/rooms/livingroom5.jfif',
+        'assets/images/houses/rooms/swimmingpool2.jfif',
+      ],
+    ),
+    EstateModel(
       image: 'assets/images/houses/makindyehouse.jpeg',
       availability: {
         'wifi': true,
