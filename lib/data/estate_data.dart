@@ -120,7 +120,7 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Mbuya, Kampala',
-      price: 3000000.0,
+      price: 1800.0,
       title: 'Elizabeth Apartments',
       roomImages: [
         'assets/images/houses/rooms/bathroom5.jfif',
