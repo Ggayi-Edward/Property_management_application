@@ -47,7 +47,7 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Bugolobi, Kampala',
-      price: 25000.0,
+      price: 2500.0,
       title: 'Pathway Residences',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
