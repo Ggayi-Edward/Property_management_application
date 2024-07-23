@@ -39,7 +39,7 @@ class EstateData {
       ],
     ),
     EstateModel(
-      image: 'assets/images/houses/bugolobihouse.jpeg',
+      image: 'assets/images/houses/rooms/image.png',
       availability: {
         'wifi': true,
         'bedrooms': 4,
