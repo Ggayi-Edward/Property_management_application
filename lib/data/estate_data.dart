@@ -94,6 +94,24 @@ class EstateData {
       ],
     ),
     EstateModel(
+      image: 'assets/images/houses/kyabanyorohouse.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 3,
+        'bathrooms': 2,
+        'swimmingPool': true,
+      },
+      location: 'Kabanyolo, Mbarara',
+      price: 3000000.0,
+      title: 'West Park & Gardens Phase 1 Extension, Oleyo',
+      roomImages: [
+        'assets/images/houses/rooms/bathroom5.jfif',
+        'assets/images/houses/rooms/kitchen5.jfif',
+        'assets/images/houses/rooms/livingroom5.jfif',
+        'assets/images/houses/rooms/swimmingpool2.jfif',
+      ],
+    ),
+    EstateModel(
       image: 'assets/images/houses/makindyehouse.jpeg',
       availability: {
         'wifi': true,

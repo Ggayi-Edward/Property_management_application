@@ -146,10 +146,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   height: size.width * 0.1,
                 ),
-                Stack(
-                  children: [
-                    Center(
-                      child: GestureDetector(
+                Center(
+                  child: Column(
+                    children: [
+                      GestureDetector(
                         onTap: _pickImage,
                         child: ClipOval(
                           child: BackdropFilter(
@@ -176,13 +176,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: size.height * 0.08,
-                      left: size.width * 0.56,
-                      child: GestureDetector(
+                      GestureDetector(
                         onTap: _pickImage,
                         child: Container(
+                          margin: EdgeInsets.only(top: 8),
                           height: size.width * 0.12,
                           width: size.width * 0.12,
                           decoration: BoxDecoration(
@@ -196,14 +193,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: size.width * 0.1,
                 ),
                 Column(
                   children: [
+                    Text(
+                      _userController.text,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      _emailController.text,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: 30),
                     TextInputField(
                       controller: _userController,
                       icon: Icons.person,

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
+import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
 
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         'IntroPageView': (context) => const IntroPageView(),
         'EstateListingView': (context) => const EstateListingView(),
         'ProfileScreen': (context) => const ProfileScreen(),
+        'PaymentPage': (context) =>  PaymentPage(),
         // Other routes can be added here
       },
     );

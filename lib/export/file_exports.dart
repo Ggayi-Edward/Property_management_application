@@ -21,3 +21,5 @@ export 'package:fluttertoast/fluttertoast.dart';
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:propertysmart2/utilities/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 export 'package:propertysmart2/constants/drawer.dart';
+export 'package:propertysmart2/payment/payment_page.dart';
+export 'package:propertysmart2/payment/confirmation_page.dart';
