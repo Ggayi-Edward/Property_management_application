@@ -65,8 +65,8 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Entebbe, Wakiso',
-      price: 3000000.0,
-      title: 'Imperial Park And Gardens(The Sugarland Estate)',
+      price: 5000.0,
+      title: 'Imperial Park And Gardens Estate',
       roomImages: [
         'assets/images/houses/rooms/livingroom3.jfif',
         'assets/images/houses/rooms/kitchen3.jfif',
