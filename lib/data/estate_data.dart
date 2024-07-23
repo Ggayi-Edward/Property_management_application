@@ -102,8 +102,8 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Kabanyolo, Mbarara',
-      price: 3000000.0,
-      title: 'West Park & Gardens Phase 1 Extension, Oleyo',
+      price: 1000.0,
+      title: 'West Gate Cottages',
       roomImages: [
         'assets/images/houses/rooms/bathroom5.jfif',
         'assets/images/houses/rooms/kitchen5.jfif',
