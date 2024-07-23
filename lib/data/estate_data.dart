@@ -138,8 +138,8 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Makindye, Kampala',
-      price: 2000000.0,
-      title: 'City Park & Gardens, Phase 2, Asejire',
+      price: 2000.0,
+      title: 'City View Villa',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
         'assets/images/houses/rooms/bathroom6.jfif',
