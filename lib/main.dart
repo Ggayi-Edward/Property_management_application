@@ -1,9 +1,9 @@
+// ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
 import 'package:propertysmart2/screens/forgot_password.dart';
-import 'package:propertysmart2/screens/login_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +15,7 @@ Future<void> main() async {
       projectId: "propertysmart-95070",
     ),
   );
+  // ignore: prefer_const_constructors
   runApp(MyApp());
 }
 
