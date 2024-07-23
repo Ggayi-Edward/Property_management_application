@@ -24,6 +24,24 @@ class EstateData {
       image: 'assets/images/houses/bugolobihouse.jpeg',
       availability: {
         'wifi': true,
+        'bedrooms': 1,
+        'bathrooms': 1,
+        'swimmingPool': false,
+      },
+      location: 'Nakasero, Kampala',
+      price: 2000.0,
+      title: 'Prince Charles Drive Cottages',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom1.jfif',
+        'assets/images/houses/rooms/kitchen1.jfif',
+        'assets/images/houses/rooms/bedroom1.jfif',
+        'assets/images/houses/rooms/bathroom1.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/bugolobihouse.jpeg',
+      availability: {
+        'wifi': true,
         'bedrooms': 4,
         'bathrooms': 3,
         'swimmingPool': false,
