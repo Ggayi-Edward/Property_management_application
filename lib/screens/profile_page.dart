@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const BackgroundImage(image: 'assets/images/background1.jpg'),
+          const BackgroundImage(image: 'assets/images/background1.jpeg'),
           SingleChildScrollView(
             child: Column(
               children: [
