@@ -5,6 +5,7 @@ import 'package:stacked/stacked.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+
 class EstateDetailsView extends StatefulWidget {
   final EstateModel estate;
   const EstateDetailsView({Key? key, required this.estate}) : super(key: key);
@@ -22,7 +23,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
       viewModelBuilder: () => EstateDetailsViewModel(),
       builder: (context, viewModel, _) {
         return Scaffold(
-          drawer: CustomDrawer(), // Add the CustomDrawer here
+          drawer:  CustomDrawer(), // Add the CustomDrawer here
           body: CustomScrollView(
             slivers: [
               SliverAppBar(

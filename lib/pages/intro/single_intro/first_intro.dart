@@ -1,5 +1,6 @@
-import 'package:propertysmart2/export/file_exports.dart';
 import 'package:flutter/material.dart';
+import 'package:propertysmart2/export/file_exports.dart';
+
 
 class FirstIntro extends StatelessWidget {
   final VoidCallback onConfirmTap;
@@ -40,7 +41,7 @@ class FirstIntro extends StatelessWidget {
           // Remove the bottom property if you want to remove the search bar
         ),
       ),
-      drawer: const CustomDrawer(),
+      drawer: CustomDrawer(), // Add the CustomDrawer here
       body: Stack(
         children: [
           Positioned.fill(

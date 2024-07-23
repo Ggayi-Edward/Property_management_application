@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
 import 'package:propertysmart2/screens/forgot_password.dart';
+import 'package:propertysmart2/screens/profile_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         'ForgotPassword': (context) => const ForgotPassword(),
         'IntroPageView': (context) => const IntroPageView(),
         'EstateListingView': (context) => const EstateListingView(),
+        'ProfileScreen': (context) => const ProfileScreen(),
         // Other routes can be added here
       },
     );

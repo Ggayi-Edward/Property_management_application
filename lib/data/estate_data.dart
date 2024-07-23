@@ -11,7 +11,7 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Bugolobi, Kampala',
-      price: '12,000,000',
+      price: 12000000.0,
       title: 'Rehoboth Park And Gardens Phase 2 Extension 2',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
@@ -29,7 +29,7 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Bukoto, Kampala',
-      price: '2,000,000',
+      price: 2000000.0,
       title: 'New York Park And Gardens',
       roomImages: [
         'assets/images/houses/rooms/livingroom2.jfif',
@@ -47,7 +47,7 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Entebbe, Wakiso',
-      price: '3,000,000',
+      price: 3000000.0,
       title: 'Imperial Park And Gardens(The Sugarland Estate)',
       roomImages: [
         'assets/images/houses/rooms/livingroom3.jfif',
@@ -65,7 +65,7 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Munyonyo, Kampala',
-      price: '2,000,000',
+      price: 2000000.0,
       title: 'Grandview Park & Gardens Phase 1 Extension',
       roomImages: [
         'assets/images/houses/rooms/bathroom4.jfif',
@@ -84,7 +84,7 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Kabanyolo, Mbarara',
-      price: '3,000,000',
+      price: 3000000.0,
       title: 'West Park & Gardens Phase 1 Extension, Oleyo',
       roomImages: [
         'assets/images/houses/rooms/bathroom5.jfif',
@@ -102,7 +102,7 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Makindye, Kampala',
-      price: '2,000,000',
+      price: 2000000.0,
       title: 'City Park & Gardens, Phase 2, Asejire',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
@@ -111,4 +111,51 @@ class EstateData {
       ],
     ),
   ];
+
+  List<EstateModel> filterEstates({
+    String? priceRange,
+    int? bedrooms,
+    int? bathrooms,
+    bool? swimmingPool,
+  }) {
+    return estates.where((estate) {
+      bool matches = true;
+
+      // Price Range Filtering
+      if (priceRange != null) {
+        matches = _filterByPriceRange(estate, priceRange);
+      }
+
+      // Bedrooms Filtering
+      if (bedrooms != null) {
+        matches = matches && estate.availability['bedrooms'] == bedrooms;
+      }
+
+      // Bathrooms Filtering
+      if (bathrooms != null) {
+        matches = matches && estate.availability['bathrooms'] == bathrooms;
+      }
+
+      // Swimming Pool Filtering
+      if (swimmingPool != null) {
+        matches = matches && estate.availability['swimmingPool'] == swimmingPool;
+      }
+
+      return matches;
+    }).toList();
+  }
+
+  bool _filterByPriceRange(EstateModel estate, String priceRange) {
+    final price = estate.price;
+    switch (priceRange) {
+      case 'Below \$100k':
+        return price < 100000;
+      case '\$100k - \$500k':
+        return price >= 100000 && price <= 500000;
+      case 'Above \$500k':
+        return price > 500000;
+      default:
+        return true;
+    }
+  }
 }

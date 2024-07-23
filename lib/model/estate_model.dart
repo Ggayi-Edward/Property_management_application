@@ -2,7 +2,7 @@ class EstateModel {
   String image;          // Main image of the estate
   String title;
   String location;
-  String price;
+  double price;
   final Map<String, dynamic> availability;
   List<String> roomImages;  // List to store URLs of room images
 
