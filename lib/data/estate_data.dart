@@ -39,6 +39,60 @@ class EstateData {
       ],
     ),
     EstateModel(
+      image: 'assets/images/houses/bukotohouse.jpeg',
+      availability: {
+        'wifi': false,
+        'bedrooms': 2,
+        'bathrooms': 1,
+        'swimmingPool': false,
+      },
+      location: 'Buchundra, Kabale',
+      price: 1200.0,
+      title: 'KK Lodge and Apartments',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/bukotohouse.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 4,
+        'bathrooms': 5,
+        'swimmingPool': true,
+      },
+      location: 'Muyenga, Kampala',
+      price: 4500.0,
+      title: 'Leslie Apartments',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/bukotohouse.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 3,
+        'bathrooms': 4,
+        'swimmingPool': false,
+      },
+      location: 'Kyebando, Wakiso',
+      price: 3000.0,
+      title: 'Grand Majesty Residences',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
       image: 'assets/images/houses/entebbe.jpeg',
       availability: {
         'wifi': true,
