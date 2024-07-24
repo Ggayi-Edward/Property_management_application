@@ -1,8 +1,6 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 
-class PasswordInput extends StatelessWidget {
+class PasswordInput extends StatefulWidget {
   const PasswordInput({
     required this.controller,
     required this.icon,
@@ -19,6 +17,19 @@ class PasswordInput extends StatelessWidget {
   final TextInputAction inputAction;
 
   @override
+  _PasswordInputState createState() => _PasswordInputState();
+}
+
+class _PasswordInputState extends State<PasswordInput> {
+  bool _obscureText = true;
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
@@ -32,29 +43,35 @@ class PasswordInput extends StatelessWidget {
         ),
         child: Center(
           child: TextField(
-            controller: controller,
+            controller: widget.controller,
+            obscureText: _obscureText,
+            keyboardType: widget.inputType,
+            textInputAction: widget.inputAction,
+            style: TextStyle(
+              color: Colors.black,  // Text color
+              fontSize: 16,
+            ),
             decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Icon(
-                  icon,
+                  widget.icon,
                   size: 20,
                   color: Colors.grey,
                 ),
               ),
-              hintText: hint,
+              hintText: widget.hint,
               hintStyle: TextStyle(
                 color: Colors.black,  // Hint text color
                 fontSize: 16,        // Hint text size
               ),
-            ),
-            obscureText: true,
-            keyboardType: inputType,
-            textInputAction: inputAction,
-            style: TextStyle(
-              color: Colors.black,  // Text color
-              fontSize: 16,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: _toggleVisibility,
+              ),
             ),
           ),
         ),

@@ -103,12 +103,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           // Existing Drawer Items
           _buildDrawerItem(Icons.home, 'Home', () {
             Navigator.pop(context);
-          }),
-          _buildDrawerItem(Icons.search, 'Search', () {
-            Navigator.pop(context);
-          }),
-          _buildDrawerItem(Icons.favorite, 'Favorites', () {
-            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, 'IntroPageView');
           }),
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
