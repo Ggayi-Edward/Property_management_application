@@ -1,5 +1,4 @@
 import 'package:propertysmart2/export/file_exports.dart';
-import 'package:flutter/material.dart';
 
 class IntroPageViewModel extends BaseViewModel {
   late PageController pageController;

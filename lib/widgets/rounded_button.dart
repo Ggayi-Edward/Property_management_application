@@ -21,10 +21,10 @@ class RoundedButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25),
         gradient: LinearGradient(
-          colors: [Color(0xFF304FFE), Colors.lightBlueAccent],
+          colors: const [Color(0xFF304FFE), Colors.lightBlueAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          stops: [0.3, 1.0],
+          stops: const [0.3, 1.0],
         ),
       ),
       child: TextButton(

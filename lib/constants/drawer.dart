@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -7,10 +5,10 @@ class CustomDrawer extends StatefulWidget {
   final bool showFilters;
 
   const CustomDrawer({
-    Key? key,
+    super.key,
     this.onFilterApplied,
     this.showFilters = false,
-  }) : super(key: key);
+  });
 
   @override
   _CustomDrawerState createState() => _CustomDrawerState();
@@ -46,7 +44,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           DrawerHeader(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF304FFE), Colors.lightBlueAccent],
+                colors: const [Color(0xFF304FFE), Colors.lightBlueAccent],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/estate_details/ContactAgentPage.dart';
-import 'package:stacked/stacked.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class EstateDetailsView extends StatefulWidget {
   final EstateModel estate;
-  const EstateDetailsView({Key? key, required this.estate}) : super(key: key);
+  const EstateDetailsView({super.key, required this.estate});
 
   @override
   _EstateDetailsViewState createState() => _EstateDetailsViewState();
@@ -328,7 +326,7 @@ class UpwardArcClipper extends CustomClipper<Path> {
 
 class FullImageView extends StatelessWidget {
   final String imageUrl;
-  const FullImageView({Key? key, required this.imageUrl}) : super(key: key);
+  const FullImageView({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {

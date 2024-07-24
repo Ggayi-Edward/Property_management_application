@@ -194,7 +194,7 @@ packages:
     source: hosted
     version: "0.9.3+2"
   firebase_auth:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_auth
       sha256: a41b56878fa6aef3ea52962329b47eee333672d4b0ecc406e071b9fc729f242c
@@ -218,7 +218,7 @@ packages:
     source: hosted
     version: "5.12.4"
   firebase_core:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_core
       sha256: "5159984ce9b70727473eb388394650677c02c925aaa6c9439905e1f30966a4d5"
@@ -242,7 +242,7 @@ packages:
     source: hosted
     version: "2.17.3"
   firebase_storage:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_storage
       sha256: "472e8532dfdcffd00ed8cc1ff57fda76af6f0a8a26547908bc20f25079922408"
@@ -385,7 +385,7 @@ packages:
     source: hosted
     version: "4.0.2"
   image_picker:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: image_picker
       sha256: "021834d9c0c3de46bf0fe40341fa07168407f694d9b2bb18d532dc1261867f7a"
