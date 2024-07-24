@@ -75,7 +75,7 @@ class EstateData {
       ],
     ),
     EstateModel(
-      image: 'assets/images/houses/bukotohouse.jpeg',
+      image: 'assets/images/houses/entebbe.jpeg',
       availability: {
         'wifi': true,
         'bedrooms': 3,
