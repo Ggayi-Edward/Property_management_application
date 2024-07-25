@@ -68,6 +68,8 @@ dev_dependencies:
   firebase_storage: ^12.1.1
   url_launcher: ^6.0.9
   image_picker: ^1.1.2
+  flare_flutter: ^3.0.2
+  flutter_animate: ^4.5.0
 
 
 

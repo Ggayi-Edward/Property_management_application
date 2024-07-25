@@ -24,4 +24,5 @@ export 'package:propertysmart2/constants/drawer.dart';
 export 'package:propertysmart2/constants/custom_scaffold.dart';
 export 'package:propertysmart2/screens/profile_page.dart';
 export 'package:propertysmart2/payment/payment_page.dart';
+export 'package:propertysmart2/screens/account_page.dart';
 export 'package:propertysmart2/payment/confirmation_page.dart';

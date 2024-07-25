@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
         'EstateListingView': (context) => const EstateListingView(),
         'ProfileScreen': (context) => const ProfileScreen(),
         'PaymentPage': (context) =>  PaymentPage(),
+        'AccountPage': (context) =>  AccountPage(),
         // Other routes can be added here
       },
     );
