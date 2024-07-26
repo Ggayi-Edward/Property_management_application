@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:propertysmart2/export/file_exports.dart'; // Ensure the import path is correct
+import 'package:propertysmart2/widgets/widgets.dart';
 
 class AccountPage extends StatelessWidget {
   @override
@@ -8,10 +10,12 @@ class AccountPage extends StatelessWidget {
       body: Column(
         children: [
           // Top half with blue background and welcome text
+          BackgroundImage(
+            image: 'assets/images/background1.jpeg',
+          ),
           Container(
             height: MediaQuery.of(context).size.height / 2,
             decoration: BoxDecoration(
-              color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -24,23 +28,31 @@ class AccountPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/splashscreen.png', // Make sure to reference your image correctly
-                    height: 220,
-                  ).animate().fadeIn(duration: 800.ms, delay: 100.ms),
                   SizedBox(height: 20),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Text(
-                      'Welcome to Property Smart',
-                      textAlign: TextAlign.left,
-                      maxLines: 3,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.blueAccent,
-                      ),
-                    ).animate().fadeIn(duration: 800.ms, delay: 200.ms),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Property Smart',
+                          style: TextStyle(
+                            color: Color(0xFF304FFE),
+                            fontSize: 55,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Welcome to Property Smart',
+                          textAlign: TextAlign.left,
+                          maxLines: 3,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.blueAccent,
+                          ),
+                        ).animate().fadeIn(duration: 800.ms, delay: 200.ms),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -51,10 +63,6 @@ class AccountPage extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.blueAccent,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  topRight: Radius.circular(50),
-                ),
               ),
               child: Center(
                 child: Padding(
@@ -77,7 +85,10 @@ class AccountPage extends StatelessWidget {
                         Colors.white,
                         Icons.person,
                             () {
-                          // Add your onPressed logic here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          );
                         },
                       ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
                       SizedBox(height: 20),
@@ -87,7 +98,12 @@ class AccountPage extends StatelessWidget {
                         Colors.greenAccent,
                         Icons.house,
                             () {
-                          // Add your onPressed logic here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginScreenLandlord(),
+                            ),
+                          );
                         },
                       ).animate().fadeIn(duration: 800.ms, delay: 800.ms),
                     ],
