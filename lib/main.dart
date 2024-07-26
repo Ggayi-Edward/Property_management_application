@@ -1,11 +1,13 @@
-// ignore: depend_on_referenced_packages
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
+import 'package:propertysmart2/screens/login_screen.dart';
+import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,8 +19,7 @@ Future<void> main() async {
       projectId: "propertysmart-95070",
     ),
   );
-  // ignore: prefer_const_constructors
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,9 +37,15 @@ class MyApp extends StatelessWidget {
         'IntroPageView': (context) => const IntroPageView(),
         'EstateListingView': (context) => const EstateListingView(),
         'ProfileScreen': (context) => const ProfileScreen(),
-        'PaymentPage': (context) =>  PaymentPage(),
-        'AccountPage': (context) =>  AccountPage(),
-        // Other routes can be added here
+        'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
+        'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
+        'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
+        'PaymentPage': (context) => PaymentPage(),
+        'AccountPage': (context) => AccountPage(),
+        'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
+        'MessagingPage': (context) => MessagingPage(),
+        'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
+        'LandlordDashboard': (context) =>  LandlordDashboard()
       },
     );
   }
