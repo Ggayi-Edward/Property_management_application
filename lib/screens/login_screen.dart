@@ -39,9 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Navigate to EstateListingView after the Snackbar message disappears
+        // Navigate to IntroPageView after the Snackbar message disappears
         Future.delayed(Duration(seconds: 2), () {
-          Navigator.pushReplacementNamed(context, 'EstateListingView');
+          Navigator.pushReplacementNamed(context, 'IntroPageView');
         });
       } else {
         // Show error Snackbar

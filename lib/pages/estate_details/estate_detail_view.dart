@@ -245,32 +245,40 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                   child: Center(
                     child: Column(
                       children: [
-                        Container(
-                          width: double.infinity,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            gradient: const LinearGradient(
-                              colors: [Colors.blue, Colors.lightBlueAccent],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blueAccent.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PaymentPage()),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              gradient: const LinearGradient(
+                                colors: [Colors.blue, Colors.lightBlueAccent],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'Checkout',
-                              style: TextStyle(
-                                color: Colors.white, // Font color
-                                fontWeight: FontWeight.w500,
-                                fontSize: 18, // Font size
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blueAccent.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Checkout',
+                                style: TextStyle(
+                                  color: Colors.white, // Font color
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18, // Font size
+                                ),
                               ),
                             ),
                           ),
@@ -285,7 +293,8 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           },
                           child: const Text(
                             'Contact Agent',
-                            style: TextStyle(color:Colors.green),),
+                            style: TextStyle(color: Colors.green),
+                          ),
                         ),
                       ],
                     ),

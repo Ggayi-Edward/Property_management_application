@@ -1,10 +1,12 @@
-import 'package:propertysmart2/export/file_exports.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
+import 'package:propertysmart2/export/file_exports.dart';
 
 class FirstIntro extends StatelessWidget {
   final VoidCallback onConfirmTap;
 
-  const FirstIntro({super.key, required this.onConfirmTap});
+  const FirstIntro({Key? key, required this.onConfirmTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,72 +39,82 @@ class FirstIntro extends StatelessWidget {
               ),
             ),
           ),
-          // Remove the bottom property if you want to remove the search bar
         ),
       ),
-      drawer: const CustomDrawer(),
-      body: Stack(
+      drawer: CustomDrawer(), // Add the CustomDrawer here
+      body: Column(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/home1.jfif',
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+          Expanded(
+            flex: 1,
+            child: Stack(
               children: [
-                const Spacer(flex: 3),
-                const SizedBox(height: 24),
-                Expanded(
-                  flex: 2,
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                      child: Text(
-                        'Discover Your Favourite Property with PropertySmart',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          foreground: Paint()
-                            ..shader = const LinearGradient(
-                              colors: <Color>[
-                                Color(0xFF0A0D21),
-                                Colors.lightBlueAccent,
-                              ],
-                            ).createShader(
-                              const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
-                            ),
-                          shadows: const <Shadow>[
-                            Shadow(
-                              offset: Offset(2.0, 2.0),
-                              blurRadius: 3.0,
-                              color: Color.fromARGB(128, 0, 0, 0),
-                            ),
-                          ],
-                        ),
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/home1.jfif',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(
+                      'Welcome',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: GestureDetector(
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    'Discover Your Favourite Property with PropertySmart',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 14, 45, 221),
+                      shadows: [
+                        Shadow(
+                          offset: Offset(2.0, 2.0),
+                          blurRadius: 3.0,
+                          color: Color.fromARGB(128, 0, 0, 0),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  GestureDetector(
                     onTap: onConfirmTap,
                     child: Container(
-                      width: 200, // Reduced width
-                      height: 45, // Reduced height
+                      width: 200,
+                      height: 45,
                       decoration: BoxDecoration(
                         gradient: AppColors.appButtonGradient,
-                        borderRadius: BorderRadius.circular(25), // Rounded corners
+                        borderRadius: BorderRadius.circular(25),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: const Offset(0, 3), // changes position of shadow
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -111,16 +123,15 @@ class FirstIntro extends StatelessWidget {
                           'Get Started',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 14, // Reduced font size
+                            fontSize: 14,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
-              ],
+                ],
+              ),
             ),
           ),
         ],

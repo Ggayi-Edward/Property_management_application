@@ -81,7 +81,13 @@ class _EstateListingViewState extends State<EstateListingView> {
   final int gridCrossAxisCount = 2;
   final double cardImageHeight = 150;
   List<EstateModel> _filteredEstates = [];
-  List<EstateModel> _estates = []; // Initialize with your estates data
+  List<EstateModel> _estates = [];
+  EstateData estateData = EstateData(); // Initialize EstateData
+
+  String? _selectedPriceRange;
+  int? _selectedBedrooms;
+  int? _selectedBathrooms;
+  bool? _selectedSwimmingPool;
 
   @override
   void initState() {
@@ -91,11 +97,34 @@ class _EstateListingViewState extends State<EstateListingView> {
 
   void _filterEstates() {
     setState(() {
-      _filteredEstates = _estates
-          .where((estate) =>
+      _filteredEstates = estateData.filterEstates(
+        priceRange: _selectedPriceRange,
+        bedrooms: _selectedBedrooms,
+        bathrooms: _selectedBathrooms,
+        swimmingPool: _selectedSwimmingPool,
+      ).where((estate) =>
       estate.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-          estate.location.toLowerCase().contains(_searchController.text.toLowerCase()))
-          .toList();
+          estate.location.toLowerCase().contains(_searchController.text.toLowerCase())
+      ).toList();
+    });
+  }
+
+  void _applyFilters(Map<String, dynamic> filters) {
+    setState(() {
+      _selectedPriceRange = filters['priceRange'];
+      _selectedBedrooms = filters['bedrooms'];
+      _selectedBathrooms = filters['bathrooms'];
+      _selectedSwimmingPool = filters['swimmingPool'];
+
+      _filteredEstates = estateData.filterEstates(
+        priceRange: _selectedPriceRange,
+        bedrooms: _selectedBedrooms,
+        bathrooms: _selectedBathrooms,
+        swimmingPool: _selectedSwimmingPool,
+      ).where((estate) =>
+      estate.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+          estate.location.toLowerCase().contains(_searchController.text.toLowerCase())
+      ).toList();
     });
   }
 
@@ -103,7 +132,7 @@ class _EstateListingViewState extends State<EstateListingView> {
   Widget build(BuildContext context) {
     return ViewModelBuilder<EstateListingViewModel>.reactive(
       viewModelBuilder: () => EstateListingViewModel(),
-      onModelReady: (viewModel) {
+      onViewModelReady: (viewModel) {
         _estates = viewModel.estates;
         _filteredEstates = _estates;
       },
@@ -155,7 +184,10 @@ class _EstateListingViewState extends State<EstateListingView> {
               ),
             ),
           ),
-          drawer: const CustomDrawer(), // Add the CustomDrawer here
+          drawer: CustomDrawer(
+            onFilterApplied: _applyFilters,
+            showFilters: true, // Show filters only on EstateListingView
+          ),
           body: _buildEstateGrid(),
         );
       },
@@ -180,3 +212,4 @@ class _EstateListingViewState extends State<EstateListingView> {
     );
   }
 }
+

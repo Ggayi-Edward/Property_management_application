@@ -61,16 +61,18 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
         ),
       );
 
-      // Navigate to EstateListingView after the Snackbar message disappears
+      // Navigate to IntroPageView after the Snackbar message disappears
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, 'EstateListingView');
+        Navigator.pushReplacementNamed(context, 'IntroPageView');
       });
     } catch (e) {
+      print('Account creation error: $e'); // Print error for debugging
+
       // Show error Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to create account. Please try again.'),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 3),
           backgroundColor: Colors.red,
         ),
       );
@@ -92,9 +94,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(
-                  height: size.width * 0.1,
-                ),
+                SizedBox(height: size.width * 0.1),
                 Center(
                   child: ClipOval(
                     child: BackdropFilter(
@@ -114,9 +114,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: size.width * 0.1,
-                ),
+                SizedBox(height: size.width * 0.1),
                 Column(
                   children: [
                     TextInputField(
@@ -145,9 +143,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
                       hint: 'Confirm Password',
                       inputAction: TextInputAction.done,
                     ),
-                    SizedBox(
-                      height: 25,
-                    ),
+                    SizedBox(height: 25),
                     if (_isLoading) CircularProgressIndicator(),
                     SizedBox(height: 30),
                     RoundedButton(

@@ -11,8 +11,8 @@ class EstateData {
         'swimmingPool': false,
       },
       location: 'Bugolobi, Kampala',
-      price: '12,000,000',
-      title: 'Rehoboth Park And Gardens Phase 2 Extension 2',
+      price: 1200.0,
+      title: 'Bugolobi Apartments',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
         'assets/images/houses/rooms/kitchen1.jfif',
@@ -28,9 +28,63 @@ class EstateData {
         'bathrooms': 2,
         'swimmingPool': false,
       },
-      location: 'Bukoto, Kampala',
-      price: '2,000,000',
-      title: 'New York Park And Gardens',
+      location: 'Bugolobi, Kampala',
+      price: 2500.0,
+      title: 'Pathway Residences',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/bukotohouse.jpeg',
+      availability: {
+        'wifi': false,
+        'bedrooms': 2,
+        'bathrooms': 1,
+        'swimmingPool': false,
+      },
+      location: 'Buchundra, Kabale',
+      price: 1200.0,
+      title: 'KK Lodge and Apartments',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/bukotohouse.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 4,
+        'bathrooms': 5,
+        'swimmingPool': true,
+      },
+      location: 'Muyenga, Kampala',
+      price: 4500.0,
+      title: 'Leslie Apartments',
+      roomImages: [
+        'assets/images/houses/rooms/livingroom2.jfif',
+        'assets/images/houses/rooms/kitchen2.jfif',
+        'assets/images/houses/rooms/bedroom2.jfif',
+        'assets/images/houses/rooms/bathroom2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/entebbe.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 3,
+        'bathrooms': 4,
+        'swimmingPool': false,
+      },
+      location: 'Kyebando, Wakiso',
+      price: 3000.0,
+      title: 'Grand Majesty Residences',
       roomImages: [
         'assets/images/houses/rooms/livingroom2.jfif',
         'assets/images/houses/rooms/kitchen2.jfif',
@@ -47,8 +101,8 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Entebbe, Wakiso',
-      price: '3,000,000',
-      title: 'Imperial Park And Gardens(The Sugarland Estate)',
+      price: 5000.0,
+      title: 'Imperial Park And Gardens Estate',
       roomImages: [
         'assets/images/houses/rooms/livingroom3.jfif',
         'assets/images/houses/rooms/kitchen3.jfif',
@@ -64,9 +118,9 @@ class EstateData {
         'bathrooms': 3,
         'swimmingPool': true,
       },
-      location: 'Munyonyo, Kampala',
-      price: '2,000,000',
-      title: 'Grandview Park & Gardens Phase 1 Extension',
+      location: 'Makindye, Kampala',
+      price: 2300.0,
+      title: 'Grandview Apartments',
       roomImages: [
         'assets/images/houses/rooms/bathroom4.jfif',
         'assets/images/houses/rooms/bedroom4.jfif',
@@ -84,8 +138,26 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Kabanyolo, Mbarara',
-      price: '3,000,000',
-      title: 'West Park & Gardens Phase 1 Extension, Oleyo',
+      price: 1000.0,
+      title: 'West Gate Cottages',
+      roomImages: [
+        'assets/images/houses/rooms/bathroom5.jfif',
+        'assets/images/houses/rooms/kitchen5.jfif',
+        'assets/images/houses/rooms/livingroom5.jfif',
+        'assets/images/houses/rooms/swimmingpool2.jfif',
+      ],
+    ),
+    EstateModel(
+      image: 'assets/images/houses/kyabanyorohouse.jpeg',
+      availability: {
+        'wifi': true,
+        'bedrooms': 3,
+        'bathrooms': 2,
+        'swimmingPool': true,
+      },
+      location: 'Mbuya, Kampala',
+      price: 1800.0,
+      title: 'Elizabeth Apartments',
       roomImages: [
         'assets/images/houses/rooms/bathroom5.jfif',
         'assets/images/houses/rooms/kitchen5.jfif',
@@ -102,8 +174,8 @@ class EstateData {
         'swimmingPool': true,
       },
       location: 'Makindye, Kampala',
-      price: '2,000,000',
-      title: 'City Park & Gardens, Phase 2, Asejire',
+      price: 2000.0,
+      title: 'City View Villa',
       roomImages: [
         'assets/images/houses/rooms/livingroom1.jfif',
         'assets/images/houses/rooms/bathroom6.jfif',
@@ -111,4 +183,51 @@ class EstateData {
       ],
     ),
   ];
+
+  List<EstateModel> filterEstates({
+    String? priceRange,
+    int? bedrooms,
+    int? bathrooms,
+    bool? swimmingPool,
+  }) {
+    return estates.where((estate) {
+      bool matches = true;
+
+      // Price Range Filtering
+      if (priceRange != null) {
+        matches = _filterByPriceRange(estate, priceRange);
+      }
+
+      // Bedrooms Filtering
+      if (bedrooms != null) {
+        matches = matches && estate.availability['bedrooms'] == bedrooms;
+      }
+
+      // Bathrooms Filtering
+      if (bathrooms != null) {
+        matches = matches && estate.availability['bathrooms'] == bathrooms;
+      }
+
+      // Swimming Pool Filtering
+      if (swimmingPool != null) {
+        matches = matches && estate.availability['swimmingPool'] == swimmingPool;
+      }
+
+      return matches;
+    }).toList();
+  }
+
+  bool _filterByPriceRange(EstateModel estate, String priceRange) {
+    final price = estate.price;
+    switch (priceRange) {
+      case 'Below \$100k':
+        return price < 100000;
+      case '\$100k - \$500k':
+        return price >= 100000 && price <= 500000;
+      case 'Above \$500k':
+        return price > 500000;
+      default:
+        return true;
+    }
+  }
 }

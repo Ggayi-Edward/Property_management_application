@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
 class IntroPageView extends StatelessWidget {
@@ -7,7 +8,7 @@ class IntroPageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<IntroPageViewModel>.reactive(
       viewModelBuilder: () => IntroPageViewModel(),
-      onModelReady: (model) {
+      onViewModelReady: (model) {
         model.init();
       },
       builder: (context, model, _) {
@@ -15,7 +16,7 @@ class IntroPageView extends StatelessWidget {
           controller: model.pageController,
           children: [
             FirstIntro(onConfirmTap: () {
-              model.navigateToView(context, const LoginScreen());
+              model.navigateToView(context, const EstateListingView());
             }),
             // Uncomment and update other intros as needed
             // SecondIntro(onNextTap: () {
