@@ -7,7 +7,9 @@ import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
 import 'package:propertysmart2/payment/confirmation_page.dart'; // Import your existing confirmation page
 import 'package:uni_links/uni_links.dart';
-import 'dart:async';
+import 'package:propertysmart2/screens/login_screen.dart';
+import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +21,7 @@ Future<void> main() async {
       projectId: "propertysmart-95070",
     ),
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -67,8 +69,15 @@ class _MyAppState extends State<MyApp> {
         'EstateListingView': (context) => const EstateListingView(),
         'ProfileScreen': (context) => const ProfileScreen(),
         'PaymentPage': (context) => PaymentPage(landlordMobileMoneyNumber: ''),
-        '/payment-confirmation': (context) => ConfirmationPage(), // Updated to use existing ConfirmationPage
-        // Other routes can be added here
+        'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
+        'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
+        'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
+        'PaymentPage': (context) => PaymentPage(),
+        'AccountPage': (context) => AccountPage(),
+        'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
+        'MessagingPage': (context) => MessagingPage(),
+        'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
+        'LandlordDashboard': (context) =>  LandlordDashboard()
       },
     );
   }

@@ -22,6 +22,26 @@ class PasswordInput extends StatefulWidget {
 
 class _PasswordInputState extends State<PasswordInput> {
   bool _obscureText = true;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        // Optional: Uncomment if you want to clear text on focus
+        // widget.controller.clear();
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   void _toggleVisibility() {
     setState(() {
@@ -35,20 +55,25 @@ class _PasswordInputState extends State<PasswordInput> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
-        height: size.height * 0.08,
+        height: size.height * 0.07, // Adjusted height
         width: size.width * 0.8,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _focusNode.hasFocus ? Colors.blue : Colors.transparent,
+            width: 2.0,
+          ),
         ),
         child: Center(
           child: TextField(
+            focusNode: _focusNode,
             controller: widget.controller,
             obscureText: _obscureText,
             keyboardType: widget.inputType,
             textInputAction: widget.inputAction,
             style: TextStyle(
-              color: Colors.black,  // Text color
+              color: Colors.black,
               fontSize: 16,
             ),
             decoration: InputDecoration(
@@ -63,8 +88,8 @@ class _PasswordInputState extends State<PasswordInput> {
               ),
               hintText: widget.hint,
               hintStyle: TextStyle(
-                color: Colors.black,  // Hint text color
-                fontSize: 16,        // Hint text size
+                color: Colors.black,
+                fontSize: 16,
               ),
               suffixIcon: IconButton(
                 icon: Icon(

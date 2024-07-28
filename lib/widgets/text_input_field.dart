@@ -1,15 +1,13 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 
-class TextInputField extends StatelessWidget {
+class TextInputField extends StatefulWidget {
   const TextInputField({
     required this.controller,
     required this.icon,
     required this.hint,
     required this.inputType,
     required this.inputAction,
-    this.maxLines = 3,
+    this.maxLines = 1,
     super.key,
   });
 
@@ -21,42 +19,74 @@ class TextInputField extends StatelessWidget {
   final int maxLines;
 
   @override
+  _TextInputFieldState createState() => _TextInputFieldState();
+}
+
+class _TextInputFieldState extends State<TextInputField> {
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        // Optional: Uncomment if you want to clear text on focus
+        // widget.controller.clear();
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
-        height: size.height * 0.09,
+        height: size.height * 0.07, // Adjusted height
         width: size.width * 0.8,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _focusNode.hasFocus ? Colors.blue : Colors.transparent,
+            width: 2.0,
+          ),
         ),
         child: Center(
           child: TextField(
-            controller: controller, // Added controller here
+            focusNode: _focusNode,
+            controller: widget.controller,
             decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Icon(
-                  icon,
+                  widget.icon,
                   size: 20,
                   color: Colors.grey,
                 ),
               ),
-              hintText: hint,
+              hintText: widget.hint,
               hintStyle: TextStyle(
-                color: Colors.black,  // Hint text color
-                fontSize: 16,        // Hint text size
+                color: Colors.black,
+                fontSize: 16,
               ),
             ),
-            keyboardType: inputType,
-            textInputAction: inputAction,
+            keyboardType: widget.inputType,
+            textInputAction: widget.inputAction,
             style: TextStyle(
-              color: Colors.black,  // Text color
+              color: Colors.black,
               fontSize: 16,
             ),
+            maxLines: widget.maxLines,
           ),
         ),
       ),
