@@ -1,8 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutterwave_standard/flutterwave.dart';
 import 'confirmation_page.dart';
 
 class PaymentPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _tenantMobileNumberController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  final String landlordMobileMoneyNumber;
+
+  PaymentPage({required this.landlordMobileMoneyNumber});
+
+  void _makePayment(BuildContext context) async {
+    final Customer customer = Customer(
+      name: _nameController.text,
+      phoneNumber: _tenantMobileNumberController.text,
+      email: _emailController.text,
+    );
+
+    final Flutterwave flutterwave = Flutterwave(
+      context: context,
+      publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X",
+      currency: "UGX",
+      amount: _amountController.text, // Use the entered amount
+      customer: customer,
+      paymentOptions: "mobilemoneyuganda",
+      customization: Customization(title: "House Rental Payment"),
+      isTestMode: true,
+      txRef: DateTime.now().millisecondsSinceEpoch.toString(),
+      redirectUrl: "propertysmart://payment-confirmation", // Your deep link
+    );
+
+    try {
+      final ChargeResponse response = await flutterwave.charge();
+      if (response != null) {
+        print(response.toJson());
+        if (response.status == "successful") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ConfirmationPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment failed: ${response.status ?? 'Unknown error'}')),
+          );
+        }
+      } else {
+        print("Transaction failed");
+      }
+    } catch (error) {
+      print("An error occurred: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $error')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +67,7 @@ class PaymentPage extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/payment_background.jpeg'), // Replace with your background image asset path
+            image: AssetImage('assets/images/payment_background.jpeg'), // Replace with your background image asset path
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
           ),
@@ -44,9 +97,52 @@ class PaymentPage extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         TextFormField(
+                          controller: _nameController,
                           decoration: InputDecoration(
-                            labelText: 'Mobile Number',
-                            hintText: 'Enter Mobile Number',
+                            labelText: 'Name',
+                            hintText: 'Enter your name',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          keyboardType: TextInputType.name,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your name';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            hintText: 'Enter your email',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: _tenantMobileNumberController,
+                          decoration: InputDecoration(
+                            labelText: 'Tenant Mobile Number',
+                            hintText: 'Enter your mobile number',
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -57,16 +153,17 @@ class PaymentPage extends StatelessWidget {
                           textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter mobile number';
+                              return 'Please enter your mobile number';
                             }
                             return null;
                           },
                         ),
-                        SizedBox(height: 12),
+                        SizedBox(height: 20),
                         TextFormField(
+                          controller: _amountController,
                           decoration: InputDecoration(
-                            labelText: 'Card Number',
-                            hintText: '1234 5678 9012 3456',
+                            labelText: 'Amount',
+                            hintText: 'Enter amount to pay',
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -74,73 +171,19 @@ class PaymentPage extends StatelessWidget {
                             ),
                           ),
                           keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.done,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter card number';
+                              return 'Please enter the amount';
                             }
                             return null;
                           },
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'Expiry Date',
-                                  hintText: 'MM/YY',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.datetime,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter expiry date';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              flex: 1,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'CVV',
-                                  hintText: '123',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                textInputAction: TextInputAction.done,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter CVV';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Navigate to ConfirmationPage if form is valid
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ConfirmationPage()),
-                              );
+                              _makePayment(context);
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -152,6 +195,23 @@ class PaymentPage extends StatelessWidget {
                           ),
                           child: Text(
                             'Proceed to Confirmation',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            _makePayment(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.greenAccent,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Test Payment',
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
