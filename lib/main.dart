@@ -14,12 +14,21 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: const FirebaseOptions(
       apiKey: "AIzaSyCXQ4B81sO45QqDW0GAMAyNclVu9UqDNzw",
+      authDomain: "propertysmart-95070.firebaseapp.com",
       appId: "1:508998199848:web:6903991d1471ab8bbfe31d",
+      storageBucket: "propertysmart-95070.appspot.com",
       messagingSenderId: "508998199848",
       projectId: "propertysmart-95070",
     ),
   );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // Handle background message
+  print('Handling a background message: ${message.messageId}');
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +54,8 @@ class MyApp extends StatelessWidget {
         'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
         'MessagingPage': (context) => MessagingPage(),
         'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
-        'LandlordDashboard': (context) =>  LandlordDashboard()
+        'LandlordDashboard': (context) =>  LandlordDashboard(),
+        'AddPropertyPage': (context) => AddPropertyPage(),
       },
     );
   }
