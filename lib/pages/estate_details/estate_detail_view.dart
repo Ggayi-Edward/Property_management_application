@@ -249,7 +249,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PaymentPage(landlordMobileMoneyNumber: '',)),
+                              MaterialPageRoute(builder: (context) => PaymentPage(landlordMobileMoneyNumber: '', landlordEmail: '',)),
                             );
                           },
                           child: Container(

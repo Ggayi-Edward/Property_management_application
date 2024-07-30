@@ -7,7 +7,7 @@ import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
 import 'package:propertysmart2/screens/login_screen.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
         'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
         'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
-        'PaymentPage': (context) => PaymentPage(),
+        'PaymentPage': (context) => PaymentPage(landlordEmail: '', landlordMobileMoneyNumber: '',),
         'AccountPage': (context) => AccountPage(),
         'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
         'MessagingPage': (context) => MessagingPage(),
