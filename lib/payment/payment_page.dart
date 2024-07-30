@@ -8,11 +8,33 @@ class PaymentPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantMobileNumberController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
-  final String landlordMobileMoneyNumber;
 
-  PaymentPage({required this.landlordMobileMoneyNumber});
+  final String landlordEmail; // Use landlord's email to map to subaccount ID
+
+  PaymentPage({required this.landlordEmail, required String landlordMobileMoneyNumber});
+
+  String _selectedNetwork = "VODAFONE"; // Default network
+
+  // Example data structure to store landlord information
+  final Map<String, String> landlordSubaccounts = {
+    'landlord1@example.com': 'RS_FF6A27F50B9A8A6711B582A85A344A79',
+    'landlord2@example.com': 'RS_1234567890ABCDEFGHIJKL',
+    // Add more landlords as needed
+  };
+
+  String? getSubaccountId(String landlordEmail) {
+    return landlordSubaccounts[landlordEmail];
+  }
 
   void _makePayment(BuildContext context) async {
+    final subaccountId = getSubaccountId(landlordEmail);
+    if (subaccountId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid landlord information')),
+      );
+      return;
+    }
+
     final Customer customer = Customer(
       name: _nameController.text,
       phoneNumber: _tenantMobileNumberController.text,
@@ -21,15 +43,18 @@ class PaymentPage extends StatelessWidget {
 
     final Flutterwave flutterwave = Flutterwave(
       context: context,
-      publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X",
+      publicKey: "FLWPUBK_TEST",
       currency: "UGX",
-      amount: _amountController.text, // Use the entered amount
+      amount: _amountController.text,
       customer: customer,
       paymentOptions: "mobilemoneyuganda",
       customization: Customization(title: "House Rental Payment"),
       isTestMode: true,
       txRef: DateTime.now().millisecondsSinceEpoch.toString(),
-      redirectUrl: "propertysmart://payment-confirmation", // Your deep link
+      redirectUrl: "propertysmart://payment-confirmation",
+      meta: {
+        "subaccount_id": subaccountId,
+      },
     );
 
     try {
@@ -67,7 +92,7 @@ class PaymentPage extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/payment_background.jpeg'), // Replace with your background image asset path
+            image: AssetImage('assets/images/payment_background.jpeg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
           ),
@@ -180,6 +205,43 @@ class PaymentPage extends StatelessWidget {
                           },
                         ),
                         SizedBox(height: 20),
+                        DropdownButtonFormField<String>(
+                          value: _selectedNetwork,
+                          items: [
+                            const DropdownMenuItem(
+                              value: "VODAFONE",
+                              child: Text("Vodafone"),
+                            ),
+                            DropdownMenuItem(
+                              value: "MTN",
+                              child: Text("MTN"),
+                            ),
+                            DropdownMenuItem(
+                              value: "AIRTEL",
+                              child: Text("Airtel"),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              _selectedNetwork = value;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Select Network',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select a network';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
@@ -201,7 +263,9 @@ class PaymentPage extends StatelessWidget {
                         SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            _makePayment(context);
+                            if (_formKey.currentState!.validate()) {
+                              _makePayment(context);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.greenAccent,

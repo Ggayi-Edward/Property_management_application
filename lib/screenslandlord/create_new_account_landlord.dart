@@ -16,6 +16,9 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _landlordEmailController = TextEditingController();
+  final TextEditingController _landlordPhoneController = TextEditingController();
+  final TextEditingController _businessNameController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _message = '';
   bool _isLoading = false;
@@ -52,19 +55,40 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
       // Optionally, update the user's profile here
       await userCredential.user?.updateProfile(displayName: _userController.text);
 
-      // Show success Snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Account created successfully!'),
-          duration: Duration(seconds: 3),
-          backgroundColor: Colors.green,
-        ),
+      // Create subaccount for landlord
+      String landlordEmail = _landlordEmailController.text;
+      String landlordPhone = _landlordPhoneController.text;
+      String businessName = _businessNameController.text;
+
+      var response = await createSubaccount(
+        email: landlordEmail,
+        phone: landlordPhone,
+        businessName: businessName,
       );
 
-      // Navigate to IntroPageView after the Snackbar message disappears
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, 'LandlordDashboard');
-      });
+      if (response != null && response['status'] == 'success') {
+        // Show success Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Account and subaccount created successfully!'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to IntroPageView after the Snackbar message disappears
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushReplacementNamed(context, 'LandlordDashboard');
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create subaccount'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print('Account creation error: $e'); // Print error for debugging
 
@@ -81,6 +105,23 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<Map<String, dynamic>> createSubaccount({
+    required String email,
+    required String phone,
+    required String businessName,
+  }) async {
+    // Your API request logic here
+    // ...
+
+    // Example response format
+    return {
+      'status': 'success',
+      'data': {
+        'subaccount_id': 'RS_1234567890ABCDEFGHIJKL',
+      },
+    };
   }
 
   @override
@@ -141,6 +182,27 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
                       controller: _confirmPasswordController,
                       icon: Icons.lock,
                       hint: 'Confirm Password',
+                      inputAction: TextInputAction.done,
+                    ),
+                    TextInputField(
+                      controller: _landlordEmailController,
+                      icon: Icons.mail_outline,
+                      hint: 'Landlord Email',
+                      inputType: TextInputType.emailAddress,
+                      inputAction: TextInputAction.next,
+                    ),
+                    TextInputField(
+                      controller: _landlordPhoneController,
+                      icon: Icons.phone,
+                      hint: 'Landlord Phone',
+                      inputType: TextInputType.phone,
+                      inputAction: TextInputAction.next,
+                    ),
+                    TextInputField(
+                      controller: _businessNameController,
+                      icon: Icons.business,
+                      hint: 'Business Name',
+                      inputType: TextInputType.text,
                       inputAction: TextInputAction.done,
                     ),
                     SizedBox(height: 25),
