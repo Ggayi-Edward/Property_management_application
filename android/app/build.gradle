@@ -61,6 +61,9 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    // Add other dependencies here
+    implementation platform('com.google.firebase:firebase-bom:32.2.0') // Ensure you're using the latest BOM version
+    implementation 'com.google.firebase:firebase-messaging'
 }
+
+// Ensure the google-services plugin is applied at the bottom
+apply plugin: 'com.google.gms.google-services'
