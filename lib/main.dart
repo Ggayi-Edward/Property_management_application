@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:propertysmart2/constants/theme_data.dart'; // Import the themes file
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
@@ -7,7 +9,6 @@ import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
 import 'package:propertysmart2/screens/login_screen.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +28,6 @@ Future<void> main() async {
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  // Handle background message
   print('Handling a background message: ${message.messageId}');
 }
 
@@ -38,6 +38,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: lightTheme, // Use light theme
+      darkTheme: darkTheme, // Use dark theme
+      themeMode: ThemeMode.system, // Automatically switch between light and dark mode
       home: const SplashScreen(),
       routes: {
         'LoginScreen': (context) => const LoginScreen(),

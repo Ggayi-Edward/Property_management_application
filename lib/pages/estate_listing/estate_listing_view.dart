@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+
 
 class EstateCard extends StatelessWidget {
   final EstateModel estate;
   final double imageHeight;
 
   const EstateCard({
-    super.key,
+    Key? key,
     required this.estate,
     required this.imageHeight,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +71,9 @@ class EstateCard extends StatelessWidget {
   }
 }
 
+
 class EstateListingView extends StatefulWidget {
-  const EstateListingView({super.key});
+  const EstateListingView({Key? key}) : super(key: key);
 
   @override
   _EstateListingViewState createState() => _EstateListingViewState();
@@ -130,6 +133,7 @@ class _EstateListingViewState extends State<EstateListingView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ViewModelBuilder<EstateListingViewModel>.reactive(
       viewModelBuilder: () => EstateListingViewModel(),
       onViewModelReady: (viewModel) {
@@ -138,78 +142,121 @@ class _EstateListingViewState extends State<EstateListingView> {
       },
       builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: true, // Show the back button
-            flexibleSpace: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF304FFE), Colors.lightBlueAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            ),
-            title: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Colors.white, Colors.lightBlueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Text(
-                'PropertySmart',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(56),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
           drawer: CustomDrawer(
             onFilterApplied: _applyFilters,
             showFilters: true, // Show filters only on EstateListingView
           ),
-          body: _buildEstateGrid(),
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 150.0,
+                pinned: true,
+                flexibleSpace: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                    return FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'PropertySmart',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (!isCollapsed)
+                            Text(
+                              'Property Listing',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                      background: Container(
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0D47A1),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SliverFillRemaining(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search by location...',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16, // Change font size here
+                            ),
+                            prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                _filterEstates();
+                              },
+                            )
+                                : null,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          onChanged: (value) {
+                            _filterEstates();
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: MasonryGridView.count(
+                        crossAxisCount: gridCrossAxisCount,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        itemCount: _filteredEstates.length,
+                        itemBuilder: (context, index) {
+                          return EstateCard(
+                            estate: _filteredEstates[index],
+                            imageHeight: cardImageHeight,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
   }
-
-  Widget _buildEstateGrid() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: MasonryGridView.count(
-        crossAxisCount: gridCrossAxisCount,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        itemCount: _filteredEstates.length,
-        itemBuilder: (context, index) {
-          return EstateCard(
-            estate: _filteredEstates[index],
-            imageHeight: cardImageHeight,
-          );
-        },
-      ),
-    );
-  }
 }
-

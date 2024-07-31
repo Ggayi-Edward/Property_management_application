@@ -6,8 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:permission_handler/permission_handler.dart'; // Add this import
+import 'package:permission_handler/permission_handler.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
+import 'package:propertysmart2/export/file_exports.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -203,8 +204,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context); // Access the theme
+
     return Scaffold(
-      backgroundColor: Colors.blue[50], // Set background color
+      backgroundColor: Colors.blue[100], // Use a thin blue background color
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -231,7 +234,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? FileImage(_profileImage!) as ImageProvider
                                   : (_user?.photoURL != null
                                   ? NetworkImage(_user!.photoURL!)
-                                  : const AssetImage('assets/images/default_avatar.jfif') as ImageProvider),
+                                  : const AssetImage('assets/images/default_avatar.jfif')
+                              as ImageProvider),
                               child: _profileImage == null && (_user?.photoURL == null)
                                   ? Icon(
                                 Icons.person,
@@ -250,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: size.width * 0.12,
                             width: size.width * 0.12,
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: theme.colorScheme.secondary, // Use theme color
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
@@ -274,17 +278,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   _userController.text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue, // Heading color
+                    color: theme.colorScheme.primary, // Use theme color
                   ),
                 ),
                 Text(
                   _emailController.text,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[700], // Secondary text color
+                    color: theme.colorScheme.onBackground, // Use theme color
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -294,7 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hint: 'Name',
                   inputType: TextInputType.name,
                   inputAction: TextInputAction.next,
-                  //color: Colors.blue, // Apply theme color
+                  color: theme.colorScheme.primary, // Use theme color
                 ),
                 TextInputField(
                   controller: _emailController,
@@ -302,7 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hint: 'Email',
                   inputType: TextInputType.emailAddress,
                   inputAction: TextInputAction.next,
-                  //color: Colors.blue, // Apply theme color
+                  color: theme.colorScheme.primary, // Use theme color
                 ),
                 TextInputField(
                   controller: _bioController,
@@ -311,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   inputType: TextInputType.multiline,
                   inputAction: TextInputAction.newline,
                   maxLines: 5,
-                  //color: Colors.blue, // Apply theme color
+                  color: theme.colorScheme.primary, // Use theme color
                 ),
                 TextInputField(
                   controller: _phoneController,
@@ -319,13 +323,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hint: 'Phone number',
                   inputType: TextInputType.phone,
                   inputAction: TextInputAction.done,
-                  //color: Colors.blue, // Apply theme color
+                  color: theme.colorScheme.primary, // Use theme color
                 ),
                 const SizedBox(height: 25),
                 RoundedButton(
                   buttonName: 'Save Profile',
                   onPressed: _handleSave,
-                  //color: Colors.blue, // Apply theme color
+                  color: theme.colorScheme.primary, // Use theme color
                 ),
                 const SizedBox(height: 30),
               ],

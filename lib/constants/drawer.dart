@@ -45,11 +45,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF304FFE), Colors.lightBlueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Color(0xFF0D47A1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,9 +104,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
             Navigator.pushNamed(context, 'ProfileScreen');
-          }),
-          _buildDrawerItem(Icons.settings, 'Settings', () {
-            Navigator.pop(context);
           }),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
             try {
@@ -179,6 +172,38 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     });
                     _applyFilters();
                   },
+                  checkColor: Colors.white, // Color of the check mark
+                  activeColor: Color(0xFF0D47A1), // Dark blue color
+                  tileColor: Color(0xFFE3F2FD), // Light blue background color
+                ),
+                // Apply and Reset Buttons
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(
+                        'Reset Filters',
+                        Colors.white,
+                        Color(0xFF0D47A1),
+                            () {
+                          setState(() {
+                            selectedPriceRange = null;
+                            selectedBedrooms = null;
+                            selectedBathrooms = null;
+                            swimmingPool = null;
+                          });
+                          _applyFilters();
+                        },
+                      ),
+                      _buildActionButton(
+                        'Apply Filters',
+                        Color(0xFF0D47A1),
+                        Colors.white,
+                        _applyFilters,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -213,6 +238,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Text(value.toString()),
           );
         }).toList(),
+        dropdownColor: Color(0xFFE3F2FD), // Light blue background for dropdown
+        style: TextStyle(color: Color(0xFF0D47A1)), // Dark blue text color
       ),
     );
   }
@@ -226,5 +253,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
         'swimmingPool': swimmingPool,
       });
     }
+  }
+
+  Widget _buildActionButton(
+      String text,
+      Color backgroundColor,
+      Color textColor,
+      VoidCallback onPressed,
+      ) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 16,
+        ),
+      ),
+    );
   }
 }

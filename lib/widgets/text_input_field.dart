@@ -8,6 +8,7 @@ class TextInputField extends StatefulWidget {
     required this.inputType,
     required this.inputAction,
     this.maxLines = 1,
+    this.color = Colors.blue, // Added color parameter
     super.key,
   });
 
@@ -17,6 +18,7 @@ class TextInputField extends StatefulWidget {
   final TextInputType inputType;
   final TextInputAction inputAction;
   final int maxLines;
+  final Color color; // Added color parameter
 
   @override
   _TextInputFieldState createState() => _TextInputFieldState();
@@ -56,7 +58,7 @@ class _TextInputFieldState extends State<TextInputField> {
           color: Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _focusNode.hasFocus ? Colors.blue : Colors.transparent,
+            color: _focusNode.hasFocus ? widget.color : Colors.transparent, // Use color parameter
             width: 2.0,
           ),
         ),
@@ -71,7 +73,7 @@ class _TextInputFieldState extends State<TextInputField> {
                 child: Icon(
                   widget.icon,
                   size: 20,
-                  color: Colors.grey,
+                  color: widget.color, // Use color parameter
                 ),
               ),
               hintText: widget.hint,

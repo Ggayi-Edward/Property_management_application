@@ -6,16 +6,19 @@ import 'package:propertysmart2/widgets/widgets.dart';
 class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: Column(
         children: [
-          // Top half with blue background and welcome text
+          // Top half with background image and welcome text
           BackgroundImage(
             image: 'assets/images/background1.jpeg',
           ),
           Container(
             height: MediaQuery.of(context).size.height / 2,
             decoration: BoxDecoration(
+              color: theme.colorScheme.primary, // Dark Blue for top section
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -35,21 +38,13 @@ class AccountPage extends StatelessWidget {
                       children: [
                         Text(
                           'Property Smart',
-                          style: TextStyle(
-                            color: Color(0xFF304FFE),
-                            fontSize: 55,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: theme.textTheme.titleLarge,
                         ),
                         Text(
                           'Welcome to Property Smart',
-                          textAlign: TextAlign.left,
+                          textAlign: TextAlign.center,
                           maxLines: 3,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.blueAccent,
-                          ),
+                          style: theme.textTheme.titleMedium,
                         ).animate().fadeIn(duration: 800.ms, delay: 200.ms),
                       ],
                     ),
@@ -58,11 +53,11 @@ class AccountPage extends StatelessWidget {
               ),
             ),
           ),
-          // Bottom half with blue background and login buttons
+          // Bottom half with color scheme background and login buttons
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.blueAccent,
+                color: theme.colorScheme.secondary, // Very Light Blue for bottom section
               ),
               child: Center(
                 child: Padding(
@@ -71,18 +66,17 @@ class AccountPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Login as',
-                        style: TextStyle(
-                          fontSize: 20,
+                        'Login as...',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black54,
                         ),
                       ).animate().fadeIn(duration: 800.ms, delay: 400.ms),
                       SizedBox(height: 20),
                       _buildLoginButton(
                         context,
                         'Tenant',
-                        Colors.white,
+                        theme.colorScheme.primary,
                         Icons.person,
                             () {
                           Navigator.push(
@@ -95,7 +89,7 @@ class AccountPage extends StatelessWidget {
                       _buildLoginButton(
                         context,
                         'Landlord',
-                        Colors.greenAccent,
+                        theme.colorScheme.primary,
                         Icons.house,
                             () {
                           Navigator.push(
@@ -119,15 +113,16 @@ class AccountPage extends StatelessWidget {
 
   Widget _buildLoginButton(BuildContext context, String text, Color color, IconData icon, VoidCallback onPressed) {
     return SizedBox(
-      width: 190, // Fixed width for both buttons
+      width: 180, // Fixed width for both buttons
       height: 40, // Fixed height for both buttons
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, size: 28),
-        label: Text(text, style: TextStyle(fontSize: 18)),
+        icon: Icon(icon, size: 26),
+        label: Text(text, style: TextStyle(fontSize: 16)),
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           backgroundColor: color,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

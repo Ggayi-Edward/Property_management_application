@@ -83,6 +83,7 @@ dev_dependencies:
   file_picker: ^8.0.6
   url_launcher: ^6.3.0
   flutterwave_standard: ^1.0.8
+  masonry_grid: ^1.0.0
 
  
 
