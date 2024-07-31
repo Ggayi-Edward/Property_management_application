@@ -64,7 +64,7 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
 
       // Navigate to IntroPageView after the Snackbar message disappears
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, 'IntroPageView');
+        Navigator.pushReplacementNamed(context, 'LandlordDashboard');
       });
     } catch (e) {
       print('Account creation error: $e'); // Print error for debugging
@@ -176,7 +176,7 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(context, 'LoginScreen');
+                              Navigator.pushNamed(context, 'LoginScreenLandlord');
                             },
                             child: Text(
                               'Login',

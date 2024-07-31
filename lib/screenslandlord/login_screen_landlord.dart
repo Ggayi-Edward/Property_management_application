@@ -41,7 +41,7 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
 
         // Navigate to IntroPageView after the Snackbar message disappears
         Future.delayed(Duration(seconds: 2), () {
-          Navigator.pushReplacementNamed(context, 'IntroPageView');
+          Navigator.pushReplacementNamed(context, 'LandlordDashboard');
         });
       } else {
         // Show error Snackbar
@@ -122,7 +122,7 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, 'ForgotPassword'),
+                  onTap: () => Navigator.pushNamed(context, 'ForgotPasswordLandlord'),
                   child: Text(
                     'Forgot Password?',
                     textAlign: TextAlign.right,
@@ -141,7 +141,7 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
                 ),
                 SizedBox(height: 25),
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, 'CreateAccount'),
+                  onTap: () => Navigator.pushNamed(context, 'CreateNewAccountLandlord'),
                   child: Container(
                     alignment: Alignment.center,
                     child: Text(
