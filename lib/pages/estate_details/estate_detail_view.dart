@@ -21,7 +21,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
       viewModelBuilder: () => EstateDetailsViewModel(),
       builder: (context, viewModel, _) {
         return Scaffold(
-          drawer: CustomDrawer(), // Add the CustomDrawer here
+          drawer: CustomDrawer(), // Ensure only one CustomDrawer is used
           body: CustomScrollView(
             slivers: [
               // New SliverAppBar with title and subtitle
@@ -65,22 +65,17 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                   },
                 ),
               ),
-              // Original SliverAppBar for estate details image
-              SliverAppBar(
-                expandedHeight: MediaQuery.of(context).size.height * 0.3, // Adjusted height
-                flexibleSpace: FlexibleSpaceBar(
-                  title: null, // Remove title if not needed
-                  background: ClipPath(
-                    clipper: UpwardArcClipper(),
-                    child: Image.asset(
-                      widget.estate.image, // Replace with Image.asset
-                      fit: BoxFit.cover,
-                    ),
+              // Remove SliverAppBar for estate details image and use SliverToBoxAdapter instead
+              SliverToBoxAdapter(
+                child: ClipPath(
+                  clipper: UpwardArcClipper(),
+                  child: Image.asset(
+                    widget.estate.image, // Replace with Image.asset
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.3, // Adjusted height
                   ),
                 ),
-                pinned: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
               ),
               SliverToBoxAdapter(
                 child: Container(
