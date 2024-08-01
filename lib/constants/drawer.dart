@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/messages/messagingPage.dart';
+import 'package:propertysmart2/messages/PropertyService.dart';
+import 'package:propertysmart2/messages/chat_service.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
@@ -21,8 +24,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
   int? selectedBedrooms;
   int? selectedBathrooms;
   bool? swimmingPool;
-  User? _user; // User information
+  User? _user;
   final FirebaseAuthService _authService = FirebaseAuthService();
+  final ChatService _chatService = ChatService();
+  final PropertyService _propertyService = PropertyService();
 
   @override
   void initState() {
@@ -35,6 +40,41 @@ class _CustomDrawerState extends State<CustomDrawer> {
     setState(() {
       _user = user;
     });
+  }
+
+  Future<void> _navigateToMessagingPage(BuildContext context) async {
+    if (_user != null) {
+      // Replace 'propertyId' with the actual ID of the property being viewed
+      String propertyId = 'propertyId';
+      String? landlordId = await _propertyService.getLandlordId(propertyId);
+      if (landlordId != null) {
+        String chatId = await _chatService.createOrJoinChat(_user!.uid, landlordId);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MessagingPage(
+              chatId: chatId,
+              senderId: _user!.uid,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unable to find landlord information'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User not logged in'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -50,7 +90,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // PropertySmart text
                 const Text(
                   'PropertySmart',
                   style: TextStyle(
@@ -60,7 +99,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                // Avatar, Username, and Email in a Row
                 Row(
                   children: [
                     CircleAvatar(
@@ -96,7 +134,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ],
             ),
           ),
-          // Existing Drawer Items
           _buildDrawerItem(Icons.home, 'Home', () {
             Navigator.pop(context);
             Navigator.pushReplacementNamed(context, 'IntroPageView');
@@ -104,6 +141,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
             Navigator.pushNamed(context, 'ProfileScreen');
+          }),
+          _buildDrawerItem(Icons.email, 'Messages', () {
+            _navigateToMessagingPage(context);
           }),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
             try {
@@ -124,7 +164,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             }
           }),
-          // New Filter Section (Conditional)
           if (widget.showFilters) ...[
             ExpansionTile(
               leading: const Icon(Icons.filter_list),
@@ -172,11 +211,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     });
                     _applyFilters();
                   },
-                  checkColor: Colors.white, // Color of the check mark
-                  activeColor: Color(0xFF0D47A1), // Dark blue color
-                  tileColor: Color(0xFFE3F2FD), // Light blue background color
+                  checkColor: Colors.white,
+                  activeColor: Color(0xFF0D47A1),
+                  tileColor: Color(0xFFE3F2FD),
                 ),
-                // Apply and Reset Buttons
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
@@ -238,8 +276,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Text(value.toString()),
           );
         }).toList(),
-        dropdownColor: Color(0xFFE3F2FD), // Light blue background for dropdown
-        style: TextStyle(color: Color(0xFF0D47A1)), // Dark blue text color
+        dropdownColor: Color(0xFFE3F2FD),
+        style: TextStyle(color: Color(0xFF0D47A1)),
       ),
     );
   }

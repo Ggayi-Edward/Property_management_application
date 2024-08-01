@@ -34,7 +34,7 @@ export 'package:propertysmart2/screenslandlord/landlord_tenant_management.dart';
 export 'package:propertysmart2/model/lease_agreement.dart';
 export 'package:propertysmart2/screenslandlord/lease_agreement_page.dart';
 export 'package:propertysmart2/model/messages.dart';
-export 'package:propertysmart2/screenslandlord/messagingPage.dart';
+export 'package:propertysmart2/messages/messagingPage.dart';
 export 'package:propertysmart2/model/mantenance_request.dart';
 export 'package:propertysmart2/screenslandlord/maintenance_RequestsPage.dart';
 export 'package:propertysmart2/data/addProperty.dart';
