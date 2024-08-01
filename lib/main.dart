@@ -32,7 +32,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: lightTheme, // Use light theme
       darkTheme: darkTheme, // Use dark theme
-      themeMode: ThemeMode.system, // Automatically switch between light and dark mode
+      themeMode:
+          ThemeMode.system, // Automatically switch between light and dark mode
       home: const SplashScreen(),
       routes: {
         'LoginScreen': (context) => const LoginScreen(),
@@ -49,15 +50,19 @@ class MyApp extends StatelessWidget {
         'IntroPageView': (context) => const IntroPageView(),
         'EstateListingView': (context) => const EstateListingView(),
         'ProfileScreen': (context) => const ProfileScreen(),
-        'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
+        'CreateNewAccountLandlord': (context) =>
+            const CreateNewAccountLandlord(),
         'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
         'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
-        'PaymentPage': (context) => PaymentPage(landlordEmail: '', landlordMobileMoneyNumber: '',),
+        'PaymentPage': (context) => PaymentPage(
+              landlordEmail: '',
+              landlordMobileMoneyNumber: '',
+            ),
         'AccountPage': (context) => AccountPage(),
         'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
         'MessagingPage': (context) => MessagingPage(),
         'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
-        'LandlordDashboard': (context) =>  LandlordDashboard(),
+        'LandlordDashboard': (context) => LandlordDashboard(),
         'AddPropertyPage': (context) => AddPropertyPage(),
       },
     );
