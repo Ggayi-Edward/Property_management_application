@@ -1,50 +1,48 @@
+// messaging_page.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:propertysmart2/export/file_exports.dart';
+import 'message_service.dart';
+import 'message.dart';
+
 class MessagingPage extends StatefulWidget {
+  final String chatId;
+  final String senderId;
+
+  MessagingPage({required this.chatId, required this.senderId});
+
   @override
   _MessagingPageState createState() => _MessagingPageState();
 }
 
 class _MessagingPageState extends State<MessagingPage> {
-  final List<Message> messages = [
-    Message(sender: 'Tenant', text: 'Hello, I have a question about the lease.', timestamp: DateTime.now().subtract(Duration(minutes: 5))),
-    Message(sender: 'Landlord', text: 'Sure, what do you need to know?', timestamp: DateTime.now().subtract(Duration(minutes: 3))),
-  ];
-
+  final MessageService _messageService = MessageService();
   final TextEditingController _messageController = TextEditingController();
-
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
-      setState(() {
-        messages.add(Message(
-          sender: 'Landlord', // Change this based on the actual sender
-          text: _messageController.text,
-          timestamp: DateTime.now(),
-        ));
-        _messageController.clear();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Messages'),
+        title: Text("Chat"),
         backgroundColor: Colors.blueAccent,
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                return ListTile(
-                  title: Text(message.sender),
-                  subtitle: Text(message.text),
-                  trailing: Text(DateFormat('HH:mm').format(message.timestamp)),
+            child: StreamBuilder<List<Message>>(
+              stream: _messageService.getMessages(widget.chatId),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return CircularProgressIndicator();
+                var messages = snapshot.data!;
+                return ListView.builder(
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    var message = messages[index];
+                    return ListTile(
+                      title: Text(message.sender),
+                      subtitle: Text(message.text),
+                      trailing: Text(DateFormat('HH:mm').format(message.timestamp)),
+                    );
+                  },
                 );
               },
             ),
@@ -66,7 +64,16 @@ class _MessagingPageState extends State<MessagingPage> {
                 ),
                 SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: _sendMessage,
+                  onPressed: () async {
+                    if (_messageController.text.isNotEmpty) {
+                      await _messageService.sendMessage(
+                        widget.chatId,
+                        widget.senderId,
+                        _messageController.text,
+                      );
+                      _messageController.clear();
+                    }
+                  },
                   child: Text('Send'),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
