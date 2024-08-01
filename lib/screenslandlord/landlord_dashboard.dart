@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/messages/messagingPage.dart';
+import 'package:propertysmart2/messages/chat_service.dart'; // Import the chat service
 
 class LandlordDashboard extends StatelessWidget {
+  final String userId;
+
+  LandlordDashboard({required this.userId}); // Add userId to the constructor
+
+  final ChatService _chatService = ChatService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,8 +71,7 @@ class LandlordDashboard extends StatelessWidget {
                     context, Icons.assignment, 'Leases', LeaseAgreementsPage()),
                 _buildDashboardItem(context, Icons.build, 'Maintenance',
                     MaintenanceRequestsPage()),
-                _buildDashboardItem(
-                    context, Icons.message, 'Messages', MessagingPage()),
+                _buildDashboardItem(context, Icons.message, 'Messages', null), // Change to null for messages
               ],
             ),
           ),
@@ -74,13 +81,28 @@ class LandlordDashboard extends StatelessWidget {
   }
 
   Widget _buildDashboardItem(
-      BuildContext context, IconData icon, String title, Widget page) {
+      BuildContext context, IconData icon, String title, Widget? page) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
+      onTap: () async {
+        if (title == 'Messages') {
+          // Assuming 'tenantId' is the ID of the tenant you want to chat with
+          String tenantId = 'tenantId'; // This should be dynamic based on your logic
+          String chatId = await _chatService.createOrJoinChat(userId, tenantId);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MessagingPage(
+                chatId: chatId,
+                senderId: userId,
+              ),
+            ),
+          );
+        } else if (page != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        }
       },
       child: Container(
         decoration: BoxDecoration(

@@ -3,11 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:propertysmart2/constants/theme_data.dart'; // Import the themes file
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/messages/messagingPage.dart';
 import 'package:propertysmart2/pages/intro/splash_screen.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screens/forgot_password.dart';
 import 'package:propertysmart2/screens/profile_page.dart';
 import 'package:propertysmart2/screens/login_screen.dart';
+
+
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 
 Future<void> main() async {
@@ -60,9 +63,11 @@ class MyApp extends StatelessWidget {
             ),
         'AccountPage': (context) => AccountPage(),
         'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
-        'MessagingPage': (context) => MessagingPage(),
+        'MessagingPage': (context) => MessagingPage(chatId: '', senderId: '',),
         'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
-        'LandlordDashboard': (context) => LandlordDashboard(),
+
+        'LandlordDashboard': (context) =>  LandlordDashboard(userId: '',),
+
         'AddPropertyPage': (context) => AddPropertyPage(),
       },
     );
