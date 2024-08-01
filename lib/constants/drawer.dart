@@ -84,7 +84,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFF0D47A1),
             ),
             child: Column(
@@ -104,7 +104,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     CircleAvatar(
                       backgroundImage: _user?.photoURL != null
                           ? NetworkImage(_user!.photoURL!)
-                          : AssetImage('assets/images/default_avatar.jfif') as ImageProvider,
+                          : const AssetImage('assets/images/default_avatar.jfif') as ImageProvider,
                       radius: 30,
                     ),
                     const SizedBox(width: 10),
@@ -114,16 +114,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         children: [
                           Text(
                             _user!.displayName!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                             ),
                           ),
-                          Text(
-                            _user!.email!,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
+                          SizedBox(
+                            width: 150, // Adjust width as needed
+                            child: Text(
+                              _user!.email!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -211,9 +215,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     });
                     _applyFilters();
                   },
+
                   checkColor: Colors.white,
                   activeColor: Color(0xFF0D47A1),
                   tileColor: Color(0xFFE3F2FD),
+
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -223,7 +229,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       _buildActionButton(
                         'Reset Filters',
                         Colors.white,
-                        Color(0xFF0D47A1),
+                        const Color(0xFF0D47A1),
                             () {
                           setState(() {
                             selectedPriceRange = null;
@@ -236,7 +242,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                       _buildActionButton(
                         'Apply Filters',
-                        Color(0xFF0D47A1),
+                        const Color(0xFF0D47A1),
                         Colors.white,
                         _applyFilters,
                       ),
@@ -276,8 +282,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Text(value.toString()),
           );
         }).toList(),
+        
         dropdownColor: Color(0xFFE3F2FD),
         style: TextStyle(color: Color(0xFF0D47A1)),
+
       ),
     );
   }
@@ -303,7 +311,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),

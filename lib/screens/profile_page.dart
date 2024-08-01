@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
@@ -25,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   User? _user;
   File? _profileImage;
+  Uint8List? _webProfileImage; // For web image storage
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -105,6 +109,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
+    if (kIsWeb) {
+      // Skip requesting permissions on web
+      return;
+    }
     await [
       Permission.camera,
       Permission.photos,
@@ -113,11 +121,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _pickImage() async {
     await _checkAndRequestPermissions();
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
+    if (kIsWeb) {
+      // Use ImagePickerWeb for web platforms
+      final pickedFile = await ImagePickerWeb.getImageAsBytes();
+      if (pickedFile != null) {
+        setState(() {
+          _webProfileImage = pickedFile;
+        });
+      }
+    } else {
+      // Use ImagePicker for mobile platforms
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _profileImage = File(pickedFile.path);
+        });
+      }
     }
   }
 
@@ -154,8 +173,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      print('Error uploading image: $e'); // Log error
     }
   }
+
 
   Future<void> _saveProfile() async {
     try {
@@ -204,9 +225,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final theme = Theme.of(context); // Access the theme
+    final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       backgroundColor: Colors.blue[100], // Use a thin blue background color
       body: SingleChildScrollView(
         child: Column(
@@ -230,109 +259,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: CircleAvatar(
                               radius: size.width * 0.14,
                               backgroundColor: Colors.grey[500]?.withOpacity(0.5),
-                              backgroundImage: _profileImage != null
+                              backgroundImage: kIsWeb
+                                  ? (_webProfileImage != null
+                                  ? MemoryImage(_webProfileImage!)
+                                  : const AssetImage('assets/images/default_avatar.jfif')
+                              as ImageProvider)
+                                  : _profileImage != null
                                   ? FileImage(_profileImage!) as ImageProvider
                                   : (_user?.photoURL != null
                                   ? NetworkImage(_user!.photoURL!)
                                   : const AssetImage('assets/images/default_avatar.jfif')
                               as ImageProvider),
-                              child: _profileImage == null && (_user?.photoURL == null)
-                                  ? Icon(
-                                Icons.person,
-                                color: Colors.white,
-                                size: size.width * 0.1,
-                              )
-                                  : null,
+                              onBackgroundImageError: (_, __) {
+                                // Handle image loading error
+                                setState(() {
+                                  // Fallback to a default image or any other error handling
+                                });
+                              },
                             ),
                           ),
                         ),
                         Positioned(
                           bottom: 0,
-                          right: 0,
+                          right: 4,
                           child: Container(
-                            margin: const EdgeInsets.all(8),
                             height: size.width * 0.12,
                             width: size.width * 0.12,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.secondary, // Use theme color
+                              color: theme.colorScheme.primary,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.add,
                               color: Colors.white,
-                              size: size.width * 0.08,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Text(
+                    _userController.text,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    _emailController.text,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextInputField(
+                    controller: _userController,
+                    icon: Icons.person,
+                    hint: 'Name',
+                    inputType: TextInputType.name,
+                    inputAction: TextInputAction.next,
+                    color: theme.colorScheme.primary,
+                  ),
+                  TextInputField(
+                    controller: _emailController,
+                    icon: Icons.mail,
+                    hint: 'Email',
+                    inputType: TextInputType.emailAddress,
+                    inputAction: TextInputAction.next,
+                    color: theme.colorScheme.primary,
+                  ),
+                  TextInputField(
+                    controller: _bioController,
+                    icon: Icons.info_outline,
+                    hint: 'Bio',
+                    inputType: TextInputType.multiline,
+                    inputAction: TextInputAction.newline,
+                    color: theme.colorScheme.primary,
+                  ),
+                  TextInputField(
+                    controller: _phoneController,
+                    icon: Icons.phone,
+                    hint: 'Phone',
+                    inputType: TextInputType.phone,
+                    inputAction: TextInputAction.next,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  RoundedButton(
+                    buttonName: 'Save',
+                    onPressed: _handleSave,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    child: Text(
+                      'Sign Out',
+                      style: TextStyle(
+                        color: theme.colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            SizedBox(
-              height: size.width * 0.1,
-            ),
-            Column(
-              children: [
-                Text(
-                  _userController.text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary, // Use theme color
-                  ),
-                ),
-                Text(
-                  _emailController.text,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: theme.colorScheme.onBackground, // Use theme color
-                  ),
-                ),
-                const SizedBox(height: 30),
-                TextInputField(
-                  controller: _userController,
-                  icon: Icons.person,
-                  hint: 'Name',
-                  inputType: TextInputType.name,
-                  inputAction: TextInputAction.next,
-                  color: theme.colorScheme.primary, // Use theme color
-                ),
-                TextInputField(
-                  controller: _emailController,
-                  icon: Icons.mail,
-                  hint: 'Email',
-                  inputType: TextInputType.emailAddress,
-                  inputAction: TextInputAction.next,
-                  color: theme.colorScheme.primary, // Use theme color
-                ),
-                TextInputField(
-                  controller: _bioController,
-                  icon: Icons.person,
-                  hint: 'Short bio',
-                  inputType: TextInputType.multiline,
-                  inputAction: TextInputAction.newline,
-                  maxLines: 5,
-                  color: theme.colorScheme.primary, // Use theme color
-                ),
-                TextInputField(
-                  controller: _phoneController,
-                  icon: Icons.phone,
-                  hint: 'Phone number',
-                  inputType: TextInputType.phone,
-                  inputAction: TextInputAction.done,
-                  color: theme.colorScheme.primary, // Use theme color
-                ),
-                const SizedBox(height: 25),
-                RoundedButton(
-                  buttonName: 'Save Profile',
-                  onPressed: _handleSave,
-                  color: theme.colorScheme.primary, // Use theme color
-                ),
-                const SizedBox(height: 30),
-              ],
             ),
           ],
         ),
