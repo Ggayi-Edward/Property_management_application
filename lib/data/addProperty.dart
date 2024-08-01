@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddPropertyPage extends StatefulWidget {
   @override
@@ -18,38 +21,89 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   int _bathrooms = 1;
   bool _swimmingPool = false;
 
-  File? _mainImage;
-  List<File> _roomImages = [];
-  final _picker = ImagePicker();
+  String? _mainImageBase64;
+  List<String> _roomImagesBase64 = [];
 
   final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
+  String? _feedbackMessage;
 
   Future<void> _pickImage(bool isMainImage) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (isMainImage) {
-          _mainImage = File(pickedFile.path);
-        } else {
-          _roomImages.add(File(pickedFile.path));
-        }
-      });
-    }
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      if (files!.length == 1) {
+        final reader = html.FileReader();
+        reader.readAsDataUrl(files[0]);
+        reader.onLoadEnd.listen((e) {
+          final base64String = reader.result as String;
+          setState(() {
+            if (isMainImage) {
+              _mainImageBase64 = base64String;
+            } else {
+              _roomImagesBase64.add(base64String);
+            }
+          });
+        });
+      }
+    });
   }
 
-  void _saveProperty() {
+  Future<String> _uploadImage(String base64Image) async {
+    final ref = FirebaseStorage.instance.ref().child('property_images/${DateTime.now().toIso8601String()}.jpg');
+    final uploadTask = ref.putString(base64Image, format: PutStringFormat.dataUrl);
+    final snapshot = await uploadTask.whenComplete(() {});
+    return await snapshot.ref.getDownloadURL();
+  }
+
+  void _saveProperty() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Here you can add logic to save the property details and images to your database
-      print('Title: ${_titleController.text}');
-      print('Location: ${_locationController.text}');
-      print('Price: ${_priceController.text}');
-      print('Description: ${_descriptionController.text}');
-      print('Main Image: ${_mainImage?.path}');
-      print('Room Images: ${_roomImages.map((img) => img.path).toList()}');
-      print('WiFi: $_wifi');
-      print('Bedrooms: $_bedrooms');
-      print('Bathrooms: $_bathrooms');
-      print('Swimming Pool: $_swimmingPool');
+      setState(() {
+        _isSaving = true;
+        _feedbackMessage = null;
+      });
+
+      try {
+        String? mainImageUrl;
+        List<String> roomImageUrls = [];
+
+        if (_mainImageBase64 != null) {
+          mainImageUrl = await _uploadImage(_mainImageBase64!);
+        }
+
+        for (var imageBase64 in _roomImagesBase64) {
+          final imageUrl = await _uploadImage(imageBase64);
+          roomImageUrls.add(imageUrl);
+        }
+
+        await FirebaseFirestore.instance.collection('properties').add({
+          'title': _titleController.text,
+          'location': _locationController.text,
+          'price': _priceController.text,
+          'description': _descriptionController.text,
+          'mainImage': mainImageUrl,
+          'roomImages': roomImageUrls,
+          'wifi': _wifi,
+          'bedrooms': _bedrooms,
+          'bathrooms': _bathrooms,
+          'swimmingPool': _swimmingPool,
+        });
+
+        setState(() {
+          _feedbackMessage = 'Property saved successfully!';
+          _isSaving = false;
+        });
+
+        Navigator.pop(context);
+      } catch (e) {
+        setState(() {
+          _feedbackMessage = 'Error saving property: $e';
+          _isSaving = false;
+        });
+      }
     }
   }
 
@@ -176,9 +230,9 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                   icon: Icon(Icons.image),
                   label: Text('Pick Main Image'),
                 ),
-                if (_mainImage != null)
-                  Image.file(
-                    _mainImage!,
+                if (_mainImageBase64 != null)
+                  Image.memory(
+                    base64Decode(_mainImageBase64!.split(',').last),
                     height: 150,
                   ),
                 SizedBox(height: 10),
@@ -189,18 +243,36 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                 ),
                 Wrap(
                   spacing: 10,
-                  children: _roomImages.map((img) => Image.file(img, height: 100)).toList(),
+                  children: _roomImagesBase64.map((imgBase64) {
+                    return Image.memory(
+                      base64Decode(imgBase64.split(',').last),
+                      height: 100,
+                    );
+                  }).toList(),
                 ),
                 SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _saveProperty,
-                    child: Text('Save Property'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                if (_isSaving)
+                  Center(child: CircularProgressIndicator())
+                else
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _saveProperty,
+                      child: Text('Save Property'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                      ),
                     ),
                   ),
-                ),
+                if (_feedbackMessage != null)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _feedbackMessage!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
