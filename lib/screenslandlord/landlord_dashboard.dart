@@ -123,7 +123,7 @@ class LandlordDashboard extends StatelessWidget {
             Icon(
               icon,
               size: 50,
-              color: Colors.blueAccent,
+              color: Color(0xFF0D47A1),
             ),
             SizedBox(height: 10),
             Text(
@@ -131,7 +131,7 @@ class LandlordDashboard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+                color: Color(0xFF0D47A1),
               ),
             ),
           ],
