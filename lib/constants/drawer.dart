@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
-import 'package:propertysmart2/messages/messagingPage.dart';
-import 'package:propertysmart2/messages/PropertyService.dart';
-import 'package:propertysmart2/messages/chat_service.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
   final bool showFilters;
 
   const CustomDrawer({
-    Key? key,
+    super.key,
     this.onFilterApplied,
     this.showFilters = false,
-  }) : super(key: key);
+  });
 
   @override
   _CustomDrawerState createState() => _CustomDrawerState();
@@ -26,8 +24,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
   bool? swimmingPool;
   User? _user;
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final ChatService _chatService = ChatService();
-  final PropertyService _propertyService = PropertyService();
 
   @override
   void initState() {
@@ -42,43 +38,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
     });
   }
 
-  Future<void> _navigateToMessagingPage(BuildContext context) async {
-    if (_user != null) {
-      // Replace 'propertyId' with the actual ID of the property being viewed
-      String propertyId = 'propertyId';
-      String? landlordId = await _propertyService.getLandlordId(propertyId);
-      if (landlordId != null) {
-        String chatId = await _chatService.createOrJoinChat(_user!.uid, landlordId);
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MessagingPage(
-              chatId: chatId,
-              senderId: _user!.uid,
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to find landlord information'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('User not logged in'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -140,15 +103,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
           _buildDrawerItem(Icons.home, 'Home', () {
             Navigator.pop(context);
-            Navigator.pushReplacementNamed(context, 'IntroPageView');
+            Navigator.pushReplacementNamed(context, 'LandlordDashboard');
           }),
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, 'ProfileScreen');
+            Navigator.pushNamed(context, 'ProfileScreenLandlord');
           }),
-          _buildDrawerItem(Icons.email, 'Messages', () {
-            _navigateToMessagingPage(context);
-          }),
+          _buildDrawerItem(
+            themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
+            themeNotifier.themeMode == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
+                () {
+              themeNotifier.toggleTheme(themeNotifier.themeMode != ThemeMode.dark);
+            },
+          ),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
             try {
               await _authService.signOut();
@@ -168,90 +135,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             }
           }),
-          if (widget.showFilters) ...[
-            ExpansionTile(
-              leading: const Icon(Icons.filter_list),
-              title: const Text('Filters'),
-              children: <Widget>[
-                _buildFilterDropdown<String>(
-                  'Price Range',
-                  selectedPriceRange,
-                  <String>['All', 'Below \$100k', '\$100k - \$500k', 'Above \$500k'],
-                      (value) {
-                    setState(() {
-                      selectedPriceRange = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                _buildFilterDropdown<int>(
-                  'Bedrooms',
-                  selectedBedrooms,
-                  <int>[1, 2, 3, 4, 5],
-                      (value) {
-                    setState(() {
-                      selectedBedrooms = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                _buildFilterDropdown<int>(
-                  'Bathrooms',
-                  selectedBathrooms,
-                  <int>[1, 2, 3, 4, 5],
-                      (value) {
-                    setState(() {
-                      selectedBathrooms = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('Swimming Pool'),
-                  value: swimmingPool ?? false,
-                  onChanged: (value) {
-                    setState(() {
-                      swimmingPool = value;
-                    });
-                    _applyFilters();
-                  },
-
-                  checkColor: Colors.white,
-                  activeColor: Color(0xFF0D47A1),
-                  tileColor: Color(0xFFE3F2FD),
-
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildActionButton(
-                        'Reset Filters',
-                        Colors.white,
-                        const Color(0xFF0D47A1),
-                            () {
-                          setState(() {
-                            selectedPriceRange = null;
-                            selectedBedrooms = null;
-                            selectedBathrooms = null;
-                            swimmingPool = null;
-                          });
-                          _applyFilters();
-                        },
-                      ),
-                      _buildActionButton(
-                        'Apply Filters',
-                        const Color(0xFF0D47A1),
-                        Colors.white,
-                        _applyFilters,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+          // Filters section removed
         ],
       ),
     );
@@ -262,67 +146,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
       leading: Icon(icon),
       title: Text(title),
       onTap: onTap,
-    );
-  }
-
-  Widget _buildFilterDropdown<T>(
-      String title,
-      T? selectedValue,
-      List<T> values,
-      ValueChanged<T?> onChanged,
-      ) {
-    return ListTile(
-      title: Text(title),
-      trailing: DropdownButton<T>(
-        value: selectedValue,
-        onChanged: onChanged,
-        items: values.map((T value) {
-          return DropdownMenuItem<T>(
-            value: value,
-            child: Text(value.toString()),
-          );
-        }).toList(),
-        
-        dropdownColor: Color(0xFFE3F2FD),
-        style: TextStyle(color: Color(0xFF0D47A1)),
-
-      ),
-    );
-  }
-
-  void _applyFilters() {
-    if (widget.onFilterApplied != null) {
-      widget.onFilterApplied!({
-        'priceRange': selectedPriceRange,
-        'bedrooms': selectedBedrooms,
-        'bathrooms': selectedBathrooms,
-        'swimmingPool': swimmingPool,
-      });
-    }
-  }
-
-  Widget _buildActionButton(
-      String text,
-      Color backgroundColor,
-      Color textColor,
-      VoidCallback onPressed,
-      ) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 16,
-        ),
-      ),
     );
   }
 }

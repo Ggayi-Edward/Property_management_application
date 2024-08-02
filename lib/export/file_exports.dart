@@ -38,3 +38,4 @@ export 'package:propertysmart2/messages/messagingPage.dart';
 export 'package:propertysmart2/model/mantenance_request.dart';
 export 'package:propertysmart2/screenslandlord/maintenance_RequestsPage.dart';
 export 'package:propertysmart2/data/addProperty.dart';
+export 'package:propertysmart2/screens/forgot_password.dart';
