@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 
 class AddPropertyPage extends StatefulWidget {
   @override
@@ -54,8 +52,17 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   }
 
   Future<String> _uploadImage(String base64Image) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not authenticated');
+    }
+
     final ref = FirebaseStorage.instance.ref().child('property_images/${DateTime.now().toIso8601String()}.jpg');
-    final uploadTask = ref.putString(base64Image, format: PutStringFormat.dataUrl);
+    final uploadTask = ref.putString(
+      base64Image,
+      format: PutStringFormat.dataUrl,
+      metadata: SettableMetadata(customMetadata: {'ownerId': user.uid}),
+    );
     final snapshot = await uploadTask.whenComplete(() {});
     return await snapshot.ref.getDownloadURL();
   }
@@ -68,7 +75,6 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       });
 
       try {
-        // Ensure the user is authenticated
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
           setState(() {
@@ -100,7 +106,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
           'bedrooms': _bedrooms,
           'bathrooms': _bathrooms,
           'swimmingPool': _swimmingPool,
-          'userId': user.uid, // Save the user's ID with the property
+          'userId': user.uid,
         });
 
         setState(() {
@@ -137,19 +143,19 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                       Text(
                         'PropertySmart',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (!isCollapsed)
                         Text(
                           'Add Property',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 14,
-                                color: Colors.white,
-                              ),
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -219,7 +225,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         keyboardType: keyboardType,
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter $label.toLowerCase()';
+            return 'Please enter ${label.toLowerCase()}';
           }
           return null;
         },
@@ -291,12 +297,12 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       child: _isSaving
           ? CircularProgressIndicator()
           : ElevatedButton(
-              onPressed: _saveProperty,
-              child: Text('Save Property'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0D47A1),
-              ),
-            ),
+        onPressed: _saveProperty,
+        child: Text('Save Property'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF0D47A1),
+        ),
+      ),
     );
   }
 }

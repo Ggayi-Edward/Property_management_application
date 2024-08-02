@@ -1,31 +1,86 @@
+import 'dart:io';
+import 'package:path/path.dart' as path; // Import the path package with alias
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:cloud_firestore/cloud_firestore.dart';
-// ignore: depend_on_referenced_packages
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:propertysmart2/data/addProperty.dart';
-// ignore: unused_import
-import 'add_property_page.dart';
+
 
 class PropertyListingsPage extends StatelessWidget {
+  Future<void> _uploadFile(String filePath, String userId) async {
+    final file = File(filePath);
+    final fileName = path.basename(filePath); // Get the file name using basename
+    final storageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+
+    final uploadTask = storageRef.putFile(
+      file,
+      SettableMetadata(
+        customMetadata: {'ownerId': userId},
+      ),
+    );
+
+    await uploadTask.whenComplete(() => print('File uploaded successfully.'));
+  }
+
   Future<void> _deleteProperty(String propertyId, String mainImageUrl, List<String> roomImageUrls) async {
     try {
-      if (mainImageUrl.isNotEmpty) {
-        await FirebaseStorage.instance.refFromURL(mainImageUrl).delete();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('User not authenticated');
+        return;
       }
-      for (String imgUrl in roomImageUrls) {
-        if (imgUrl.isNotEmpty) {
-          await FirebaseStorage.instance.refFromURL(imgUrl).delete();
+
+      // Delete the main image if owned by the user
+      if (mainImageUrl.isNotEmpty) {
+        final mainImageRef = FirebaseStorage.instance.refFromURL(mainImageUrl);
+        try {
+          final metadata = await mainImageRef.getMetadata();
+          if (metadata.customMetadata?['ownerId'] == user.uid) {
+            await mainImageRef.delete();
+          } else {
+            print('User does not own this image');
+          }
+        } catch (e) {
+          print('Error retrieving metadata or deleting main image: $e');
         }
       }
+
+      // Delete room images if owned by the user
+      for (String imgUrl in roomImageUrls) {
+        if (imgUrl.isNotEmpty) {
+          final imgRef = FirebaseStorage.instance.refFromURL(imgUrl);
+          try {
+            final metadata = await imgRef.getMetadata();
+            if (metadata.customMetadata?['ownerId'] == user.uid) {
+              await imgRef.delete();
+            } else {
+              print('User does not own this image');
+            }
+          } catch (e) {
+            print('Error retrieving metadata or deleting room image: $e');
+          }
+        }
+      }
+
+      // Delete the property document
       await FirebaseFirestore.instance.collection('properties').doc(propertyId).delete();
+      print('Property deleted successfully.');
     } catch (e) {
       print('Error deleting property: $e');
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Scaffold(
+        body: Center(child: Text('Please log in to view your properties.')),
+      );
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -43,20 +98,19 @@ class PropertyListingsPage extends StatelessWidget {
                       Text(
                         'PropertySmart',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (!isCollapsed)
                         Text(
                           'Property Listing',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -82,7 +136,10 @@ class PropertyListingsPage extends StatelessWidget {
             ],
           ),
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('properties').snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection('properties')
+                .where('userId', isEqualTo: user.uid)
+                .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
                 return SliverFillRemaining(
@@ -104,7 +161,7 @@ class PropertyListingsPage extends StatelessWidget {
 
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                      (context, index) {
                     final property = properties[index];
                     final data = property.data() as Map<String, dynamic>?;
 
@@ -157,22 +214,22 @@ class PropertyListingsPage extends StatelessWidget {
                                 Wrap(
                                   spacing: 10,
                                   children: roomImages.map(
-                                    (imgUrl) => imgUrl.isNotEmpty
+                                        (imgUrl) => imgUrl.isNotEmpty
                                         ? Image.network(
-                                            imgUrl,
-                                            height: 100,
-                                            loadingBuilder: (context, child, progress) {
-                                              if (progress == null) {
-                                                return child;
-                                              } else {
-                                                return Center(child: CircularProgressIndicator());
-                                              }
-                                            },
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Center(child: Icon(Icons.error, color: Colors.red));
-                                            },
-                                          )
-                                        : Container(), // Handle empty URL case
+                                      imgUrl,
+                                      height: 100,
+                                      loadingBuilder: (context, child, progress) {
+                                        if (progress == null) {
+                                          return child;
+                                        } else {
+                                          return Center(child: CircularProgressIndicator());
+                                        }
+                                      },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Center(child: Icon(Icons.error, color: Colors.red));
+                                      },
+                                    )
+                                        : Container(),
                                   ).toList(),
                                 ),
                               ],
