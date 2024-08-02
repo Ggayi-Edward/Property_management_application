@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class AddPropertyPage extends StatefulWidget {
   @override
@@ -14,7 +16,6 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
 
   bool _wifi = false;
   int _bedrooms = 1;
@@ -67,6 +68,16 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       });
 
       try {
+        // Ensure the user is authenticated
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          setState(() {
+            _feedbackMessage = 'User not authenticated. Please log in.';
+            _isSaving = false;
+          });
+          return;
+        }
+
         String? mainImageUrl;
         List<String> roomImageUrls = [];
 
@@ -83,13 +94,13 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
           'title': _titleController.text,
           'location': _locationController.text,
           'price': _priceController.text,
-          'description': _descriptionController.text,
           'mainImage': mainImageUrl,
           'roomImages': roomImageUrls,
           'wifi': _wifi,
           'bedrooms': _bedrooms,
           'bathrooms': _bathrooms,
           'swimmingPool': _swimmingPool,
+          'userId': user.uid, // Save the user's ID with the property
         });
 
         setState(() {
@@ -110,44 +121,87 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Property'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTextFormField('Title', _titleController),
-                _buildTextFormField('Location', _locationController),
-                _buildTextFormField('Price', _priceController, TextInputType.number),
-                _buildTextFormField('Description', _descriptionController),
-                _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
-                _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
-                _buildSliderRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value.toInt()), 1, 10),
-                _buildSliderRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value.toInt()), 1, 10),
-                _buildImagePicker('Pick Main Image', () => _pickImage(true), _mainImageBase64),
-                _buildImagePicker('Pick Room Images', () => _pickImage(false), null, _roomImagesBase64),
-                SizedBox(height: 20),
-                _buildSaveButton(),
-                if (_feedbackMessage != null)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        _feedbackMessage!,
-                        style: TextStyle(color: Colors.red),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 150.0,
+            pinned: true,
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'PropertySmart',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
                       ),
+                      if (!isCollapsed)
+                        Text(
+                          'Add Property',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0D47A1),
                     ),
                   ),
-              ],
+                );
+              },
             ),
           ),
-        ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTextFormField('Title', _titleController),
+                        _buildTextFormField('Location', _locationController),
+                        _buildTextFormField('Price', _priceController, TextInputType.number),
+                        _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
+                        _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
+                        _buildDropdownRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value!), 1, 10),
+                        _buildDropdownRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value!), 1, 10),
+                        _buildImagePicker('Pick Main Image', () => _pickImage(true), _mainImageBase64),
+                        _buildImagePicker('Pick Room Images', () => _pickImage(false), null, _roomImagesBase64),
+                        SizedBox(height: 20),
+                        _buildSaveButton(),
+                        if (_feedbackMessage != null)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                _feedbackMessage!,
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -159,7 +213,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.blue),
+          labelStyle: TextStyle(color: Color(0xFF0D47A1)),
           border: OutlineInputBorder(),
         ),
         keyboardType: keyboardType,
@@ -176,27 +230,30 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged) {
     return Row(
       children: [
-        Text(label, style: TextStyle(color: Colors.blue)),
+        Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
         Switch(value: value, onChanged: onChanged),
       ],
     );
   }
 
-  Widget _buildSliderRow(String label, int value, ValueChanged<double> onChanged, int min, int max) {
+  Widget _buildDropdownRow(String label, int value, ValueChanged<int?> onChanged, int min, int max) {
     return Row(
       children: [
-        Text(label, style: TextStyle(color: Colors.blue)),
-        Expanded(
-          child: Slider(
-            value: value.toDouble(),
-            min: min.toDouble(),
-            max: max.toDouble(),
-            divisions: max - min,
-            label: '$value',
-            onChanged: onChanged,
-          ),
+        Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
+        SizedBox(width: 20),
+        DropdownButton<int>(
+          value: value,
+          items: List.generate(max - min + 1, (index) => index + min).map((int value) {
+            return DropdownMenuItem<int>(
+              value: value,
+              child: Text(
+                value.toString(),
+                style: TextStyle(color: Color(0xFF0D47A1), fontSize: 14),
+              ),
+            );
+          }).toList(),
+          onChanged: onChanged,
         ),
-        Text('$value', style: TextStyle(color: Colors.blue)),
       ],
     );
   }
@@ -207,8 +264,8 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       children: [
         TextButton.icon(
           onPressed: onPressed,
-          icon: Icon(Icons.image, color: Colors.blue),
-          label: Text(label, style: TextStyle(color: Colors.blue)),
+          icon: Icon(Icons.image, color: Color(0xFF0D47A1)),
+          label: Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
         ),
         if (imageBase64 != null)
           Image.memory(
@@ -232,14 +289,14 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   Widget _buildSaveButton() {
     return Center(
       child: _isSaving
-        ? CircularProgressIndicator()
-        : ElevatedButton(
-            onPressed: _saveProperty,
-            child: Text('Save Property'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+          ? CircularProgressIndicator()
+          : ElevatedButton(
+              onPressed: _saveProperty,
+              child: Text('Save Property'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF0D47A1),
+              ),
             ),
-          ),
     );
   }
 }
