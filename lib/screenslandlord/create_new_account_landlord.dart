@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
+import 'package:propertysmart2/export/file_exports.dart';
 
 class CreateNewAccountLandlord extends StatefulWidget {
   const CreateNewAccountLandlord({super.key});
@@ -86,101 +87,113 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final ThemeData theme = Theme.of(context);
     return Stack(
       children: [
-        BackgroundImage(image: 'assets/images/background6.jfif'),
+        Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background6.jfif'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: size.width * 0.1),
-                Center(
-                  child: ClipOval(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: 6,
-                        sigmaY: 6,
-                      ),
-                      child: CircleAvatar(
-                        radius: size.width * 0.14,
-                        backgroundColor: Colors.grey[500]?.withOpacity(0.5),
-                        child: Icon(
-                          FontAwesomeIcons.userPlus,
-                          color: Colors.white,
-                          size: size.width * 0.1,
+          body: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary, // Use very light blue from theme
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: size.width * 0.1),
+                  Center(
+                    child: ClipOval(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 6,
+                          sigmaY: 6,
+                        ),
+                        child: CircleAvatar(
+                          radius: size.width * 0.14,
+                          backgroundColor: Colors.grey[500]?.withOpacity(0.5),
+                          child: Icon(
+                            FontAwesomeIcons.userPlus,
+                            color: Colors.white,
+                            size: size.width * 0.1,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: size.width * 0.1),
-                Column(
-                  children: [
-                    TextInputField(
-                      controller: _userController,
-                      icon: Icons.person,
-                      hint: 'User',
-                      inputType: TextInputType.name,
-                      inputAction: TextInputAction.next,
-                    ),
-                    TextInputField(
-                      controller: _emailController,
-                      icon: Icons.mail,
-                      hint: 'Email',
-                      inputType: TextInputType.emailAddress,
-                      inputAction: TextInputAction.next,
-                    ),
-                    PasswordInput(
-                      controller: _passwordController,
-                      icon: Icons.lock,
-                      hint: 'Password',
-                      inputAction: TextInputAction.next,
-                    ),
-                    PasswordInput(
-                      controller: _confirmPasswordController,
-                      icon: Icons.lock,
-                      hint: 'Confirm Password',
-                      inputAction: TextInputAction.done,
-                    ),
-                    SizedBox(height: 25),
-                    if (_isLoading) CircularProgressIndicator(),
-                    SizedBox(height: 30),
-                    RoundedButton(
-                      buttonName: 'Sign Up',
-                      onPressed: _createAccount,
-                    ),
-                    SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account?',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, 'LoginScreenLandlord');
-                          },
-                          child: Text(
-                            'Login',
+                  SizedBox(height: size.width * 0.1),
+                  Column(
+                    children: [
+                      TextInputField(
+                        controller: _userController,
+                        icon: Icons.person,
+                        hint: 'User',
+                        inputType: TextInputType.name,
+                        inputAction: TextInputAction.next,
+                      ),
+                      TextInputField(
+                        controller: _emailController,
+                        icon: Icons.mail,
+                        hint: 'Email',
+                        inputType: TextInputType.emailAddress,
+                        inputAction: TextInputAction.next,
+                      ),
+                      PasswordInput(
+                        controller: _passwordController,
+                        icon: Icons.lock,
+                        hint: 'Password',
+                        inputAction: TextInputAction.next,
+                      ),
+                      PasswordInput(
+                        controller: _confirmPasswordController,
+                        icon: Icons.lock,
+                        hint: 'Confirm Password',
+                        inputAction: TextInputAction.done,
+                      ),
+                      SizedBox(height: 25),
+                      if (_isLoading) CircularProgressIndicator(),
+                      SizedBox(height: 30),
+                      RoundedButton(
+                        buttonName: 'Sign Up',
+                        onPressed: _createAccount,
+                      ),
+                      SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account?',
                             style: TextStyle(
-                              color: Colors.blue,
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, 'LoginScreenLandlord');
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                color: Colors.blueAccent,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

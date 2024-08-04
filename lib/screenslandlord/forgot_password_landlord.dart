@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,81 +40,77 @@ class _ForgotPasswordLandlordState extends State<ForgotPasswordLandlord> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Stack(
-      children: [
-        SizedBox(height: size.height * 0.1),
-        BackgroundImage(image: 'assets/images/background2.jpg'),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              ),
-            ),
-            title: Text(
-              'Forgot Password',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: size.width * 0.8,
-                  child: Text(
-                    'Enter your email and we will send the instructions to reset your password',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextInputField(
-                  controller: _emailController,
-                  icon: Icons.mail,
-                  hint: 'Email',
-                  inputType: TextInputType.emailAddress,
-                  inputAction: TextInputAction.done,
-                ),
-                SizedBox(height: 20),
-                if (_isLoading) CircularProgressIndicator(),
-                if (_message.isNotEmpty)
-                  Text(
-                    _message,
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                SizedBox(height: 20),
-                RoundedButton(
-                  buttonName: 'Send',
-                  onPressed: _sendPasswordResetEmail,
-                ),
-              ],
-            ),
+    final theme = Theme.of(context); // Ensure you have the theme context
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.secondary, // Light blue background color
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
           ),
         ),
-      ],
+        title: Text(
+          'Forgot Password',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: size.width * 0.8,
+              child: Text(
+                'Enter your email and we will send the instructions to reset your password',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 20),
+            TextInputField(
+              controller: _emailController,
+              icon: Icons.mail,
+              hint: 'Email',
+              inputType: TextInputType.emailAddress,
+              inputAction: TextInputAction.done,
+            ),
+            SizedBox(height: 20),
+            if (_isLoading) CircularProgressIndicator(),
+            if (_message.isNotEmpty)
+              Text(
+                _message,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            SizedBox(height: 20),
+            RoundedButton(
+              buttonName: 'Send',
+              onPressed: _sendPasswordResetEmail,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

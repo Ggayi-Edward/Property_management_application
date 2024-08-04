@@ -69,104 +69,95 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        BackgroundImage(
-          image: 'assets/images/background1.jpeg',
-        ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(
-            children: [
-              Flexible(
-                child: Center(
-                  child: Text(
-                    'Property Smart',
-                    style: TextStyle(
-                      color: Color(0xFF304FFE),
-                      fontSize: 55,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+    final ThemeData theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.secondary, // Very Light Blue
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Title
+            Center(
+              child: Text(
+                'Property Smart',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.primary, // Dark Blue
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              if (_errorMessage.isNotEmpty)
-                Text(
+            ),
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
                   _errorMessage,
                   style: TextStyle(
                     color: Colors.red,
                     fontSize: 16,
                   ),
                 ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  TextInputField(
-                    controller: _emailController,
-                    icon: Icons.mail,
-                    hint: 'Email',
-                    inputType: TextInputType.emailAddress,
-                    inputAction: TextInputAction.next,
-                  ),
-                  PasswordInput(
-                    controller: _passwordController,
-                    icon: Icons.lock,
-                    hint: 'Password',
-                    inputType: TextInputType.text,
-                    inputAction: TextInputAction.done,
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, 'ForgotPassword'),
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  _isLoading
-                      ? CircularProgressIndicator()
-                      : RoundedButton(
-                    buttonName: 'Login',
-                    onPressed: _login,
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                ],
               ),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(context, 'CreateAccount'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        width: 1,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+            // Form Fields and Buttons
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextInputField(
+                  controller: _emailController,
+                  icon: Icons.mail,
+                  hint: 'Email',
+                  inputType: TextInputType.emailAddress,
+                  inputAction: TextInputAction.next,
+                ),
+                SizedBox(height: 16),
+                PasswordInput(
+                  controller: _passwordController,
+                  icon: Icons.lock,
+                  hint: 'Password',
+                  inputType: TextInputType.text,
+                  inputAction: TextInputAction.done,
+                ),
+                SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, 'ForgotPassword'),
                   child: Text(
-                    'Create New Account',
+                    'Forgot Password?',
+                    textAlign: TextAlign.right,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary, // Dark Blue
+                      fontSize: 16,
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
+                SizedBox(height: 25),
+                _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : RoundedButton(
+                  buttonName: 'Login',
+                  onPressed: _login,
+                ),
+                SizedBox(height: 25),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, 'CreateAccount'),
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Create New Account',
+                      style: TextStyle(
+                        color: theme.colorScheme.primary, // Dark Blue
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

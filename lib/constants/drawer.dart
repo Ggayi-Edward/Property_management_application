@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_notifier.dart';
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:propertysmart2/export/file_exports.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -19,7 +25,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   int? selectedBedrooms;
   int? selectedBathrooms;
   bool? swimmingPool;
-  User? _user; // User information
+  User? _user;
   final FirebaseAuthService _authService = FirebaseAuthService();
 
   @override
@@ -37,22 +43,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
+<<<<<<< HEAD
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: const [Color(0xFF304FFE), Colors.lightBlueAccent],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
+=======
+            decoration: const BoxDecoration(
+              color: Color(0xFF0D47A1),
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // PropertySmart text
                 const Text(
                   'PropertySmart',
                   style: TextStyle(
@@ -62,13 +74,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                // Avatar, Username, and Email in a Row
                 Row(
                   children: [
                     CircleAvatar(
                       backgroundImage: _user?.photoURL != null
                           ? NetworkImage(_user!.photoURL!)
-                          : AssetImage('assets/images/default_avatar.jfif') as ImageProvider,
+                          : const AssetImage('assets/images/default_avatar.jfif') as ImageProvider,
                       radius: 30,
                     ),
                     const SizedBox(width: 10),
@@ -78,16 +89,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         children: [
                           Text(
                             _user!.displayName!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                             ),
                           ),
-                          Text(
-                            _user!.email!,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
+                          SizedBox(
+                            width: 150, // Adjust width as needed
+                            child: Text(
+                              _user!.email!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -98,18 +113,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ],
             ),
           ),
-          // Existing Drawer Items
           _buildDrawerItem(Icons.home, 'Home', () {
             Navigator.pop(context);
-            Navigator.pushReplacementNamed(context, 'IntroPageView');
+            Navigator.pushReplacementNamed(context, 'LandlordDashboard');
           }),
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, 'ProfileScreen');
+            Navigator.pushNamed(context, 'ProfileScreenLandlord');
           }),
-          _buildDrawerItem(Icons.settings, 'Settings', () {
-            Navigator.pop(context);
-          }),
+          _buildDrawerItem(
+            themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
+            themeNotifier.themeMode == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
+                () {
+              themeNotifier.toggleTheme(themeNotifier.themeMode != ThemeMode.dark);
+            },
+          ),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
             try {
               await _authService.signOut();
@@ -129,58 +147,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             }
           }),
-          // New Filter Section (Conditional)
-          if (widget.showFilters) ...[
-            ExpansionTile(
-              leading: const Icon(Icons.filter_list),
-              title: const Text('Filters'),
-              children: <Widget>[
-                _buildFilterDropdown<String>(
-                  'Price Range',
-                  selectedPriceRange,
-                  <String>['All', 'Below \$100k', '\$100k - \$500k', 'Above \$500k'],
-                      (value) {
-                    setState(() {
-                      selectedPriceRange = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                _buildFilterDropdown<int>(
-                  'Bedrooms',
-                  selectedBedrooms,
-                  <int>[1, 2, 3, 4, 5],
-                      (value) {
-                    setState(() {
-                      selectedBedrooms = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                _buildFilterDropdown<int>(
-                  'Bathrooms',
-                  selectedBathrooms,
-                  <int>[1, 2, 3, 4, 5],
-                      (value) {
-                    setState(() {
-                      selectedBathrooms = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-                CheckboxListTile(
-                  title: const Text('Swimming Pool'),
-                  value: swimmingPool ?? false,
-                  onChanged: (value) {
-                    setState(() {
-                      swimmingPool = value;
-                    });
-                    _applyFilters();
-                  },
-                ),
-              ],
-            ),
-          ],
+          // Filters section removed
         ],
       ),
     );
@@ -192,37 +159,5 @@ class _CustomDrawerState extends State<CustomDrawer> {
       title: Text(title),
       onTap: onTap,
     );
-  }
-
-  Widget _buildFilterDropdown<T>(
-      String title,
-      T? selectedValue,
-      List<T> values,
-      ValueChanged<T?> onChanged,
-      ) {
-    return ListTile(
-      title: Text(title),
-      trailing: DropdownButton<T>(
-        value: selectedValue,
-        onChanged: onChanged,
-        items: values.map((T value) {
-          return DropdownMenuItem<T>(
-            value: value,
-            child: Text(value.toString()),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  void _applyFilters() {
-    if (widget.onFilterApplied != null) {
-      widget.onFilterApplied!({
-        'priceRange': selectedPriceRange,
-        'bedrooms': selectedBedrooms,
-        'bathrooms': selectedBathrooms,
-        'swimmingPool': swimmingPool,
-      });
-    }
   }
 }

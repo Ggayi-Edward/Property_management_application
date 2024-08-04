@@ -74,13 +74,31 @@ dev_dependencies:
   font_awesome_flutter: ^10.7.0
   fluttertoast: ^8.2.6
   cloud_firestore: ^5.1.0
+<<<<<<< HEAD
   url_launcher: ^6.0.9
 <<<<<<< HEAD
 =======
+=======
+  firebase_auth: ^5.1.2
+  firebase_storage: ^12.1.1
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
   image_picker: ^1.1.2
   flare_flutter: ^3.0.2
   flutter_animate: ^4.5.0
   intl: ^0.19.0
+  firebase_messaging: ^15.0.3
+  firebase_analytics: ^11.2.0
+  firebase_app_check: ^0.3.0+3
+  permission_handler: ^11.3.1
+  file_picker: ^8.0.6
+  url_launcher: ^6.3.0
+  flutterwave_standard: ^1.0.8
+  masonry_grid: ^1.0.0
+  image_picker_web: ^4.0.0
+  provider: ^6.1.2
+  path: ^1.9.0
+
+
  
 >>>>>>> 8018c471147bbe25476b3e399c8d7d0d612cfa37
 

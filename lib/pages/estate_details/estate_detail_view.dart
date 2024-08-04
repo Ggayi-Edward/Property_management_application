@@ -1,5 +1,9 @@
 import 'package:propertysmart2/export/file_exports.dart';
+<<<<<<< HEAD
 import 'package:propertysmart2/pages/estate_details/ContactAgentPage.dart';
+=======
+import 'package:stacked/stacked.dart';
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -20,18 +24,59 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
       viewModelBuilder: () => EstateDetailsViewModel(),
       builder: (context, viewModel, _) {
         return Scaffold(
-          drawer: CustomDrawer(), // Add the CustomDrawer here
+          drawer: CustomDrawer(), // Ensure only one CustomDrawer is used
           body: CustomScrollView(
             slivers: [
+              // New SliverAppBar with title and subtitle
               SliverAppBar(
-                expandedHeight: MediaQuery.of(context).size.height * 0.4,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: ClipPath(
-                    clipper: UpwardArcClipper(),
-                    child: Image.asset(
-                      widget.estate.image, // Replace with Image.asset
-                      fit: BoxFit.cover,
-                    ),
+                expandedHeight: 150.0,
+                pinned: true,
+                flexibleSpace: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                    return FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'PropertySmart',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (!isCollapsed)
+                            Text(
+                              'House Details',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                      background: Container(
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0D47A1),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Remove SliverAppBar for estate details image and use SliverToBoxAdapter instead
+              SliverToBoxAdapter(
+                child: ClipPath(
+                  clipper: UpwardArcClipper(),
+                  child: Image.asset(
+                    widget.estate.image, // Replace with Image.asset
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.3, // Adjusted height
                   ),
                 ),
               ),
@@ -247,7 +292,11 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PaymentPage(landlordMobileMoneyNumber: '',)),
+                              MaterialPageRoute(
+                                  builder: (context) => PaymentPage(
+                                    landlordMobileMoneyNumber: '',
+                                    landlordEmail: '',
+                                  )),
                             );
                           },
                           child: Container(
@@ -255,11 +304,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             height: 50,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              gradient: const LinearGradient(
-                                colors: [Colors.blue, Colors.lightBlueAccent],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                              color: Color(0xFF0D47A1),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.blueAccent.withOpacity(0.5),
@@ -282,18 +327,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ContactAgentPage()),
-                            );
-                          },
-                          child: const Text(
-                            'Contact Agent',
-                            style: TextStyle(color: Colors.green),
-                          ),
-                        ),
+                        // Removed Contact Agent button
                       ],
                     ),
                   ),

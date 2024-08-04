@@ -8,11 +8,34 @@ class PaymentPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantMobileNumberController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
-  final String landlordMobileMoneyNumber;
+  final TextEditingController _searchController = TextEditingController();
 
-  PaymentPage({required this.landlordMobileMoneyNumber});
+  final String landlordEmail; // Use landlord's email to map to subaccount ID
+
+  PaymentPage({required this.landlordEmail, required String landlordMobileMoneyNumber});
+
+  String _selectedNetwork = "VODAFONE"; // Default network
+
+  // Example data structure to store landlord information
+  final Map<String, String> landlordSubaccounts = {
+    'landlord1@example.com': 'RS_FF6A27F50B9A8A6711B582A85A344A79',
+    'landlord2@example.com': 'RS_1234567890ABCDEFGHIJKL',
+    // Add more landlords as needed
+  };
+
+  String? getSubaccountId(String landlordEmail) {
+    return landlordSubaccounts[landlordEmail];
+  }
 
   void _makePayment(BuildContext context) async {
+    final subaccountId = getSubaccountId(landlordEmail);
+    if (subaccountId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid landlord information')),
+      );
+      return;
+    }
+
     final Customer customer = Customer(
       name: _nameController.text,
       phoneNumber: _tenantMobileNumberController.text,
@@ -21,15 +44,18 @@ class PaymentPage extends StatelessWidget {
 
     final Flutterwave flutterwave = Flutterwave(
       context: context,
-      publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X",
+      publicKey: "FLWPUBK_TEST",
       currency: "UGX",
-      amount: _amountController.text, // Use the entered amount
+      amount: _amountController.text,
       customer: customer,
       paymentOptions: "mobilemoneyuganda",
       customization: Customization(title: "House Rental Payment"),
       isTestMode: true,
       txRef: DateTime.now().millisecondsSinceEpoch.toString(),
-      redirectUrl: "propertysmart://payment-confirmation", // Your deep link
+      redirectUrl: "propertysmart://payment-confirmation",
+      meta: {
+        "subaccount_id": subaccountId,
+      },
     );
 
     try {
@@ -57,172 +83,271 @@ class PaymentPage extends StatelessWidget {
     }
   }
 
+  void _filterEstates() {
+    // Your filter logic here
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Payment Details'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/payment_background.jpeg'), // Replace with your background image asset path
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              child: SingleChildScrollView(
-                child: Card(
-                  color: Colors.white.withOpacity(0.8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 8,
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 150.0,
+            pinned: true,
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'PropertySmart',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (!isCollapsed)
                         Text(
-                          'Enter Payment Details',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
+                          'Payment',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: InputDecoration(
-                            labelText: 'Name',
-                            hintText: 'Enter your name',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                    ],
+                  ),
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0D47A1),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SliverFillRemaining(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: SingleChildScrollView(
+                  child: Card(
+                    color: Colors.blue[200], // Set card background color to blue[100]
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 8,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Enter Payment Details',
+                            style: theme.textTheme.titleLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              labelText: 'Name',
+                              hintText: 'Enter your name',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
                             ),
+                            keyboardType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your name';
+                              }
+                              return null;
+                            },
                           ),
-                          keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            hintText: 'Enter your email',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              hintText: 'Enter your email',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
                             ),
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              return null;
+                            },
                           ),
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: _tenantMobileNumberController,
-                          decoration: InputDecoration(
-                            labelText: 'Tenant Mobile Number',
-                            hintText: 'Enter your mobile number',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: _tenantMobileNumberController,
+                            decoration: InputDecoration(
+                              labelText: 'Tenant Mobile Number',
+                              hintText: 'Enter your mobile number',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
                             ),
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your mobile number';
+                              }
+                              return null;
+                            },
                           ),
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your mobile number';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: _amountController,
-                          decoration: InputDecoration(
-                            labelText: 'Amount',
-                            hintText: 'Enter amount to pay',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: _amountController,
+                            decoration: InputDecoration(
+                              labelText: 'Amount',
+                              hintText: 'Enter amount to pay',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
                             ),
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter the amount';
+                              }
+                              return null;
+                            },
                           ),
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.done,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the amount';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              _makePayment(context);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: _selectedNetwork,
+                            onChanged: (String? newValue) {
+                              _selectedNetwork = newValue!;
+                            },
+                            items: <String>['VODAFONE', 'MTN', 'AIRTEL']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(color: Colors.blue[900], fontWeight: FontWeight.w400,fontSize:16),
+                                  // Blue dropdown items
+                                ),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              labelText: 'Select Network',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
                             ),
+                            icon: Icon(Icons.arrow_drop_down, color: Colors.blue, size: 30),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select a network';
+                              }
+                              return null;
+                            },
                           ),
-                          child: Text(
-                            'Proceed to Confirmation',
-                            style: TextStyle(fontSize: 16),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _makePayment(context);
+                              }
+                            },
+                            child: Text('Proceed to Confirmation'),
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            _makePayment(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.greenAccent,
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _makePayment(context);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
                             ),
+                            child: Text('Test Payment'),
                           ),
-                          child: Text(
-                            'Test Payment',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
