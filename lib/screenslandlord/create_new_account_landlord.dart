@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 
-class CreateNewAccount extends StatefulWidget {
-  const CreateNewAccount({super.key});
+class CreateNewAccountLandlord extends StatefulWidget {
+  const CreateNewAccountLandlord({super.key});
 
   @override
-  _CreateNewAccountState createState() => _CreateNewAccountState();
+  _CreateNewAccountLandlordState createState() => _CreateNewAccountLandlordState();
 }
 
-class _CreateNewAccountState extends State<CreateNewAccount> {
+class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -63,7 +63,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
 
       // Navigate to IntroPageView after the Snackbar message disappears
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, 'IntroPageView');
+        Navigator.pushReplacementNamed(context, 'LandlordDashboard');
       });
     } catch (e) {
       print('Account creation error: $e'); // Print error for debugging
@@ -164,7 +164,7 @@ class _CreateNewAccountState extends State<CreateNewAccount> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, 'LoginScreen');
+                            Navigator.pushNamed(context, 'LoginScreenLandlord');
                           },
                           child: Text(
                             'Login',

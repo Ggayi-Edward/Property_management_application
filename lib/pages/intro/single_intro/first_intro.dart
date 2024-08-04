@@ -11,7 +11,7 @@ class FirstIntro extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(140.0),
+        preferredSize: const Size.fromHeight(85.0),
         child: AppBar(
           flexibleSpace: Container(
             decoration: const BoxDecoration(
@@ -59,7 +59,7 @@ class FirstIntro extends StatelessWidget {
                   right: 0,
                   child: Container(
                     color: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 40),
                     child: Text(
                       'Welcome',
                       textAlign: TextAlign.center,
@@ -82,19 +82,19 @@ class FirstIntro extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 15),
                   Text(
                     'Discover Your Favourite Property with PropertySmart',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 14, 45, 221),
+                      color: Color.fromARGB(255, 35, 154, 223),
                       shadows: [
                         Shadow(
                           offset: Offset(2.0, 2.0),
                           blurRadius: 3.0,
-                          color: Color.fromARGB(128, 0, 0, 0),
+                          color: Color.fromARGB(128, 177, 162, 162),
                         ),
                       ],
                     ),
