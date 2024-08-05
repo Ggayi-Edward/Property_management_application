@@ -63,11 +63,9 @@ class FirstIntro extends StatelessWidget {
                       ),
                       background: Container(
                         decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+
+                            color:Color(0xFF0D47A1)
+
                         ),
                       ),
                     );
@@ -113,11 +111,9 @@ class FirstIntro extends StatelessWidget {
                               width: 200,
                               height: 50,
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+
+                                  color: Color(0xFF0D47A1),
+
                                 borderRadius: BorderRadius.circular(25),
                                 boxShadow: [
                                   BoxShadow(
