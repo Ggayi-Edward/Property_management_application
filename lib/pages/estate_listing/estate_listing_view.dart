@@ -213,7 +213,7 @@ class _EstateListingViewState extends State<EstateListingView> {
                               color: Colors.grey[600],
                               fontSize: 16, // Change font size here
                             ),
-                            prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+                            prefixIcon: const Icon(Icons.search, color: Color(0xFF0D47A1)),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
                               icon: const Icon(Icons.clear),

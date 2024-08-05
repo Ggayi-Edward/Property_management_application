@@ -51,11 +51,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF304FFE), ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+
+                color: Color(0xFF0D47A1)
+
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
