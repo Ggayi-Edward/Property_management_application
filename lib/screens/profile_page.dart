@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,7 +60,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _configureFirebaseMessaging() async {
-    final NotificationSettings settings = await _firebaseMessaging.requestPermission(
+    final NotificationSettings settings =
+        await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -101,7 +101,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print("FCM Token: $token");
 
       if (_user != null && token != null) {
-        await _firestore.collection('users').doc(_user!.uid).update({'fcmToken': token});
+        await _firestore
+            .collection('users')
+            .doc(_user!.uid)
+            .update({'fcmToken': token});
       }
     } else {
       print('User declined or has not accepted permission');
@@ -122,15 +125,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickImage() async {
     await _checkAndRequestPermissions();
     if (kIsWeb) {
-      // Use ImagePickerWeb for web platforms
-      final pickedFile = await ImagePickerWeb.getImageAsBytes();
-      if (pickedFile != null) {
-        setState(() {
-          _webProfileImage = pickedFile;
-        });
-      }
+      // Web image picking is commented out; you can implement this if needed
     } else {
-      // Use ImagePicker for mobile platforms
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
@@ -141,14 +137,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _uploadImage() async {
-    if (_profileImage == null) return;
+    if (_profileImage == null && _webProfileImage == null) return;
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final fileName = 'profile_pics/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        String fileName =
+            'profile_pics/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
         final storageRef = FirebaseStorage.instance.ref().child(fileName);
-        await storageRef.putFile(_profileImage!);
+
+        final metadata = SettableMetadata(customMetadata: {
+          'ownerId': user.uid,
+        });
+
+        if (kIsWeb) {
+          // For web
+          await storageRef.putData(_webProfileImage!, metadata);
+        } else {
+          // For mobile
+          await storageRef.putFile(_profileImage!, metadata);
+        }
+
         final downloadURL = await storageRef.getDownloadURL();
 
         await user.updatePhotoURL(downloadURL);
@@ -173,10 +182,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           duration: Duration(seconds: 2),
         ),
       );
-      print('Error uploading image: $e'); // Log error
+      print('Error uploading image: $e');
     }
   }
-
 
   Future<void> _saveProfile() async {
     try {
@@ -184,7 +192,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (user != null) {
         await user.updateProfile(displayName: _userController.text);
 
-        if (_emailController.text.isNotEmpty && _emailController.text != user.email) {
+        if (_emailController.text.isNotEmpty &&
+            _emailController.text != user.email) {
           await user.verifyBeforeUpdateEmail(_emailController.text);
         }
 
@@ -236,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         ),
       ),
-      backgroundColor: Colors.blue[100], // Use a thin blue background color
+      backgroundColor: Colors.blue[100],
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -258,18 +267,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             child: CircleAvatar(
                               radius: size.width * 0.14,
-                              backgroundColor: Colors.grey[500]?.withOpacity(0.5),
+                              backgroundColor:
+                                  Colors.grey[500]?.withOpacity(0.5),
                               backgroundImage: kIsWeb
                                   ? (_webProfileImage != null
-                                  ? MemoryImage(_webProfileImage!)
-                                  : const AssetImage('assets/images/default_avatar.jfif')
-                              as ImageProvider)
+                                      ? MemoryImage(_webProfileImage!)
+                                      : const AssetImage(
+                                              'assets/images/default_avatar.jfif')
+                                          as ImageProvider)
                                   : _profileImage != null
-                                  ? FileImage(_profileImage!) as ImageProvider
-                                  : (_user?.photoURL != null
-                                  ? NetworkImage(_user!.photoURL!)
-                                  : const AssetImage('assets/images/default_avatar.jfif')
-                              as ImageProvider),
+                                      ? FileImage(_profileImage!)
+                                          as ImageProvider
+                                      : (_user?.photoURL != null
+                                          ? NetworkImage(_user!.photoURL!)
+                                          : const AssetImage(
+                                                  'assets/images/default_avatar.jfif')
+                                              as ImageProvider),
                               onBackgroundImageError: (_, __) {
                                 // Handle image loading error
                                 setState(() {

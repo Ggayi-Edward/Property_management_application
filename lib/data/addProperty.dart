@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'dart:io'; // For File type
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddPropertyPage extends StatefulWidget {
   @override
@@ -20,48 +21,40 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   int _bathrooms = 1;
   bool _swimmingPool = false;
 
-  String? _mainImageBase64;
-  List<String> _roomImagesBase64 = [];
+  File? _mainImage;
+  List<File> _roomImages = [];
 
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   String? _feedbackMessage;
 
   Future<void> _pickImage(bool isMainImage) async {
-    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
-    uploadInput.accept = 'image/*';
-    uploadInput.click();
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    uploadInput.onChange.listen((e) {
-      final files = uploadInput.files;
-      if (files!.length == 1) {
-        final reader = html.FileReader();
-        reader.readAsDataUrl(files[0]);
-        reader.onLoadEnd.listen((e) {
-          final base64String = reader.result as String;
-          setState(() {
-            if (isMainImage) {
-              _mainImageBase64 = base64String;
-            } else {
-              _roomImagesBase64.add(base64String);
-            }
-          });
-        });
-      }
-    });
+    if (pickedFile != null) {
+      setState(() {
+        if (isMainImage) {
+          _mainImage = File(pickedFile.path);
+        } else {
+          _roomImages.add(File(pickedFile.path));
+        }
+      });
+    }
   }
 
-  Future<String> _uploadImage(String base64Image) async {
+  Future<String> _uploadImage(File imageFile) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('User not authenticated');
     }
 
-    final ref = FirebaseStorage.instance.ref().child('property_images/${DateTime.now().toIso8601String()}.jpg');
-    final uploadTask = ref.putString(
-      base64Image,
-      format: PutStringFormat.dataUrl,
-      metadata: SettableMetadata(customMetadata: {'ownerId': user.uid}),
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('property_images/${DateTime.now().toIso8601String()}.jpg');
+    final uploadTask = ref.putFile(
+      imageFile,
+      SettableMetadata(customMetadata: {'ownerId': user.uid}),
     );
     final snapshot = await uploadTask.whenComplete(() {});
     return await snapshot.ref.getDownloadURL();
@@ -87,12 +80,12 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         String? mainImageUrl;
         List<String> roomImageUrls = [];
 
-        if (_mainImageBase64 != null) {
-          mainImageUrl = await _uploadImage(_mainImageBase64!);
+        if (_mainImage != null) {
+          mainImageUrl = await _uploadImage(_mainImage!);
         }
 
-        for (var imageBase64 in _roomImagesBase64) {
-          final imageUrl = await _uploadImage(imageBase64);
+        for (var imageFile in _roomImages) {
+          final imageUrl = await _uploadImage(imageFile);
           roomImageUrls.add(imageUrl);
         }
 
@@ -143,19 +136,20 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                       Text(
                         'PropertySmart',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (!isCollapsed)
                         Text(
                           'Add Property',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -181,13 +175,28 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                       children: [
                         _buildTextFormField('Title', _titleController),
                         _buildTextFormField('Location', _locationController),
-                        _buildTextFormField('Price', _priceController, TextInputType.number),
-                        _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
-                        _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
-                        _buildDropdownRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value!), 1, 10),
-                        _buildDropdownRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value!), 1, 10),
-                        _buildImagePicker('Pick Main Image', () => _pickImage(true), _mainImageBase64),
-                        _buildImagePicker('Pick Room Images', () => _pickImage(false), null, _roomImagesBase64),
+                        _buildTextFormField(
+                            'Price', _priceController, TextInputType.number),
+                        _buildSwitchRow('WiFi', _wifi,
+                            (value) => setState(() => _wifi = value)),
+                        _buildSwitchRow('Swimming Pool', _swimmingPool,
+                            (value) => setState(() => _swimmingPool = value)),
+                        _buildDropdownRow(
+                            'Bedrooms',
+                            _bedrooms,
+                            (value) => setState(() => _bedrooms = value!),
+                            1,
+                            10),
+                        _buildDropdownRow(
+                            'Bathrooms',
+                            _bathrooms,
+                            (value) => setState(() => _bathrooms = value!),
+                            1,
+                            10),
+                        _buildImagePicker('Pick Main Image',
+                            () => _pickImage(true), _mainImage),
+                        _buildImagePicker('Pick Room Images',
+                            () => _pickImage(false), null, _roomImages),
                         SizedBox(height: 20),
                         _buildSaveButton(),
                         if (_feedbackMessage != null)
@@ -212,7 +221,8 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     );
   }
 
-  Widget _buildTextFormField(String label, TextEditingController controller, [TextInputType keyboardType = TextInputType.text]) {
+  Widget _buildTextFormField(String label, TextEditingController controller,
+      [TextInputType keyboardType = TextInputType.text]) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -233,7 +243,8 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     );
   }
 
-  Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildSwitchRow(
+      String label, bool value, ValueChanged<bool> onChanged) {
     return Row(
       children: [
         Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
@@ -242,14 +253,16 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     );
   }
 
-  Widget _buildDropdownRow(String label, int value, ValueChanged<int?> onChanged, int min, int max) {
+  Widget _buildDropdownRow(
+      String label, int value, ValueChanged<int?> onChanged, int min, int max) {
     return Row(
       children: [
         Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
         SizedBox(width: 20),
         DropdownButton<int>(
           value: value,
-          items: List.generate(max - min + 1, (index) => index + min).map((int value) {
+          items: List.generate(max - min + 1, (index) => index + min)
+              .map((int value) {
             return DropdownMenuItem<int>(
               value: value,
               child: Text(
@@ -264,7 +277,9 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     );
   }
 
-  Widget _buildImagePicker(String label, VoidCallback onPressed, String? imageBase64, [List<String>? imagesBase64]) {
+  Widget _buildImagePicker(
+      String label, VoidCallback onPressed, File? imageFile,
+      [List<File>? imagesFiles]) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -273,17 +288,17 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
           icon: Icon(Icons.image, color: Color(0xFF0D47A1)),
           label: Text(label, style: TextStyle(color: Color(0xFF0D47A1))),
         ),
-        if (imageBase64 != null)
-          Image.memory(
-            base64Decode(imageBase64.split(',').last),
+        if (imageFile != null)
+          Image.file(
+            imageFile,
             height: 150,
           ),
-        if (imagesBase64 != null)
+        if (imagesFiles != null)
           Wrap(
             spacing: 10,
-            children: imagesBase64.map((imgBase64) {
-              return Image.memory(
-                base64Decode(imgBase64.split(',').last),
+            children: imagesFiles.map((file) {
+              return Image.file(
+                file,
                 height: 100,
               );
             }).toList(),
@@ -297,12 +312,12 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       child: _isSaving
           ? CircularProgressIndicator()
           : ElevatedButton(
-        onPressed: _saveProperty,
-        child: Text('Save Property'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF0D47A1),
-        ),
-      ),
+              onPressed: _saveProperty,
+              child: Text('Save Property'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF0D47A1),
+              ),
+            ),
     );
   }
 }

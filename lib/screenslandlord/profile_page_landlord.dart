@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:image_picker_web/image_picker_web.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,7 +12,9 @@ import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
 class ProfileScreenLandlord extends StatefulWidget {
-  const ProfileScreenLandlord({super.key, required String userId});
+  const ProfileScreenLandlord({super.key, required this.userId});
+
+  final String userId;
 
   @override
   _ProfileScreenLandlordState createState() => _ProfileScreenLandlordState();
@@ -120,11 +122,12 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
   Future<void> _pickImage() async {
     await _checkAndRequestPermissions();
     if (kIsWeb) {
-      // Use ImagePickerWeb for web platforms
-      final pickedFile = await ImagePickerWeb.getImageAsBytes();
+      // Use ImagePicker for web platforms
+      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
+        final webImage = await pickedFile.readAsBytes();
         setState(() {
-          _webProfileImage = pickedFile;
+          _webProfileImage = webImage;
         });
       }
     } else {
@@ -139,14 +142,22 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
   }
 
   Future<void> _uploadImage() async {
-    if (_profileImage == null) return;
+    if (_profileImage == null && _webProfileImage == null) return;
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final fileName = 'profile_pics/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        String fileName = 'profile_pics/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
         final storageRef = FirebaseStorage.instance.ref().child(fileName);
-        await storageRef.putFile(_profileImage!);
+
+        if (kIsWeb) {
+          // For web
+          await storageRef.putData(_webProfileImage!);
+        } else {
+          // For mobile
+          await storageRef.putFile(_profileImage!);
+        }
+
         final downloadURL = await storageRef.getDownloadURL();
 
         await user.updatePhotoURL(downloadURL);
@@ -174,7 +185,6 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
       print('Error uploading image: $e'); // Log error
     }
   }
-
 
   Future<void> _saveProfile() async {
     try {
@@ -259,15 +269,15 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                               backgroundColor: Colors.grey[500]?.withOpacity(0.5),
                               backgroundImage: kIsWeb
                                   ? (_webProfileImage != null
-                                  ? MemoryImage(_webProfileImage!)
-                                  : const AssetImage('assets/images/default_avatar.jfif')
-                              as ImageProvider)
+                                      ? MemoryImage(_webProfileImage!)
+                                      : const AssetImage('assets/images/default_avatar.jfif')
+                                          as ImageProvider)
                                   : _profileImage != null
-                                  ? FileImage(_profileImage!) as ImageProvider
-                                  : (_user?.photoURL != null
-                                  ? NetworkImage(_user!.photoURL!)
-                                  : const AssetImage('assets/images/default_avatar.jfif')
-                              as ImageProvider),
+                                      ? FileImage(_profileImage!) as ImageProvider
+                                      : (_user?.photoURL != null
+                                          ? NetworkImage(_user!.photoURL!)
+                                          : const AssetImage('assets/images/default_avatar.jfif')
+                                              as ImageProvider),
                               onBackgroundImageError: (_, __) {
                                 // Handle image loading error
                                 setState(() {
