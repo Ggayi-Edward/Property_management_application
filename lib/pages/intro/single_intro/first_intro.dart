@@ -11,19 +11,19 @@ class FirstIntro extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      drawer: CustomDrawer(),
+      drawer: CustomDrawer(showFilters: false),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/home1.jfif',
+              'assets/images/houses/rooms/swimmingpool3.jfif',
               fit: BoxFit.cover,
             ),
           ),
           CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 150.0,
+                expandedHeight: 200.0,
                 pinned: true,
                 flexibleSpace: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
@@ -36,17 +36,24 @@ class FirstIntro extends StatelessWidget {
                           Text(
                             'PropertySmart',
                             style: theme.textTheme.titleLarge?.copyWith(
-                              fontSize: 20,
+                              fontSize: 22,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(1.0, 1.0),
+                                  blurRadius: 2.0,
+                                  color: Colors.black.withOpacity(0.2),
+                                ),
+                              ],
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (!isCollapsed)
                             Text(
                               'Your Real Estate Partner',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontSize: 14,
+                              style: theme.textTheme.displayMedium?.copyWith(
+                                fontSize: 16,
                                 color: Colors.white,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -55,10 +62,13 @@ class FirstIntro extends StatelessWidget {
                       ),
                       background: Container(
                         decoration: const BoxDecoration(
-                          color: Color(0xFF0D47A1),
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-
+                      ),
                     );
                   },
                 ),
@@ -66,11 +76,11 @@ class FirstIntro extends StatelessWidget {
               SliverFillRemaining(
                 child: Center(
                   child: Card(
-                    elevation: 4,
+                    elevation: 8,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    color: Color(0xFF90CAF9).withOpacity(0.9), // Thin blue color
+                    color: Colors.white.withOpacity(0.9),
                     margin: EdgeInsets.all(16),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -83,7 +93,7 @@ class FirstIntro extends StatelessWidget {
                           Text(
                             'Discover Your Favourite Property with PropertySmart',
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.headlineSmall?.copyWith(
+                            style: theme.textTheme.bodyLarge?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               shadows: [
@@ -100,13 +110,17 @@ class FirstIntro extends StatelessWidget {
                             onTap: onConfirmTap,
                             child: Container(
                               width: 200,
-                              height: 45,
+                              height: 50,
                               decoration: BoxDecoration(
-                                color: Colors.white, // White background
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                                 borderRadius: BorderRadius.circular(25),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withOpacity(0.3),
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: const Offset(0, 3),
@@ -117,8 +131,8 @@ class FirstIntro extends StatelessWidget {
                                 child: Text(
                                   'Get Started',
                                   style: TextStyle(
-                                    color: Colors.blueAccent, // Text color
-                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),

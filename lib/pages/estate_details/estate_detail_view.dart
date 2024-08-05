@@ -21,7 +21,8 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
       viewModelBuilder: () => EstateDetailsViewModel(),
       builder: (context, viewModel, _) {
         return Scaffold(
-          drawer: CustomDrawer(), // Ensure only one CustomDrawer is used
+          drawer: CustomDrawer(showFilters: false,), // Ensure only one CustomDrawer is used
+           // Show filters only on this page
           body: CustomScrollView(
             slivers: [
               // New SliverAppBar with title and subtitle

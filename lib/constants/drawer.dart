@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
@@ -22,8 +23,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
   int? selectedBedrooms;
   int? selectedBathrooms;
   bool? swimmingPool;
+  bool? wifi;
   User? _user;
   final FirebaseAuthService _authService = FirebaseAuthService();
+  bool showFilters = false; // Control to show/hide filters
 
   @override
   void initState() {
@@ -103,11 +106,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
           _buildDrawerItem(Icons.home, 'Home', () {
             Navigator.pop(context);
-            Navigator.pushReplacementNamed(context, 'LandlordDashboard');
+            _navigateToHome(context);
           }),
           _buildDrawerItem(Icons.person, 'Profile', () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, 'ProfileScreenLandlord');
+            _navigateToProfile(context);
           }),
           _buildDrawerItem(
             themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
@@ -135,10 +138,52 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             }
           }),
-          // Filters section removed
+          ListTile(
+            leading: const Icon(Icons.filter_list),
+            title: const Text('Filters'),
+            onTap: () {
+              setState(() {
+                showFilters = !showFilters; // Toggle filter visibility
+              });
+            },
+          ),
+          if (showFilters) _buildFilters(), // Display filters if showFilters is true
         ],
       ),
     );
+  }
+
+  void _navigateToHome(BuildContext context) {
+    // Navigate to landlord or tenant home based on user role
+    if (_user != null) {
+      // Check for landlord or tenant role and navigate accordingly
+      // Assuming you have a way to determine user role (e.g., user metadata, custom claims, etc.)
+      bool isLandlord = _user!.uid == 'landlordUid'; // Replace with actual logic
+      if (isLandlord) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LandlordDashboard(userId: _user!.uid)),
+        );
+      } else {
+        Navigator.pushReplacementNamed(context, 'IntroPageView');
+      }
+    }
+  }
+
+  void _navigateToProfile(BuildContext context) {
+    // Navigate to landlord or tenant profile based on user role
+    if (_user != null) {
+      // Check for landlord or tenant role and navigate accordingly
+      bool isLandlord = _user!.uid == 'landlordUid'; // Replace with actual logic
+      if (isLandlord) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreenLandlord(userId: _user!.uid)),
+        );
+      } else {
+        Navigator.pushNamed(context, 'ProfileScreen');
+      }
+    }
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
@@ -146,6 +191,121 @@ class _CustomDrawerState extends State<CustomDrawer> {
       leading: Icon(icon),
       title: Text(title),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildFilters() {
+    return Column(
+      children: [
+        ListTile(
+          title: const Text('Price Range'),
+          trailing: DropdownButton<String>(
+            value: selectedPriceRange,
+            items: <String>[
+              '\$0 - \$100,000',
+              '\$100,000 - \$200,000',
+              '\$200,000 - \$300,000',
+              '\$300,000 - \$400,000',
+              '\$400,000+',
+            ].map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    color: Color(0xFF0D47A1), // Thick blue text
+                    fontSize: 14, // Reduced font size
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedPriceRange = newValue;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text('Bedrooms'),
+          trailing: DropdownButton<int>(
+            value: selectedBedrooms,
+            items: List.generate(6, (index) => index).map((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(
+                  '$value',
+                  style: const TextStyle(
+                    color: Color(0xFF0D47A1), // Thick blue text
+                    fontSize: 14, // Reduced font size
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (int? newValue) {
+              setState(() {
+                selectedBedrooms = newValue;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text('Bathrooms'),
+          trailing: DropdownButton<int>(
+            value: selectedBathrooms,
+            items: List.generate(6, (index) => index).map((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(
+                  '$value',
+                  style: const TextStyle(
+                    color: Color(0xFF0D47A1), // Thick blue text
+                    fontSize: 14, // Reduced font size
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (int? newValue) {
+              setState(() {
+                selectedBathrooms = newValue;
+              });
+            },
+          ),
+        ),
+        SwitchListTile(
+          title: const Text('Swimming Pool'),
+          value: swimmingPool ?? false,
+          onChanged: (bool value) {
+            setState(() {
+              swimmingPool = value;
+            });
+          },
+        ),
+        SwitchListTile(
+          title: const Text('WiFi'),
+          value: wifi ?? false,
+          onChanged: (bool value) {
+            setState(() {
+              wifi = value;
+            });
+          },
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Apply filters
+            if (widget.onFilterApplied != null) {
+              widget.onFilterApplied!({
+                'priceRange': selectedPriceRange,
+                'bedrooms': selectedBedrooms,
+                'bathrooms': selectedBathrooms,
+                'swimmingPool': swimmingPool,
+                'wifi': wifi,
+              });
+            }
+          },
+          child: const Text('Apply Filters'),
+        ),
+      ],
     );
   }
 }

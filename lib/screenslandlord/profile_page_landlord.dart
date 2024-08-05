@@ -12,7 +12,7 @@ import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
 class ProfileScreenLandlord extends StatefulWidget {
-  const ProfileScreenLandlord({super.key});
+  const ProfileScreenLandlord({super.key, required String userId});
 
   @override
   _ProfileScreenLandlordState createState() => _ProfileScreenLandlordState();

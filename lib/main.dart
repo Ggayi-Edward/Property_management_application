@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
               'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
               'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
               'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
-              'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(),
+              'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(userId: '',),
               'PaymentPage': (context) => PaymentPage(
                 landlordEmail: '',
                 landlordMobileMoneyNumber: '',
