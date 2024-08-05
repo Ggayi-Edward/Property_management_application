@@ -27,30 +27,13 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
-dependencies:
- 
-  flutter:
-    sdk: flutter
-  flutterwave_standard: ^1.0.0
-  http: ^1.2.2
-  uni_links: ^0.5.1
-  
-  
-  #firebase_core: latest_version
+
 
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
 
-  carousel_slider: any
-  font_awesome_flutter: any
-  flutter_staggered_grid_view: any
-  firebase_core: any
-  firebase_auth: any
-  firebase_storage: any
-  image_picker: any
 
 dev_dependencies:
   flutter_test:
@@ -63,8 +46,12 @@ dev_dependencies:
   # rules and activating additional ones.
   # cupertino_icons: ^1.0.2
   stacked: ^3.4.3
+  cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.10+1
   flutter_lints: ^4.0.0
+  http: ^1.2.2
+  uni_links: ^0.5.1
+  carousel_slider: ^4.2.1
   flutter_staggered_grid_view: ^0.7.0
   cached_network_image: ^3.3.1
   smooth_page_indicator: ^1.2.0
@@ -74,14 +61,8 @@ dev_dependencies:
   font_awesome_flutter: ^10.7.0
   fluttertoast: ^8.2.6
   cloud_firestore: ^5.1.0
-<<<<<<< HEAD
-  url_launcher: ^6.0.9
-<<<<<<< HEAD
-=======
-=======
   firebase_auth: ^5.1.2
   firebase_storage: ^12.1.1
->>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
   image_picker: ^1.1.2
   flare_flutter: ^3.0.2
   flutter_animate: ^4.5.0
@@ -100,7 +81,7 @@ dev_dependencies:
 
 
  
->>>>>>> 8018c471147bbe25476b3e399c8d7d0d612cfa37
+
 
 
 

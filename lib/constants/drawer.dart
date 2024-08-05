@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
->>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 
@@ -53,17 +50,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-<<<<<<< HEAD
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: const [Color(0xFF304FFE), Colors.lightBlueAccent],
+                colors: [Color(0xFF304FFE), ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-=======
-            decoration: const BoxDecoration(
-              color: Color(0xFF0D47A1),
->>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +151,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               });
             },
           ),
-          if (showFilters) _buildFilters(), // Display filters if showFilters is true
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: showFilters ? null : 0, // Adjust height to show/hide filters
+            child: showFilters ? _buildFilters() : null,
+          ),
         ],
       ),
     );
@@ -302,20 +298,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
             });
           },
         ),
-        ElevatedButton(
-          onPressed: () {
-            // Apply filters
-            if (widget.onFilterApplied != null) {
-              widget.onFilterApplied!({
-                'priceRange': selectedPriceRange,
-                'bedrooms': selectedBedrooms,
-                'bathrooms': selectedBathrooms,
-                'swimmingPool': swimmingPool,
-                'wifi': wifi,
-              });
-            }
-          },
-          child: const Text('Apply Filters'),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              // Apply filters
+              if (widget.onFilterApplied != null) {
+                widget.onFilterApplied!({
+                  'priceRange': selectedPriceRange,
+                  'bedrooms': selectedBedrooms,
+                  'bathrooms': selectedBathrooms,
+                  'swimmingPool': swimmingPool,
+                  'wifi': wifi,
+                });
+              }
+            },
+            child: const Text('Apply Filters'),
+          ),
         ),
       ],
     );

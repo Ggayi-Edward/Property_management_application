@@ -1,9 +1,5 @@
 import 'package:propertysmart2/export/file_exports.dart';
-<<<<<<< HEAD
-import 'package:propertysmart2/pages/estate_details/ContactAgentPage.dart';
-=======
 import 'package:stacked/stacked.dart';
->>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
