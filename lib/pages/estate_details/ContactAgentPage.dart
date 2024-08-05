@@ -17,7 +17,7 @@ class ContactAgentPage extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Row(
-                children: [
+                children: const [
                   CircleAvatar(
                     radius: 50,
                     backgroundImage: AssetImage('assets/images/rob.jpg'), // Replace with your image asset
@@ -33,7 +33,7 @@ class ContactAgentPage extends StatelessWidget {
               flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Text('Email: miyajr@gmail.com'),
                   Text('Contact: +256-12345678'),
                   Text('Ratings/Reviews: Submit'),
@@ -103,7 +103,7 @@ class SocialMediaIcon extends StatelessWidget {
   final IconData icon;
   final String url;
 
-  SocialMediaIcon({required this.icon, required this.url});
+  const SocialMediaIcon({required this.icon, required this.url});
 
   @override
   Widget build(BuildContext context) {

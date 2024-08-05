@@ -1,6 +1,9 @@
+<<<<<<< HEAD
+=======
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 
@@ -50,8 +53,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
+<<<<<<< HEAD
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: const [Color(0xFF304FFE), Colors.lightBlueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+=======
             decoration: const BoxDecoration(
               color: Color(0xFF0D47A1),
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

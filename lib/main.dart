@@ -1,4 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
+<<<<<<< HEAD
+import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/pages/intro/splash_screen.dart';
+import 'package:propertysmart2/screens/forgot_password.dart';
+<<<<<<< HEAD
+=======
+import 'package:propertysmart2/screens/profile_page.dart';
+import 'package:propertysmart2/payment/confirmation_page.dart'; // Import your existing confirmation page
+import 'package:uni_links/uni_links.dart';
+import 'package:propertysmart2/screens/login_screen.dart';
+import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+
+>>>>>>> 8018c471147bbe25476b3e399c8d7d0d612cfa37
+=======
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +21,7 @@ import 'pages/intro/splash_screen.dart';
 import 'constants/theme_notifier.dart';
 import 'export/file_exports.dart';
 import 'screenslandlord/landlord_dashboard.dart';
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

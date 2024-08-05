@@ -47,6 +47,11 @@ dependencies:
   carousel_slider: any
   font_awesome_flutter: any
   flutter_staggered_grid_view: any
+  firebase_core: any
+  firebase_auth: any
+  firebase_storage: any
+  image_picker: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,10 +73,15 @@ dev_dependencies:
   pull_to_refresh: ^2.0.0
   font_awesome_flutter: ^10.7.0
   fluttertoast: ^8.2.6
-  firebase_core: ^3.2.0
   cloud_firestore: ^5.1.0
+<<<<<<< HEAD
+  url_launcher: ^6.0.9
+<<<<<<< HEAD
+=======
+=======
   firebase_auth: ^5.1.2
   firebase_storage: ^12.1.1
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
   image_picker: ^1.1.2
   flare_flutter: ^3.0.2
   flutter_animate: ^4.5.0
@@ -90,6 +100,7 @@ dev_dependencies:
 
 
  
+>>>>>>> 8018c471147bbe25476b3e399c8d7d0d612cfa37
 
 
 

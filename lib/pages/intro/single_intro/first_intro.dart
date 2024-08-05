@@ -1,10 +1,15 @@
+<<<<<<< HEAD
+// ignore_for_file: prefer_const_constructors
+
+=======
 import 'package:flutter/material.dart';
+>>>>>>> 133bdbbd85a349eb643da36d3c0079233e48d086
 import 'package:propertysmart2/export/file_exports.dart';
 
 class FirstIntro extends StatelessWidget {
   final VoidCallback onConfirmTap;
 
-  const FirstIntro({Key? key, required this.onConfirmTap}) : super(key: key);
+  const FirstIntro({super.key, required this.onConfirmTap});
 
   @override
   Widget build(BuildContext context) {
