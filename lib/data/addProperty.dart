@@ -1,4 +1,4 @@
-import 'dart:convert';
+// lib/data/addProperty.dart
 import 'dart:io'; // For File type
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -136,20 +136,20 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                       Text(
                         'PropertySmart',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (!isCollapsed)
                         Text(
                           'Add Property',
                           style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
+                          Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -178,25 +178,25 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                         _buildTextFormField(
                             'Price', _priceController, TextInputType.number),
                         _buildSwitchRow('WiFi', _wifi,
-                            (value) => setState(() => _wifi = value)),
+                                (value) => setState(() => _wifi = value)),
                         _buildSwitchRow('Swimming Pool', _swimmingPool,
-                            (value) => setState(() => _swimmingPool = value)),
+                                (value) => setState(() => _swimmingPool = value)),
                         _buildDropdownRow(
                             'Bedrooms',
                             _bedrooms,
-                            (value) => setState(() => _bedrooms = value!),
+                                (value) => setState(() => _bedrooms = value!),
                             1,
                             10),
                         _buildDropdownRow(
                             'Bathrooms',
                             _bathrooms,
-                            (value) => setState(() => _bathrooms = value!),
+                                (value) => setState(() => _bathrooms = value!),
                             1,
                             10),
                         _buildImagePicker('Pick Main Image',
-                            () => _pickImage(true), _mainImage),
+                                () => _pickImage(true), _mainImage),
                         _buildImagePicker('Pick Room Images',
-                            () => _pickImage(false), null, _roomImages),
+                                () => _pickImage(false), null, _roomImages),
                         SizedBox(height: 20),
                         _buildSaveButton(),
                         if (_feedbackMessage != null)
@@ -312,12 +312,12 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       child: _isSaving
           ? CircularProgressIndicator()
           : ElevatedButton(
-              onPressed: _saveProperty,
-              child: Text('Save Property'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0D47A1),
-              ),
-            ),
+        onPressed: _saveProperty,
+        child: Text('Save Property'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF0D47A1),
+        ),
+      ),
     );
   }
 }

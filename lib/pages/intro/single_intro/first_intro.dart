@@ -1,11 +1,60 @@
-
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
-class FirstIntro extends StatelessWidget {
+class FirstIntro extends StatefulWidget {
   final VoidCallback onConfirmTap;
 
   const FirstIntro({super.key, required this.onConfirmTap});
+
+  @override
+  _FirstIntroState createState() => _FirstIntroState();
+}
+
+class _FirstIntroState extends State<FirstIntro> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFirebase();
+  }
+
+  Future<void> _initializeFirebase() async {
+    await Firebase.initializeApp();
+    _configureFirebaseMessaging();
+  }
+
+  Future<void> _configureFirebaseMessaging() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final notification = message.notification;
+      if (notification != null) {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text(notification.title ?? 'No Title'),
+              content: Text(notification.body ?? 'No Body'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Message clicked!');
+    });
+
+    final String? token = await _firebaseMessaging.getToken();
+    print("FCM Token: $token");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +112,7 @@ class FirstIntro extends StatelessWidget {
                       ),
                       background: Container(
                         decoration: const BoxDecoration(
-
-                            color:Color(0xFF0D47A1)
-
+                          color: Color(0xFF0D47A1),
                         ),
                       ),
                     );
@@ -106,14 +153,12 @@ class FirstIntro extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
                           GestureDetector(
-                            onTap: onConfirmTap,
+                            onTap: widget.onConfirmTap,
                             child: Container(
                               width: 200,
                               height: 50,
                               decoration: BoxDecoration(
-
-                                  color: Color(0xFF0D47A1),
-
+                                color: Color(0xFF0D47A1),
                                 borderRadius: BorderRadius.circular(25),
                                 boxShadow: [
                                   BoxShadow(

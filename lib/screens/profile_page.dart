@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
@@ -25,13 +24,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
-    _configureFirebaseMessaging();
   }
 
   Future<void> _fetchUserData() async {
@@ -51,54 +48,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _bioController.text = userDoc['bio'] ?? '';
         });
       }
-    }
-  }
-
-  Future<void> _configureFirebaseMessaging() async {
-    final NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        final RemoteNotification? notification = message.notification;
-        final AndroidNotification? android = message.notification?.android;
-
-        if (notification != null && android != null) {
-          showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text(notification.title ?? ''),
-                content: Text(notification.body ?? ''),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      });
-
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print('Message clicked!');
-      });
-
-      final String? token = await _firebaseMessaging.getToken();
-      print("FCM Token: $token");
-
-      if (_user != null && token != null) {
-        await _firestore.collection('users').doc(_user!.uid).update({'fcmToken': token});
-      }
-    } else {
-      print('User declined or has not accepted permission');
     }
   }
 
@@ -126,7 +75,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('Error picking image: $e');
     }
   }
-
 
   Future<void> _uploadImage() async {
     if (_profileImage == null) return;
