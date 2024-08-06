@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,8 +9,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:propertysmart2/widgets/widgets.dart';
+
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -40,74 +41,145 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      setState(() {
-        _user = user;
-        _userController.text = user.displayName ?? '';
-        _emailController.text = user.email ?? '';
-        _phoneController.text = user.phoneNumber ?? '';
-      });
-
-      // Fetch bio from Firestore
-      final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
         setState(() {
-          _bioController.text = userDoc['bio'] ?? '';
+          _user = user;
+          _userController.text = user.displayName ?? '';
+          _emailController.text = user.email ?? '';
+          _phoneController.text = user.phoneNumber ?? '';
         });
+
+        // Fetch bio from Firestore
+        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          setState(() {
+            _bioController.text = userDoc['bio'] ?? '';
+          });
+        } else {
+          // Handle case where document does not exist
+          setState(() {
+            _bioController.text = ''; // or any default value
+          });
+        }
       }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to fetch user data: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
   Future<void> _configureFirebaseMessaging() async {
-    final NotificationSettings settings =
-        await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    try {
+      final NotificationSettings settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        print('User granted permission');
 
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        final RemoteNotification? notification = message.notification;
-        final AndroidNotification? android = message.notification?.android;
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          final RemoteNotification? notification = message.notification;
+          final AndroidNotification? android = message.notification?.android;
 
-        if (notification != null && android != null) {
-          showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text(notification.title ?? ''),
-                content: Text(notification.body ?? ''),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'),
+          if (notification != null && android != null) {
+            showDialog(
+              context: context,
+              builder: (_) {
+                return AlertDialog(
+                  title: Text('Property Smart - ${notification.title ?? 'Notification'}'),
+                  content: Text(notification.body ?? ''),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('OK'),
+                    ),
+                  ],
+                  backgroundColor: Theme.of(context).dialogBackgroundColor,
+                  titleTextStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                ],
-              );
-            },
-          );
+                  contentTextStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                );
+              },
+            );
+          }
+        });
+
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+          print('Message clicked!');
+        });
+
+        final String? token = await _firebaseMessaging.getToken();
+        print("FCM Token: $token");
+
+        if (_user != null && token != null) {
+          await _firestore
+              .collection('users')
+              .doc(_user!.uid)
+              .update({'fcmToken': token});
         }
-      });
-
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print('Message clicked!');
-      });
-
-      final String? token = await _firebaseMessaging.getToken();
-      print("FCM Token: $token");
-
-      if (_user != null && token != null) {
-        await _firestore
-            .collection('users')
-            .doc(_user!.uid)
-            .update({'fcmToken': token});
+      } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        print('User denied permission');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Notification permissions are required for full functionality. Please enable them in your device settings.'),
+            duration: Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Open Settings',
+              onPressed: () async {
+                final Uri uri = Uri.parse(Platform.isAndroid
+                    ? 'package:your.package.name'
+                    : 'App-Prefs:root=NOTIFICATIONS_ID');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                } else {
+                  throw 'Could not launch $uri';
+                }
+              },
+            ),
+          ),
+        );
+      } else {
+        print('User has not yet granted permission');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Notification permissions are required for full functionality. Please grant permission in your device settings.'),
+            duration: Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Open Settings',
+              onPressed: () async {
+                final Uri uri = Uri.parse(Platform.isAndroid
+                    ? 'package:your.package.name'
+                    : 'App-Prefs:root=NOTIFICATIONS_ID');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                } else {
+                  throw 'Could not launch $uri';
+                }
+              },
+            ),
+          ),
+        );
       }
-    } else {
-      print('User declined or has not accepted permission');
+    } catch (e) {
+      print('Error configuring Firebase Messaging: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to configure notifications: $e'),
+          duration: Duration(seconds: 5),
+        ),
+      );
     }
   }
 
@@ -125,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickImage() async {
     await _checkAndRequestPermissions();
     if (kIsWeb) {
-      // Web image picking is commented out; you can implement this if needed
+      // Web image picking can be implemented here if needed
     } else {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
@@ -234,159 +306,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        title: const Text('Profile'),
       ),
-      backgroundColor: Colors.blue[100],
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: size.width * 0.1,
-            ),
-            Center(
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Stack(
                 children: [
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: Stack(
-                      children: [
-                        ClipOval(
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(
-                              sigmaX: 6,
-                              sigmaY: 6,
-                            ),
-                            child: CircleAvatar(
-                              radius: size.width * 0.14,
-                              backgroundColor:
-                                  Colors.grey[500]?.withOpacity(0.5),
-                              backgroundImage: kIsWeb
-                                  ? (_webProfileImage != null
-                                      ? MemoryImage(_webProfileImage!)
-                                      : const AssetImage(
-                                              'assets/images/default_avatar.jfif')
-                                          as ImageProvider)
-                                  : _profileImage != null
-                                      ? FileImage(_profileImage!)
-                                          as ImageProvider
-                                      : (_user?.photoURL != null
-                                          ? NetworkImage(_user!.photoURL!)
-                                          : const AssetImage(
-                                                  'assets/images/default_avatar.jfif')
-                                              as ImageProvider),
-                              onBackgroundImageError: (_, __) {
-                                // Handle image loading error
-                                setState(() {
-                                  // Fallback to a default image or any other error handling
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: Container(
-                            height: size.width * 0.12,
-                            width: size.width * 0.12,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  CircleAvatar(
+                    radius: size.width * 0.2,
+                    backgroundImage: _profileImage != null
+                        ? FileImage(_profileImage!)
+                        : (_user?.photoURL != null
+                        ? NetworkImage(_user!.photoURL!)
+                        : AssetImage('assets/default_profile.png')
+                    as ImageProvider),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    _userController.text,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    _emailController.text,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextInputField(
-                    controller: _userController,
-                    icon: Icons.person,
-                    hint: 'Name',
-                    inputType: TextInputType.name,
-                    inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
-                  ),
-                  TextInputField(
-                    controller: _emailController,
-                    icon: Icons.mail,
-                    hint: 'Email',
-                    inputType: TextInputType.emailAddress,
-                    inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
-                  ),
-                  TextInputField(
-                    controller: _bioController,
-                    icon: Icons.info_outline,
-                    hint: 'Bio',
-                    inputType: TextInputType.multiline,
-                    inputAction: TextInputAction.newline,
-                    color: theme.colorScheme.primary,
-                  ),
-                  TextInputField(
-                    controller: _phoneController,
-                    icon: Icons.phone,
-                    hint: 'Phone',
-                    inputType: TextInputType.phone,
-                    inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 20),
-                  RoundedButton(
-                    buttonName: 'Save',
-                    onPressed: _handleSave,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.of(context).pushReplacementNamed('/login');
-                    },
-                    child: Text(
-                      'Sign Out',
-                      style: TextStyle(
-                        color: theme.colorScheme.error,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: _pickImage,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              TextField(
+                controller: _userController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone',
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _bioController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Bio',
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _handleSave,
+                child: const Text('Save Changes'),
+              ),
+            ],
+          ),
         ),
       ),
     );
