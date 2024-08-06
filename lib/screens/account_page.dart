@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:propertysmart2/export/file_exports.dart'; // Ensure the import path is correct
 import 'package:propertysmart2/widgets/widgets.dart';
@@ -16,7 +15,10 @@ class AccountPage extends StatelessWidget {
             image: 'assets/images/background1.jpeg',
           ),
           Container(
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height / 2,
             decoration: BoxDecoration(
               color: theme.colorScheme.primary, // Dark Blue for top section
               boxShadow: [
@@ -33,7 +35,8 @@ class AccountPage extends StatelessWidget {
                 children: [
                   SizedBox(height: 20),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     child: Column(
                       children: [
                         Text(
@@ -57,7 +60,8 @@ class AccountPage extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.secondary, // Very Light Blue for bottom section
+                color: theme.colorScheme
+                    .secondary, // Very Light Blue for bottom section
               ),
               child: Center(
                 child: Padding(
@@ -81,7 +85,8 @@ class AccountPage extends StatelessWidget {
                             () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
                           );
                         },
                       ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
@@ -111,16 +116,24 @@ class AccountPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoginButton(BuildContext context, String text, Color color, IconData icon, VoidCallback onPressed) {
+  Widget _buildLoginButton(BuildContext context, String text, Color color,
+      IconData icon, VoidCallback onPressed) {
     return SizedBox(
-      width: 180, // Fixed width for both buttons
-      height: 40, // Fixed height for both buttons
+      width: MediaQuery
+          .of(context)
+          .size
+          .width * 0.8, // 80% of the screen width
+      height: 50, // Increased height for better readability
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, size: 26),
-        label: Text(text, style: TextStyle(fontSize: 16)),
+        icon: Icon(icon, size: 24),
+        label: Text(
+          text,
+          style: TextStyle(fontSize: 18), // Adjusted font size
+        ),
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          // Adjusted padding
           backgroundColor: color,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
