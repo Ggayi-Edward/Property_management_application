@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,8 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:path/path.dart' as path;
 import 'package:propertysmart2/data/addProperty.dart';
+
 
 class PropertyListingsPage extends StatelessWidget {
   Future<void> uploadFile(PlatformFile file, String userId) async {
@@ -17,17 +18,14 @@ class PropertyListingsPage extends StatelessWidget {
       String fileName;
 
       if (kIsWeb) {
-        // Web specific
         fileBytes = file.bytes;
         fileName = file.name;
       } else {
-        // Mobile specific
         fileBytes = await File(file.path!).readAsBytes();
         fileName = path.basename(file.path!);
       }
 
       final storageRef = FirebaseStorage.instance.ref().child('uploads/$userId/$fileName');
-
       final uploadTask = storageRef.putData(
         fileBytes!,
         SettableMetadata(
@@ -43,7 +41,7 @@ class PropertyListingsPage extends StatelessWidget {
     }
   }
 
-  Future<void> deleteProperty(String propertyId, String mainImageUrl, List<String> roomImageUrls) async {
+  Future<void> deleteProperty(String propertyId, String mainImageUrl) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -51,39 +49,27 @@ class PropertyListingsPage extends StatelessWidget {
         return;
       }
 
-      // Delete the main image if owned by the user
-      if (mainImageUrl.isNotEmpty) {
-        final mainImageRef = FirebaseStorage.instance.refFromURL(mainImageUrl);
+      Future<void> deleteImage(String imageUrl) async {
+        if (imageUrl.isEmpty) return;
+        final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
         try {
-          final metadata = await mainImageRef.getMetadata();
+          final metadata = await imageRef.getMetadata();
           if (metadata.customMetadata?['ownerId'] == user.uid) {
-            await mainImageRef.delete();
+            await imageRef.delete();
+            print('Image deleted: $imageUrl');
           } else {
-            print('User does not own this image');
+            print('User does not own this image: $imageUrl');
           }
         } catch (e) {
-          print('Error retrieving metadata or deleting main image: $e');
-        }
-      }
-
-      // Delete room images if owned by the user
-      for (String imgUrl in roomImageUrls) {
-        if (imgUrl.isNotEmpty) {
-          final imgRef = FirebaseStorage.instance.refFromURL(imgUrl);
-          try {
-            final metadata = await imgRef.getMetadata();
-            if (metadata.customMetadata?['ownerId'] == user.uid) {
-              await imgRef.delete();
-            } else {
-              print('User does not own this image');
-            }
-          } catch (e) {
-            print('Error retrieving metadata or deleting room image: $e');
+          if (e.toString().contains('object-not-found')) {
+            print('Image not found, might already be deleted: $imageUrl');
+          } else {
+            print('Error retrieving metadata or deleting image: $e');
           }
         }
       }
 
-      // Delete the property document
+      await deleteImage(mainImageUrl);
       await FirebaseFirestore.instance.collection('properties').doc(propertyId).delete();
       print('Property deleted successfully.');
     } catch (e) {
@@ -98,7 +84,6 @@ class PropertyListingsPage extends StatelessWidget {
       PlatformFile file = result.files.first;
       await uploadFile(file, userId);
     } else {
-      // User canceled the picker
       print('No file selected.');
     }
   }
@@ -192,80 +177,73 @@ class PropertyListingsPage extends StatelessWidget {
 
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                  (context, index) {
                     final property = properties[index];
                     final data = property.data() as Map<String, dynamic>?;
 
                     final mainImage = data?['mainImage'] as String? ?? '';
-                    final roomImages = data?['roomImages'] is List
-                        ? List<String>.from(data!['roomImages'])
-                        : <String>[];
-
-                    print('Main image URL: $mainImage');
-                    print('Room image URLs: $roomImages');
 
                     return Card(
                       margin: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
                           if (mainImage.isNotEmpty)
                             CachedNetworkImage(
                               imageUrl: mainImage,
-                              height: 200,
-                              width: double.infinity,
+                              height: 150,
+                              width: 150,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Center(child: CircularProgressIndicator()),
                               errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data?['title'] ?? 'No title',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data?['title'] ?? 'No title',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(data?['location'] ?? 'No location'),
-                                SizedBox(height: 10),
-                                Text('\$${data?['price'] ?? '0'}'),
-                                SizedBox(height: 10),
-                                Text(data?['description'] ?? 'No description'),
-                                SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 10,
-                                  children: roomImages.map(
-                                        (imgUrl) {
-                                      print('Room image URL: $imgUrl');
-                                      return imgUrl.isNotEmpty
-                                          ? CachedNetworkImage(
-                                        imageUrl: imgUrl,
-                                        height: 100,
-                                        width: 100,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                        errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
-                                      )
-                                          : Container();
-                                    },
-                                  ).toList(),
-                                ),
-                              ],
+                                  SizedBox(height: 10),
+                                  Text(data?['location'] ?? 'No location'),
+                                  SizedBox(height: 10),
+                                  Text('\$${data?['price'] ?? '0'}'),
+                                  SizedBox(height: 10),
+                                  Text(data?['description'] ?? 'No description'),
+                                ],
+                              ),
                             ),
                           ),
-                          ButtonBar(
+                          Column(
                             children: [
+                              TextButton(
+                                onPressed: () {
+                                  // Add your edit logic here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddPropertyPage(
+                                        propertyId: property.id,
+                                        propertyData: data,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Edit',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ),
                               TextButton(
                                 onPressed: () {
                                   deleteProperty(
                                     property.id,
                                     mainImage,
-                                    roomImages,
                                   );
                                 },
                                 child: Text(
