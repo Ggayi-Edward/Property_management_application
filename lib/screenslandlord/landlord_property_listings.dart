@@ -1,29 +1,49 @@
 import 'dart:io';
-import 'package:path/path.dart' as path; // Import the path package with alias
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:path/path.dart' as path;
 import 'package:propertysmart2/data/addProperty.dart';
 
-
 class PropertyListingsPage extends StatelessWidget {
-  Future<void> _uploadFile(String filePath, String userId) async {
-    final file = File(filePath);
-    final fileName = path.basename(filePath); // Get the file name using basename
-    final storageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+  Future<void> uploadFile(PlatformFile file, String userId) async {
+    try {
+      Uint8List? fileBytes;
+      String fileName;
 
-    final uploadTask = storageRef.putFile(
-      file,
-      SettableMetadata(
-        customMetadata: {'ownerId': userId},
-      ),
-    );
+      if (kIsWeb) {
+        // Web specific
+        fileBytes = file.bytes;
+        fileName = file.name;
+      } else {
+        // Mobile specific
+        fileBytes = await File(file.path!).readAsBytes();
+        fileName = path.basename(file.path!);
+      }
 
-    await uploadTask.whenComplete(() => print('File uploaded successfully.'));
+      final storageRef = FirebaseStorage.instance.ref().child('uploads/$userId/$fileName');
+
+      final uploadTask = storageRef.putData(
+        fileBytes!,
+        SettableMetadata(
+          contentType: 'image/jpeg',
+          customMetadata: {'ownerId': userId},
+        ),
+      );
+
+      await uploadTask;
+      print('File uploaded successfully.');
+    } catch (e) {
+      print('File upload failed: $e');
+    }
   }
 
-  Future<void> _deleteProperty(String propertyId, String mainImageUrl, List<String> roomImageUrls) async {
+  Future<void> deleteProperty(String propertyId, String mainImageUrl, List<String> roomImageUrls) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -71,6 +91,17 @@ class PropertyListingsPage extends StatelessWidget {
     }
   }
 
+  Future<void> pickAndUploadFile(String userId) async {
+    final result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      await uploadFile(file, userId);
+    } else {
+      // User canceled the picker
+      print('No file selected.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,27 +201,22 @@ class PropertyListingsPage extends StatelessWidget {
                         ? List<String>.from(data!['roomImages'])
                         : <String>[];
 
+                    print('Main image URL: $mainImage');
+                    print('Room image URLs: $roomImages');
+
                     return Card(
                       margin: EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (mainImage.isNotEmpty)
-                            Image.network(
-                              mainImage,
+                            CachedNetworkImage(
+                              imageUrl: mainImage,
                               height: 200,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) {
-                                  return child;
-                                } else {
-                                  return Center(child: CircularProgressIndicator());
-                                }
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(child: Icon(Icons.error, color: Colors.red));
-                              },
+                              placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
                             ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -214,22 +240,19 @@ class PropertyListingsPage extends StatelessWidget {
                                 Wrap(
                                   spacing: 10,
                                   children: roomImages.map(
-                                        (imgUrl) => imgUrl.isNotEmpty
-                                        ? Image.network(
-                                      imgUrl,
-                                      height: 100,
-                                      loadingBuilder: (context, child, progress) {
-                                        if (progress == null) {
-                                          return child;
-                                        } else {
-                                          return Center(child: CircularProgressIndicator());
-                                        }
-                                      },
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Center(child: Icon(Icons.error, color: Colors.red));
-                                      },
-                                    )
-                                        : Container(),
+                                        (imgUrl) {
+                                      print('Room image URL: $imgUrl');
+                                      return imgUrl.isNotEmpty
+                                          ? CachedNetworkImage(
+                                        imageUrl: imgUrl,
+                                        height: 100,
+                                        width: 100,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                        errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
+                                      )
+                                          : Container();
+                                    },
                                   ).toList(),
                                 ),
                               ],
@@ -239,7 +262,7 @@ class PropertyListingsPage extends StatelessWidget {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  _deleteProperty(
+                                  deleteProperty(
                                     property.id,
                                     mainImage,
                                     roomImages,

@@ -1,62 +1,164 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:propertysmart2/export/file_exports.dart';// Ensure the import path is correct
+import 'package:file_picker/file_picker.dart'; // Import file_picker package
+import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/model/lease_agreement.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:propertysmart2/export/file_exports.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class LeaseAgreementsPage extends StatelessWidget {
-  final List<LeaseAgreement> leaseAgreements = [
-    LeaseAgreement(
-      id: '1',
-      tenantName: 'John Doe',
-      propertyAddress: '123 Main St, Cityville',
-      startDate: DateTime(2023, 1, 1),
-      endDate: DateTime(2024, 1, 1),
-      monthlyRent: 1200.00,
-    ),
-    LeaseAgreement(
-      id: '2',
-      tenantName: 'Jane Smith',
-      propertyAddress: '456 Elm St, Townsville',
-      startDate: DateTime(2023, 5, 1),
-      endDate: DateTime(2024, 5, 1),
-      monthlyRent: 1500.00,
-    ),
-  ];
+class LeaseAgreementsPage extends StatefulWidget {
+  @override
+  _LeaseAgreementsPageState createState() => _LeaseAgreementsPageState();
+}
+
+class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
+  List<LeaseAgreement> leaseAgreements = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLeaseAgreements();
+  }
+
+  Future<void> _fetchLeaseAgreements() async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance.collection('lease_agreements').get();
+      final agreements = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return LeaseAgreement(
+          id: doc.id,
+          tenantName: data['tenantName'],
+          propertyAddress: data['propertyAddress'],
+          startDate: DateTime.parse(data['startDate']),
+          endDate: DateTime.parse(data['endDate']),
+          monthlyRent: data['monthlyRent'],
+          documents: List<String>.from(data['documents']), // List of document URLs
+        );
+      }).toList();
+
+      setState(() {
+        leaseAgreements = agreements;
+      });
+    } catch (e) {
+      print('Error fetching lease agreements: $e');
+    }
+  }
+
+  void _addNewLeaseAgreement(LeaseAgreement lease) {
+    setState(() {
+      leaseAgreements.add(lease);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Lease Agreements'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: ListView.builder(
-        itemCount: leaseAgreements.length,
-        itemBuilder: (context, index) {
-          final lease = leaseAgreements[index];
-          return Card(
-            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              title: Text(lease.tenantName),
-              subtitle: Text(lease.propertyAddress),
-              trailing: Text(DateFormat('yyyy-MM-dd').format(lease.endDate)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LeaseAgreementDetailsPage(leaseAgreement: lease),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 150.0,
+            pinned: true,
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'PropertySmart',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (!isCollapsed)
+                        Text(
+                          'Lease Agreements',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0D47A1),
+                    ),
                   ),
                 );
               },
             ),
-          );
-        },
+            actions: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () async {
+                  final newLease = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateLeaseAgreementPage()),
+                  );
+                  if (newLease != null) {
+                    _addNewLeaseAgreement(newLease);
+                  }
+                },
+              ),
+            ],
+          ),
+          leaseAgreements.isEmpty
+              ? SliverFillRemaining(
+            child: Center(
+              child: Text(
+                'No agreements here',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            ),
+          )
+              : SliverList(
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                final lease = leaseAgreements[index];
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: ListTile(
+                    title: Text(lease.tenantName),
+                    subtitle: Text(lease.propertyAddress),
+                    trailing: Text(DateFormat('yyyy-MM-dd').format(lease.endDate)),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LeaseAgreementDetailsPage(leaseAgreement: lease),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+              childCount: leaseAgreements.length,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to a page to create a new lease agreement
+        onPressed: () async {
+          final newLease = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreateLeaseAgreementPage()),
+          );
+          if (newLease != null) {
+            _addNewLeaseAgreement(newLease);
+          }
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Color(0xFF0D47A1),
       ),
     );
   }
@@ -66,6 +168,59 @@ class LeaseAgreementDetailsPage extends StatelessWidget {
   final LeaseAgreement leaseAgreement;
 
   LeaseAgreementDetailsPage({required this.leaseAgreement});
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _editLeaseAgreement(BuildContext context) async {
+    final editedLease = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateLeaseAgreementPage(leaseAgreement: leaseAgreement),
+      ),
+    );
+    if (editedLease != null) {
+      // Handle updated lease agreement data here
+    }
+  }
+
+  void _deleteLeaseAgreement(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this lease agreement?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform the deletion
+                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context, 'deleted'); // Return a result indicating deletion
+              },
+              child: Text('Delete'),
+              style: TextButton.styleFrom(backgroundColor: Colors.red),
+            ),
+          ],
+        );
+      },
+    ).then((result) {
+      if (result == 'deleted') {
+        // Handle the deletion logic here, e.g., remove from the list
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,19 +244,30 @@ class LeaseAgreementDetailsPage extends StatelessWidget {
             SizedBox(height: 10),
             Text('Monthly Rent: \$${leaseAgreement.monthlyRent.toStringAsFixed(2)}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
+            if (leaseAgreement.documents.isNotEmpty)
+              ...leaseAgreement.documents.map((url) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(child: Text('Document: $url', overflow: TextOverflow.ellipsis)),
+                    IconButton(
+                      icon: Icon(Icons.download),
+                      onPressed: () {
+                        _launchURL(url);
+                      },
+                    ),
+                  ],
+                ),
+              )),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // Edit lease agreement
-                  },
+                  onPressed: () => _editLeaseAgreement(context),
                   child: Text('Edit'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Delete lease agreement
-                  },
+                  onPressed: () => _deleteLeaseAgreement(context),
                   child: Text('Delete'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
