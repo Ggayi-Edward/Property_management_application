@@ -1,262 +1,216 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:propertysmart2/export/file_exports.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:propertysmart2/data/addProperty.dart';
+import 'package:propertysmart2/widgets/drawer.dart';
 
+class EstateListingView extends StatelessWidget {
+  Future<void> uploadFile(PlatformFile file, String userId) async {
+    try {
+      Uint8List? fileBytes;
+      String fileName;
 
-class EstateCard extends StatelessWidget {
-  final EstateModel estate;
-  final double imageHeight;
+      if (kIsWeb) {
+        fileBytes = file.bytes;
+        fileName = file.name;
+      } else {
+        fileBytes = await File(file.path!).readAsBytes();
+        fileName = path.basename(file.path!);
+      }
 
-  const EstateCard({
-    Key? key,
-    required this.estate,
-    required this.imageHeight,
-  }) : super(key: key);
+      final storageRef = FirebaseStorage.instance.ref().child('uploads/$userId/$fileName');
+      final uploadTask = storageRef.putData(
+        fileBytes!,
+        SettableMetadata(
+          contentType: 'image/jpeg',
+          customMetadata: {'ownerId': userId},
+        ),
+      );
+
+      await uploadTask;
+      print('File uploaded successfully.');
+    } catch (e) {
+      print('File upload failed: $e');
+    }
+  }
+
+  Future<void> pickAndUploadFile(String userId) async {
+    final result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      await uploadFile(file, userId);
+    } else {
+      print('No file selected.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EstateDetailsView(estate: estate),
-            ),
-          );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Scaffold(
+        body: Center(child: Text('Please log in to view your properties.')),
+      );
+    }
+
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      drawer: CustomDrawer(), // Add your custom drawer widget here
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 200.0,
+            pinned: true,
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'PropertySmart',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 22,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(1.0, 1.0),
+                              blurRadius: 2.0,
+                              color: Colors.black.withOpacity(0.2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isCollapsed)
+                        Text(
+                          'Property Listing',
+                          style: theme.textTheme.displayMedium?.copyWith(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                    ],
                   ),
-                  child: Image.asset(
-                    estate.image,
-                    fit: BoxFit.cover,
-                    width: constraints.maxWidth,
-                    height: imageHeight,
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0D47A1),
+                    ),
                   ),
                 );
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    estate.location,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    estate.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text('\$${estate.price.toString()}'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class EstateListingView extends StatefulWidget {
-  const EstateListingView({Key? key}) : super(key: key);
-
-  @override
-  _EstateListingViewState createState() => _EstateListingViewState();
-}
-
-class _EstateListingViewState extends State<EstateListingView> {
-  final TextEditingController _searchController = TextEditingController();
-  final int gridCrossAxisCount = 2;
-  final double cardImageHeight = 150;
-  List<EstateModel> _filteredEstates = [];
-  List<EstateModel> _estates = [];
-  EstateData estateData = EstateData(); // Initialize EstateData
-
-  String? _selectedPriceRange;
-  int? _selectedBedrooms;
-  int? _selectedBathrooms;
-  bool? _selectedSwimmingPool;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(_filterEstates);
-  }
-
-  void _filterEstates() {
-    setState(() {
-      _filteredEstates = estateData.filterEstates(
-        priceRange: _selectedPriceRange,
-        bedrooms: _selectedBedrooms,
-        bathrooms: _selectedBathrooms,
-        swimmingPool: _selectedSwimmingPool,
-      ).where((estate) =>
-      estate.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-          estate.location.toLowerCase().contains(_searchController.text.toLowerCase())
-      ).toList();
-    });
-  }
-
-  void _applyFilters(Map<String, dynamic> filters) {
-    setState(() {
-      _selectedPriceRange = filters['priceRange'];
-      _selectedBedrooms = filters['bedrooms'];
-      _selectedBathrooms = filters['bathrooms'];
-      _selectedSwimmingPool = filters['swimmingPool'];
-
-      _filteredEstates = estateData.filterEstates(
-        priceRange: _selectedPriceRange,
-        bedrooms: _selectedBedrooms,
-        bathrooms: _selectedBathrooms,
-        swimmingPool: _selectedSwimmingPool,
-      ).where((estate) =>
-      estate.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-          estate.location.toLowerCase().contains(_searchController.text.toLowerCase())
-      ).toList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ViewModelBuilder<EstateListingViewModel>.reactive(
-      viewModelBuilder: () => EstateListingViewModel(),
-      onViewModelReady: (viewModel) {
-        _estates = viewModel.estates;
-        _filteredEstates = _estates;
-      },
-      builder: (context, viewModel, child) {
-        return Scaffold(
-          drawer: CustomDrawer(
-            onFilterApplied: _applyFilters,
-            showFilters: true, // Show filters only on EstateListingView
+            actions: [], // Removed the IconButton for adding properties
           ),
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 150.0,
-                pinned: true,
-                flexibleSpace: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    var isCollapsed = constraints.maxHeight <= kToolbarHeight + 20;
-                    return FlexibleSpaceBar(
-                      centerTitle: true,
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'PropertySmart',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (!isCollapsed)
-                            Text(
-                              'Property Listing',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontSize: 14,
-                                color: Colors.white,
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('properties')
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return SliverFillRemaining(
+                  child: Center(child: Text('Error: ${snapshot.error}')),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(child: Text('No properties available.')),
+                );
+              }
+
+              final properties = snapshot.data!.docs;
+
+              return SliverPadding(
+                padding: const EdgeInsets.all(10.0),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10.0,
+                    mainAxisSpacing: 10.0,
+                    childAspectRatio: 0.75,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final property = properties[index];
+                      final data = property.data() as Map<String, dynamic>?;
+
+                      final mainImage = data?['mainImage'] as String? ?? '';
+
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0), // Rounded corners for both top and bottom
+                        child: Card(
+                          elevation: 4.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (mainImage.isNotEmpty)
+                                CachedNetworkImage(
+                                  imageUrl: mainImage,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
+                                ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data?['title'] ?? 'No title',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black, // Set text color to black
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      data?['location'] ?? 'No location',
+                                      style: TextStyle(
+                                        color: Colors.black, // Set text color to black
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      '\$${data?['price'] ?? '0'}',
+                                      style: TextStyle(
+                                        color: Colors.black, // Set text color to black
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                        ],
-                      ),
-                      background: Container(
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0D47A1),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SliverFillRemaining(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search by location...',
-                            hintStyle: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16, // Change font size here
-                            ),
-                            prefixIcon: const Icon(Icons.search, color: Color(0xFF0D47A1)),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                _filterEstates();
-                              },
-                            )
-                                : null,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
+                            ],
                           ),
-                          onChanged: (value) {
-                            _filterEstates();
-                          },
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: MasonryGridView.count(
-                        crossAxisCount: gridCrossAxisCount,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        itemCount: _filteredEstates.length,
-                        itemBuilder: (context, index) {
-                          return EstateCard(
-                            estate: _filteredEstates[index],
-                            imageHeight: cardImageHeight,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                    childCount: properties.length,
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

@@ -15,7 +15,7 @@ class IntroPageView extends StatelessWidget {
           controller: model.pageController,
           children: [
             FirstIntro(onConfirmTap: () {
-              model.navigateToView(context, const EstateListingView());
+              model.navigateToView(context,  EstateListingView());
             }),
             // Uncomment and update other intros as needed
             // SecondIntro(onNextTap: () {

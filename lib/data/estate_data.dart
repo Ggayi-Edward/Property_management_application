@@ -18,7 +18,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen1.jfif',
         'assets/images/houses/rooms/bedroom1.jfif',
         'assets/images/houses/rooms/bathroom1.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/bukotohouse.jpeg',
@@ -36,7 +36,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen2.jfif',
         'assets/images/houses/rooms/bedroom2.jfif',
         'assets/images/houses/rooms/bathroom2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/bukotohouse.jpeg',
@@ -54,7 +54,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen2.jfif',
         'assets/images/houses/rooms/bedroom2.jfif',
         'assets/images/houses/rooms/bathroom2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/bukotohouse.jpeg',
@@ -72,7 +72,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen2.jfif',
         'assets/images/houses/rooms/bedroom2.jfif',
         'assets/images/houses/rooms/bathroom2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/entebbe.jpeg',
@@ -90,7 +90,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen2.jfif',
         'assets/images/houses/rooms/bedroom2.jfif',
         'assets/images/houses/rooms/bathroom2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/entebbe.jpeg',
@@ -108,7 +108,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen3.jfif',
         'assets/images/houses/rooms/bedroom3.jfif',
         'assets/images/houses/rooms/bathroom3.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/makindyehouse.jpeg',
@@ -127,7 +127,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen4.jfif',
         'assets/images/houses/rooms/livingroom4.jfif',
         'assets/images/houses/rooms/swimmingpool1.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/kyabanyorohouse.jpeg',
@@ -145,7 +145,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen5.jfif',
         'assets/images/houses/rooms/livingroom5.jfif',
         'assets/images/houses/rooms/swimmingpool2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/kyabanyorohouse.jpeg',
@@ -163,7 +163,7 @@ class EstateData {
         'assets/images/houses/rooms/kitchen5.jfif',
         'assets/images/houses/rooms/livingroom5.jfif',
         'assets/images/houses/rooms/swimmingpool2.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
     EstateModel(
       image: 'assets/images/houses/makindyehouse.jpeg',
@@ -180,7 +180,7 @@ class EstateData {
         'assets/images/houses/rooms/livingroom1.jfif',
         'assets/images/houses/rooms/bathroom6.jfif',
         'assets/images/houses/rooms/swimmingpool3.jfif',
-      ], id: '',
+      ], id: '', phoneNumber: '',
     ),
   ];
 

@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
               'CreateAccount': (context) => const CreateNewAccount(),
               'ForgotPassword': (context) => const ForgotPassword(),
               'IntroPageView': (context) => const IntroPageView(),
-              'EstateListingView': (context) => const EstateListingView(),
+              'EstateListingView': (context) =>  EstateListingView(),
               'ProfileScreen': (context) => const ProfileScreen(),
               'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
               'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),

@@ -52,7 +52,7 @@ dev_dependencies:
   http: ^1.2.2
   app_links: ^6.1.4
   carousel_slider: ^4.2.1
-  flutter_staggered_grid_view: ^0.7.0
+  
   cached_network_image: ^3.3.1
   smooth_page_indicator: ^1.2.0
   google_fonts: ^6.2.1
@@ -78,7 +78,7 @@ dev_dependencies:
   # image_picker_web: ^4.0.0
   provider: ^6.1.2
   path: ^1.9.0
-
+  flutter_staggered_grid_view: ^0.7.0
 
 
  

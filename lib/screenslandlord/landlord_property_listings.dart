@@ -236,7 +236,7 @@ class PropertyListingsPage extends StatelessWidget {
                                 },
                                 child: Text(
                                   'Edit',
-                                  style: TextStyle(color: Colors.blue),
+                                  style: TextStyle(color: Color(0xFF0D47A1)),
                                 ),
                               ),
                               TextButton(

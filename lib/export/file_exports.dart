@@ -19,7 +19,7 @@ export 'package:propertysmart2/widgets/password_input.dart';
 export 'package:fluttertoast/fluttertoast.dart';
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:propertysmart2/utilities/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
-export 'package:propertysmart2/constants/drawer.dart';
+export 'package:propertysmart2/widgets/drawer.dart';
 export 'package:propertysmart2/screens/profile_page.dart';
 export 'package:propertysmart2/payment/payment_page.dart';
 export 'package:propertysmart2/screens/account_page.dart';
