@@ -200,17 +200,17 @@ class EstateData {
 
       // Bedrooms Filtering
       if (bedrooms != null) {
-        matches = matches && estate.availability['bedrooms'] == bedrooms;
+        matches = matches && estate.availability?['bedrooms'] == bedrooms;
       }
 
       // Bathrooms Filtering
       if (bathrooms != null) {
-        matches = matches && estate.availability['bathrooms'] == bathrooms;
+        matches = matches && estate.availability?['bathrooms'] == bathrooms;
       }
 
       // Swimming Pool Filtering
       if (swimmingPool != null) {
-        matches = matches && estate.availability['swimmingPool'] == swimmingPool;
+        matches = matches && estate.availability?['swimmingPool'] == swimmingPool;
       }
 
       return matches;

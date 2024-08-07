@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // Import this to use kIsWeb
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:stacked/stacked.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -20,10 +22,9 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
       viewModelBuilder: () => EstateDetailsViewModel(),
       builder: (context, viewModel, _) {
         return Scaffold(
-          
           body: CustomScrollView(
             slivers: [
-              // New SliverAppBar with title and subtitle
+              // SliverAppBar with title and subtitle
               SliverAppBar(
                 expandedHeight: 150.0,
                 pinned: true,
@@ -64,16 +65,27 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                   },
                 ),
               ),
-              // Remove SliverAppBar for estate details image and use SliverToBoxAdapter instead
+              // Estate details image
               SliverToBoxAdapter(
                 child: ClipPath(
                   clipper: UpwardArcClipper(),
-                  child: Image.asset(
-                    widget.estate.image, // Replace with Image.asset
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.3, // Adjusted height
-                  ),
+                  child: widget.estate.image.isNotEmpty
+                      ? Image.network(
+                          widget.estate.image,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Image load error: $error');
+                            return const Center(child: Icon(Icons.image_not_supported));
+                          },
+                        )
+                      : Container(
+                          color: Colors.grey[300],
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          width: double.infinity,
+                          child: const Center(child: Icon(Icons.image_not_supported)),
+                        ),
                 ),
               ),
               SliverToBoxAdapter(
@@ -140,7 +152,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Bedrooms: ${widget.estate.availability['bedrooms']}',
+                              'Bedrooms: ${widget.estate.availability?['bedrooms'] ?? 'N/A'}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -157,7 +169,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Bathrooms: ${widget.estate.availability['bathrooms']}',
+                              'Bathrooms: ${widget.estate.availability?['bathrooms'] ?? 'N/A'}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -174,7 +186,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Wifi: ${widget.estate.availability['wifi'] ? 'Yes' : 'No'}',
+                              'Wifi: ${widget.estate.availability?['wifi'] == true ? 'Yes' : 'No'}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -191,7 +203,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Swimming Pool: ${widget.estate.availability['swimmingPool'] ? 'Yes' : 'No'}',
+                              'Swimming Pool: ${widget.estate.availability?['swimmingPool'] == true ? 'Yes' : 'No'}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -206,9 +218,9 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 200, // Height for slider images
+                  height: 200,
                   child: CarouselSlider.builder(
-                    itemCount: widget.estate.roomImages.length,
+                    itemCount: widget.estate.roomImages?.length ?? 0,
                     itemBuilder: (context, index, realIndex) {
                       return GestureDetector(
                         onTap: () {
@@ -216,7 +228,7 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => FullImageView(
-                                imageUrl: widget.estate.roomImages[index],
+                                imageUrl: widget.estate.roomImages![index],
                               ),
                             ),
                           );
@@ -235,23 +247,23 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20.0),
-                            child: Image.asset(
-                              widget.estate.roomImages[index], // Replace with Image.asset
+                            child: Image.network(
+                              widget.estate.roomImages![index],
                               fit: BoxFit.cover,
                               width: MediaQuery.of(context).size.width * 0.8,
                               height: 200,
-                              errorBuilder: (context, error, stackTrace) =>
-                              const Center(child: Icon(Icons.error)),
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Carousel image load error: $error');
+                                return const Center(child: Icon(Icons.image_not_supported));
+                              },
                             ),
                           ),
                         ),
                       );
                     },
                     options: CarouselOptions(
-                      height: 200,
+                      autoPlay: true,
                       enlargeCenterPage: true,
-                      enableInfiniteScroll: true,
-                      viewportFraction: 0.8,
                       onPageChanged: (index, reason) {
                         setState(() {
                           _currentRoomIndex = index;
@@ -265,14 +277,23 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    widget.estate.roomImages.length,
-                        (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentRoomIndex == index ? Colors.blue : Colors.grey,
+                    widget.estate.roomImages?.length ?? 0,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _currentRoomIndex = index;
+                        });
+                      },
+                      child: Container(
+                        width: 8.0,
+                        height: 8.0,
+                        margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentRoomIndex == index
+                              ? const Color.fromRGBO(0, 0, 0, 0.9)
+                              : const Color.fromRGBO(0, 0, 0, 0.4),
+                        ),
                       ),
                     ),
                   ),
@@ -280,51 +301,27 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PaymentPage(
-                                    landlordMobileMoneyNumber: '',
-                                    landlordEmail: '',
-                                  )),
-                            );
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: Color(0xFF0D47A1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blueAccent.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Checkout',
-                                style: TextStyle(
-                                  color: Colors.white, // Font color
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 18, // Font size
-                                ),
-                              ),
-                            ),
-                          ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Add your checkout logic here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D47A1),
+                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Checkout',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                        const SizedBox(height: 10),
-                        // Removed Contact Agent button
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -337,37 +334,40 @@ class _EstateDetailsViewState extends State<EstateDetailsView> {
   }
 }
 
+// Define FullImageView
+class FullImageView extends StatelessWidget {
+  final String imageUrl;
+
+  const FullImageView({required this.imageUrl, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Full Image View'),
+      ),
+      body: Center(
+        child: Image.network(imageUrl),
+      ),
+    );
+  }
+}
+
+// Define UpwardArcClipper
 class UpwardArcClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0, size.height - 40);
-    var controlPoint = Offset(size.width / 2, size.height);
-    var endPoint = Offset(size.width, size.height - 40);
-    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    final path = Path();
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, size.height);
     path.lineTo(size.width, 0);
+    path.lineTo(0, 0);
+    path.arcToPoint(Offset(size.width / 2, size.height / 2),
+        radius: Radius.circular(20));
     path.close();
     return path;
   }
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class FullImageView extends StatelessWidget {
-  final String imageUrl;
-  const FullImageView({super.key, required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Image.asset(
-          imageUrl, // Replace with Image.asset
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
 }

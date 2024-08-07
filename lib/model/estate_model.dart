@@ -6,8 +6,8 @@ class EstateModel {
   String title;
   String location;
   double price;
-  final Map<String, dynamic> availability;
-  List<String> roomImages; // List to store URLs of room images
+  Map<String, dynamic>? availability;
+  List<String>? roomImages; // List to store URLs of room images
   String phoneNumber; // New field for owner's phone number
 
   EstateModel({

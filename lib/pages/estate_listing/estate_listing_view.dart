@@ -8,10 +8,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:propertysmart2/data/addProperty.dart';
+import 'package:propertysmart2/model/estate_model.dart';
+import 'package:propertysmart2/pages/estate_details/estate_detail_view.dart';
 import 'package:propertysmart2/widgets/drawer.dart';
 
 class EstateListingView extends StatelessWidget {
+  const EstateListingView({super.key});
+
   Future<void> uploadFile(PlatformFile file, String userId) async {
     try {
       Uint8List? fileBytes;
@@ -64,7 +67,7 @@ class EstateListingView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      drawer: CustomDrawer(), // Add your custom drawer widget here
+      drawer: CustomDrawer(),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -111,12 +114,9 @@ class EstateListingView extends StatelessWidget {
                 );
               },
             ),
-            actions: [], // Removed the IconButton for adding properties
           ),
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('properties')
-                .snapshots(),
+            stream: FirebaseFirestore.instance.collection('properties').snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
                 return SliverFillRemaining(
@@ -139,7 +139,7 @@ class EstateListingView extends StatelessWidget {
               return SliverPadding(
                 padding: const EdgeInsets.all(10.0),
                 sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 10.0,
                     mainAxisSpacing: 10.0,
@@ -152,53 +152,67 @@ class EstateListingView extends StatelessWidget {
 
                       final mainImage = data?['mainImage'] as String? ?? '';
 
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(15.0), // Rounded corners for both top and bottom
-                        child: Card(
-                          elevation: 4.0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (mainImage.isNotEmpty)
-                                CachedNetworkImage(
-                                  imageUrl: mainImage,
-                                  height: 150,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
-                                ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      data?['title'] ?? 'No title',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black, // Set text color to black
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      data?['location'] ?? 'No location',
-                                      style: TextStyle(
-                                        color: Colors.black, // Set text color to black
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      '\$${data?['price'] ?? '0'}',
-                                      style: TextStyle(
-                                        color: Colors.black, // Set text color to black
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EstateDetailsView(
+                                estate: EstateModel.fromFirestore(property),
                               ),
-                            ],
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15.0),
+                          child: Card(
+                            elevation: 4.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (mainImage.isNotEmpty)
+                                  CachedNetworkImage(
+                                    imageUrl: mainImage,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) =>
+                                        Center(child: Icon(Icons.error, color: Colors.red)),
+                                  ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data?['title'] ?? 'No title',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        data?['location'] ?? 'No location',
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        '\$${data?['price'] ?? '0'}',
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

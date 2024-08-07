@@ -12,7 +12,7 @@ class AddPropertyPage extends StatefulWidget {
   final String? propertyId;
   final Map<String, dynamic>? propertyData;
 
-  AddPropertyPage({this.propertyId, this.propertyData});
+  const AddPropertyPage({Key? key, this.propertyId, this.propertyData}) : super(key: key);
 
   @override
   _AddPropertyPageState createState() => _AddPropertyPageState();
@@ -89,7 +89,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       final mimeType = 'image/jpeg';
       final uploadTask = kIsWeb
           ? ref.putData(imageFile, SettableMetadata(contentType: mimeType, customMetadata: {'ownerId': user.uid}))
-          : ref.putFile(imageFile, SettableMetadata(contentType: mimeType, customMetadata: {'ownerId': user.uid}));
+          : ref.putFile(imageFile as io.File, SettableMetadata(contentType: mimeType, customMetadata: {'ownerId': user.uid}));
       setState(() {
         _isUploading = true;
       });
@@ -209,8 +209,8 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
           value: value,
           items: List.generate(max - min + 1, (index) => index + min)
               .map((e) => DropdownMenuItem(
-                    child: Text('$e', style: TextStyle(color:Color(0xFF0D47A1))),
                     value: e,
+                    child: Text('$e', style: TextStyle(color: Color(0xFF0D47A1))),
                   ))
               .toList(),
           onChanged: onChanged,
@@ -283,7 +283,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
