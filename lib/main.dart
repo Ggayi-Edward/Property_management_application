@@ -1,20 +1,41 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:propertysmart2/export/file_exports.dart';
-import 'package:propertysmart2/pages/intro/splash_screen.dart';
-import 'package:propertysmart2/screens/forgot_password.dart';
-import 'package:propertysmart2/screens/profile_page.dart';
-// Import your existing confirmation page
-import 'package:propertysmart2/screens/login_screen.dart';
-import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:propertysmart2/payment/payment_page.dart';
+import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+import 'package:propertysmart2/screenslandlord/lease_agreement_page.dart';
+import 'package:propertysmart2/screenslandlord/profile_page_landlord.dart';
 import 'package:provider/provider.dart';
-import 'constants/theme_data.dart';
-import 'constants/theme_notifier.dart';
+import 'package:propertysmart2/constants/theme_data.dart';
+import 'package:propertysmart2/constants/theme_notifier.dart';
+import 'package:propertysmart2/pages/intro/splash_screen.dart';
+import 'package:propertysmart2/screens/account_page.dart';
+import 'package:propertysmart2/screens/create_new_account.dart';
+import 'package:propertysmart2/screenslandlord/create_new_account_landlord.dart';
+import 'package:propertysmart2/pages/estate_listing/estate_listing_view.dart';
+import 'package:propertysmart2/screens/forgot_password.dart';
+import 'package:propertysmart2/screenslandlord/forgot_password_landlord.dart';
+import 'package:propertysmart2/screens/login_screen.dart';
+import 'package:propertysmart2/screenslandlord/login_screen_landlord.dart';
+import 'package:propertysmart2/pages/intro/intropage_view.dart';
+import 'package:propertysmart2/screens/profile_page.dart';
 
+import 'data/addAgreement.dart';
+import 'data/addProperty.dart';
+import 'messages/messagingPage.dart';
+
+
+
+// Background message handler for Firebase Messaging
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Note: No need to initialize Firebase here again
+  print('Handling a background message: ${message.messageId}');
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Ensure Firebase is only initialized once
   await Firebase.initializeApp(
     options: const FirebaseOptions(
       apiKey: "AIzaSyCXQ4B81sO45QqDW0GAMAyNclVu9UqDNzw",
@@ -25,13 +46,10 @@ Future<void> main() async {
       projectId: "propertysmart-95070",
     ),
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(MyApp());
-}
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('Handling a background message: ${message.messageId}');
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -46,7 +64,7 @@ class MyApp extends StatelessWidget {
             theme: lightTheme, // Use light theme
             darkTheme: darkTheme, // Use dark theme
             themeMode: themeNotifier.themeMode, // Control theme mode dynamically
-            home: const SplashScreen(),
+            home: const SplashScreen(), // Set the initial screen
             routes: {
               'LoginScreen': (context) => const LoginScreen(),
               'CreateAccount': (context) => const CreateNewAccount(),
@@ -57,17 +75,17 @@ class MyApp extends StatelessWidget {
               'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
               'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
               'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
-              'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(userId: '',),
+              'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(userId: ''),
               'PaymentPage': (context) => PaymentPage(
                 landlordEmail: '',
                 landlordMobileMoneyNumber: '',
               ),
               'AccountPage': (context) => AccountPage(),
               'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
-              'MessagingPage': (context) => MessagingPage(chatId: '', senderId: '',),
-              'MaintenanceRequestsPage': (context) => MaintenanceRequestsPage(),
-              'LandlordDashboard': (context) => LandlordDashboard(userId: '',),
+              'MessagingPage': (context) => MessagingPage(chatId: '', senderId: ''),
+              'LandlordDashboard': (context) => LandlordDashboard(userId: ''),
               'AddPropertyPage': (context) => AddPropertyPage(),
+              'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(),
             },
           );
         },
