@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+import 'package:propertysmart2/messages/landlord_list_page.dart'; // Import the landlord list page
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
@@ -51,9 +52,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-
-                color: Color(0xFF0D47A1)
-
+              color: Color(0xFF0D47A1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +116,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           _buildDrawerItem(
             themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
             themeNotifier.themeMode == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
-                () {
+            () {
               themeNotifier.toggleTheme(themeNotifier.themeMode != ThemeMode.dark);
             },
           ),
@@ -139,6 +138,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               );
             }
+          }),
+          _buildDrawerItem(Icons.email, 'Messages', () {
+            Navigator.pop(context);
+            _navigateToMessages(context);
           }),
           ListTile(
             leading: const Icon(Icons.filter_list),
@@ -163,7 +166,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     // Navigate to landlord or tenant home based on user role
     if (_user != null) {
       // Check for landlord or tenant role and navigate accordingly
-      // Assuming you have a way to determine user role (e.g., user metadata, custom claims, etc.)
       bool isLandlord = _user!.uid == 'landlordUid'; // Replace with actual logic
       if (isLandlord) {
         Navigator.pushReplacement(
@@ -190,6 +192,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
         Navigator.pushNamed(context, 'ProfileScreen');
       }
     }
+  }
+
+  void _navigateToMessages(BuildContext context) {
+    // Navigate to the LandlordListPage
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LandlordListPage(userId: _user!.uid, tenantId: '',)), // Pass userId if needed
+    );
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {

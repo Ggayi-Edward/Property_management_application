@@ -93,7 +93,7 @@ class _CreateNewAccountLandlordState extends State<CreateNewAccountLandlord> {
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/background6.jfif'),
+              image: AssetImage('assets/images/background1.jpeg'),
               fit: BoxFit.cover,
             ),
           ),
