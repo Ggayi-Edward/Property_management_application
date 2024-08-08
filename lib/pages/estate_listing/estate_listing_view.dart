@@ -195,21 +195,20 @@ class EstateListingView extends StatelessWidget {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 5), // Reduced spacing
                                       Text(
                                         data?['location'] ?? 'No location',
                                         style: const TextStyle(
                                           color: Colors.black,
                                         ),
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 5), // Reduced spacing
                                       Text(
                                         '\$${data?['price'] ?? '0'}',
                                         style: const TextStyle(
                                           color: Colors.black,
                                         ),
                                       ),
-                        
                                     ],
                                   ),
                                 ),
