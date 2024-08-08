@@ -1,13 +1,13 @@
-// message_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'message.dart';
 
 class MessageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> sendMessage(String chatId, String senderId, String messageText) async {
+  Future<void> sendMessage(String chatId, String senderId, String senderName, String messageText) async {
     await _firestore.collection('chats').doc(chatId).collection('messages').add({
       'senderId': senderId,
+      'senderName': senderName, // Include senderName
       'messageText': messageText,
       'timestamp': FieldValue.serverTimestamp(),
     });
@@ -24,9 +24,9 @@ class MessageService {
         .collection('chats')
         .doc(chatId)
         .collection('messages')
-        .orderBy('timestamp')
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>)).toList());
+            snapshot.docs.map((doc) => Message.fromFirestore(doc.data() as Map<String, dynamic>)).toList());
   }
 }
