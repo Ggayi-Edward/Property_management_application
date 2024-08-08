@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as path;
+import 'package:propertysmart2/data/addAgreement.dart'; // Import the file with CreateLeaseAgreementPage
 
 class AddPropertyPage extends StatefulWidget {
   final String? propertyId;
@@ -150,17 +151,17 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         };
 
         if (widget.propertyId == null) {
-          await FirebaseFirestore.instance.collection('properties').add(propertyData);
+          final docRef = await FirebaseFirestore.instance.collection('properties').add(propertyData);
+          Navigator.pop(context, docRef.id); // Return the document ID
         } else {
           await FirebaseFirestore.instance.collection('properties').doc(widget.propertyId).update(propertyData);
+          Navigator.pop(context, widget.propertyId); // Return the document ID
         }
 
         setState(() {
           _feedbackMessage = 'Property saved successfully!';
           _isSaving = false;
         });
-
-        Navigator.pop(context);
       } catch (e) {
         setState(() {
           _feedbackMessage = 'Error saving property: $e';
@@ -168,6 +169,15 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         });
       }
     }
+  }
+
+  void _navigateToCreateLeaseAgreementPage(String propertyId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateLeaseAgreementPage(propertyId: propertyId),
+      ),
+    );
   }
 
   Widget _buildTextFormField(String label, TextEditingController controller, [TextInputType keyboardType = TextInputType.text]) {
@@ -203,14 +213,20 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   Widget _buildDropdownRow(String label, int value, ValueChanged<int?> onChanged, int min, int max) {
     return Row(
       children: [
-        Text(label, style: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.w400)),
+        Text(
+          label,
+          style: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.w400),
+        ),
         SizedBox(width: 20),
         DropdownButton<int>(
           value: value,
           items: List.generate(max - min + 1, (index) => index + min)
               .map((e) => DropdownMenuItem(
                     value: e,
-                    child: Text('$e', style: TextStyle(color: Color(0xFF0D47A1))),
+                    child: Text(
+                      '$e',
+                      style: TextStyle(color: Color(0xFF0D47A1), fontSize: 16),
+                    ),
                   ))
               .toList(),
           onChanged: onChanged,
@@ -241,34 +257,17 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   }
 
   Widget _displayImage(dynamic image) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: kIsWeb
-          ? Image.memory(image, width: 100, height: 100)
-          : Image.file(image as io.File, width: 100, height: 100),
-    );
-  }
-
-  Widget _buildSaveButton() {
-    return Center(
-      child: ElevatedButton(
-        onPressed: _isSaving || _isUploading ? null : _saveProperty,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF0D47A1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-        ),
-        child: _isSaving || _isUploading
-            ? SizedBox(
-                height: 24.0,
-                width: 24.0,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  strokeWidth: 2.0,
-                ),
-              )
-            : Text('Save Property'),
+    return Container(
+      width: 100,
+      height: 100,
+      margin: EdgeInsets.symmetric(horizontal: 8.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Color(0xFF0D47A1)),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Image(
+        image: kIsWeb ? MemoryImage(image) : FileImage(image as io.File),
+        fit: BoxFit.cover,
       ),
     );
   }
@@ -278,37 +277,62 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.propertyId != null ? 'Edit Property' : 'Add Property',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          widget.propertyId == null ? 'Add Property' : 'Edit Property',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
         ),
+        backgroundColor: Color(0xFF0D47A1),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              _buildTextFormField('Title', _titleController),
-              _buildTextFormField('Location', _locationController),
-              _buildTextFormField('Price', _priceController, TextInputType.number),
-              _buildTextFormField('Owner\'s Phone Number', _ownerPhoneController, TextInputType.phone),
-              _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
-              _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
-              _buildDropdownRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value!), 1, 10),
-              _buildDropdownRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value!), 1, 10),
-              _buildImagePicker('Pick Main Image', () => _pickImage(true), _mainImage),
-              _buildImagePicker('Pick Room Images', () => _pickImage(false), null, _roomImages),
-              SizedBox(height: 20),
-              _buildSaveButton(),
-              if (_feedbackMessage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    _feedbackMessage!,
-                    style: TextStyle(color: Colors.red),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTextFormField('Title', _titleController),
+                _buildTextFormField('Location', _locationController),
+                _buildTextFormField('Price', _priceController, TextInputType.number),
+                _buildTextFormField('Owner Phone', _ownerPhoneController),
+                _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
+                _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
+                _buildDropdownRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value!), 1, 10),
+                _buildDropdownRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value!), 1, 10),
+                SizedBox(height: 20),
+                _buildImagePicker('Upload Main Image', () => _pickImage(true), _mainImage),
+                SizedBox(height: 20),
+                _buildImagePicker('Upload Room Images', () => _pickImage(false), null, _roomImages),
+                SizedBox(height: 20),
+                _isSaving
+                    ? Center(child: CircularProgressIndicator(),)
+                    : Center(
+                        child: ElevatedButton(
+                          onPressed: _saveProperty,
+                          child: Text(widget.propertyId == null ? 'Save Property' : 'Update Property'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF0D47A1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                if (_feedbackMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      _feedbackMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

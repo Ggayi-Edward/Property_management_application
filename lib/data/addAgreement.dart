@@ -7,9 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CreateLeaseAgreementPage extends StatefulWidget {
+  final String propertyId;
   final Map<String, dynamic>? leaseAgreement;
 
-  CreateLeaseAgreementPage({this.leaseAgreement});
+  CreateLeaseAgreementPage({required this.propertyId, this.leaseAgreement});
 
   @override
   _CreateLeaseAgreementPageState createState() => _CreateLeaseAgreementPageState();
@@ -61,12 +62,15 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
 
         UploadTask uploadTask;
         if (kIsWeb) {
+          // Web platform - use file.bytes
           uploadTask = ref.putData(file.bytes!, SettableMetadata(contentType: file.extension));
         } else {
-          uploadTask = ref.putFile(File(file.path!));
+          // Mobile/Desktop platforms - use file.path
+          final localFile = File(file.path!);
+          uploadTask = ref.putFile(localFile);
         }
 
-        final snapshot = await uploadTask.whenComplete(() => null);
+        final snapshot = await uploadTask;
         final downloadUrl = await snapshot.ref.getDownloadURL();
         documentUrls.add(downloadUrl);
       } catch (e) {
@@ -89,6 +93,7 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
         'monthlyRent': monthlyRent,
         'documents': documentUrls,
         'userId': FirebaseAuth.instance.currentUser!.uid,
+        'propertyId': widget.propertyId,
       };
 
       try {
@@ -112,8 +117,14 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Lease Agreement'),
-        backgroundColor: Colors.blueAccent,
+        title: Text(
+          'Create Lease Agreement',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Color(0xFF0D47A1),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
