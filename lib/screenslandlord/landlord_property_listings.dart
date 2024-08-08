@@ -8,7 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:propertysmart2/data/addAgreement.dart';
 import 'package:propertysmart2/data/addProperty.dart';
+import 'package:propertysmart2/screenslandlord/editproperty.dart'; // Import the Edit Property Page
 
 
 class PropertyListingsPage extends StatelessWidget {
@@ -139,17 +141,6 @@ class PropertyListingsPage extends StatelessWidget {
                 );
               },
             ),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddPropertyPage()),
-                  );
-                },
-              ),
-            ],
           ),
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -213,24 +204,21 @@ class PropertyListingsPage extends StatelessWidget {
                                   Text(data?['location'] ?? 'No location'),
                                   SizedBox(height: 10),
                                   Text('\$${data?['price'] ?? '0'}'),
-                                  SizedBox(height: 10),
-                                  Text(data?['description'] ?? 'No description'),
+                                  
                                 ],
                               ),
                             ),
                           ),
                           Column(
                             children: [
+                              // Edit button
                               TextButton(
                                 onPressed: () {
-                                  // Add your edit logic here
+                                  // Navigate to Edit Property Page
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddPropertyPage(
-                                        propertyId: property.id,
-                                        propertyData: data,
-                                      ),
+                                      builder: (context) => EditPropertyPage(propertyId: property.id, propertyData: data),
                                     ),
                                   );
                                 },
@@ -239,6 +227,23 @@ class PropertyListingsPage extends StatelessWidget {
                                   style: TextStyle(color: Color(0xFF0D47A1)),
                                 ),
                               ),
+                              // Add Agreement button
+                              TextButton(
+                                onPressed: () {
+                                  // Navigate to Create Lease Agreement Page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CreateLeaseAgreementPage(propertyId: property.id),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Add Agreement',
+                                  style: TextStyle(color: Color(0xFF0D47A1)),
+                                ),
+                              ),
+                              // Delete button
                               TextButton(
                                 onPressed: () {
                                   deleteProperty(
@@ -263,6 +268,16 @@ class PropertyListingsPage extends StatelessWidget {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddPropertyPage()),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Color(0xFF0D47A1),
       ),
     );
   }

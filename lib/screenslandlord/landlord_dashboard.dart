@@ -1,7 +1,9 @@
+import 'package:propertysmart2/constants/theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/main.dart';
 import 'package:propertysmart2/messages/tenant_list_page.dart';
 import 'package:propertysmart2/messages/chat_service.dart';
-
+import 'package:provider/provider.dart';
 
 class LandlordDashboard extends StatelessWidget {
   final String userId;
@@ -70,7 +72,7 @@ class LandlordDashboard extends StatelessWidget {
                 _buildDashboardItem(
                     context, Icons.home, 'Properties', PropertyListingsPage()),
                 _buildDashboardItem(
-                    context, Icons.assignment, 'Leases', LeaseAgreementsPage()),
+                    context, Icons.assignment, 'Agreements', LeaseAgreementsPage()),
                 _buildDashboardItem(
                   context, Icons.message, 'Messages', null), // Change to null for messages
               ],
@@ -140,6 +142,7 @@ class LandlordDashboard extends StatelessWidget {
   }
 }
 
+
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({Key? key}) : super(key: key);
 
@@ -166,6 +169,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.themeMode == ThemeMode.dark;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -256,6 +262,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             }
           }),
+          _buildThemeSwitch(themeNotifier, isDarkMode),
         ],
       ),
     );
@@ -272,6 +279,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ),
       ),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildThemeSwitch(ThemeNotifier themeNotifier, bool isDarkMode) {
+    return ListTile(
+      leading: Icon(
+        isDarkMode ? Icons.dark_mode : Icons.light_mode,
+        color: Color(0xFF0D47A1),
+      ),
+      title: Text(
+        isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme',
+        style: TextStyle(
+          color: Color(0xFF0D47A1),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onTap: () {
+        themeNotifier.toggleTheme(!isDarkMode);
+      },
     );
   }
 }

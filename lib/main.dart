@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
               'MessagingPage': (context) => MessagingPage(chatId: '', senderId: ''),
               'LandlordDashboard': (context) => LandlordDashboard(userId: ''),
               'AddPropertyPage': (context) => AddPropertyPage(),
-              'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(),
+              'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(propertyId: '',),
             },
           );
         },
