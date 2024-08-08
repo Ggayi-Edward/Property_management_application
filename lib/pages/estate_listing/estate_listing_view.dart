@@ -151,14 +151,15 @@ class EstateListingView extends StatelessWidget {
                       final data = property.data() as Map<String, dynamic>?;
 
                       final mainImage = data?['mainImage'] as String? ?? '';
+                      final propertyId = property.id; // Get the property ID
 
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EstateDetailsView(
-                                estate: EstateModel.fromFirestore(property),
+                              builder: (context) => EstateDetailsPage(
+                                estateId: propertyId, // Pass the property ID
                               ),
                             ),
                           );
@@ -208,6 +209,7 @@ class EstateListingView extends StatelessWidget {
                                           color: Colors.black,
                                         ),
                                       ),
+                        
                                     ],
                                   ),
                                 ),
