@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-import '../model/lease_agreement.dart';
-
 class CreateLeaseAgreementPage extends StatefulWidget {
-  final LeaseAgreement? leaseAgreement;
+  final Map<String, dynamic>? leaseAgreement;
 
   CreateLeaseAgreementPage({this.leaseAgreement});
 
@@ -20,12 +17,21 @@ class CreateLeaseAgreementPage extends StatefulWidget {
 
 class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
   final _formKey = GlobalKey<FormState>();
-  String tenantName = '';
+  String title = '';
   String propertyAddress = '';
-  DateTime startDate = DateTime.now();
-  DateTime endDate = DateTime.now().add(Duration(days: 365));
   double monthlyRent = 0.0;
   List<PlatformFile> uploadedDocuments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.leaseAgreement != null) {
+      final lease = widget.leaseAgreement!;
+      title = lease['title'] ?? '';
+      propertyAddress = lease['propertyAddress'] ?? '';
+      monthlyRent = lease['monthlyRent']?.toDouble() ?? 0.0;
+    }
+  }
 
   Future<void> _pickFiles() async {
     try {
@@ -41,25 +47,6 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
         SnackBar(content: Text('Error picking files: $e')),
       );
       print('Error picking files: $e');
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context, DateTime initialDate, bool isStartDate) async {
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-
-    if (selectedDate != null && selectedDate != initialDate) {
-      setState(() {
-        if (isStartDate) {
-          startDate = selectedDate;
-        } else {
-          endDate = selectedDate;
-        }
-      });
     }
   }
 
@@ -96,26 +83,20 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
     if (_formKey.currentState?.validate() ?? false) {
       final documentUrls = await _uploadDocuments(uploadedDocuments);
 
-      final newLease = LeaseAgreement(
-        id: DateTime.now().toString(),
-        tenantName: tenantName,
-        propertyAddress: propertyAddress,
-        startDate: startDate,
-        endDate: endDate,
-        monthlyRent: monthlyRent,
-        documents: documentUrls,
-      );
+      final newLease = {
+        'title': title,
+        'propertyAddress': propertyAddress,
+        'monthlyRent': monthlyRent,
+        'documents': documentUrls,
+        'userId': FirebaseAuth.instance.currentUser!.uid,
+      };
 
       try {
-        await FirebaseFirestore.instance.collection('lease_agreements').add({
-          'tenantName': tenantName,
-          'propertyAddress': propertyAddress,
-          'startDate': startDate.toIso8601String(),
-          'endDate': endDate.toIso8601String(),
-          'monthlyRent': monthlyRent,
-          'documents': documentUrls,
-          'userId': FirebaseAuth.instance.currentUser!.uid,
-        });
+        if (widget.leaseAgreement == null) {
+          await FirebaseFirestore.instance.collection('lease_agreements').add(newLease);
+        } else {
+          await FirebaseFirestore.instance.collection('lease_agreements').doc(widget.leaseAgreement!['id']).update(newLease);
+        }
 
         Navigator.pop(context, newLease);
       } catch (e) {
@@ -143,15 +124,15 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Tenant Name'),
+                  decoration: InputDecoration(labelText: 'Title'),
                   onChanged: (value) {
                     setState(() {
-                      tenantName = value;
+                      title = value;
                     });
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter tenant name';
+                      return 'Please enter a title';
                     }
                     return null;
                   },
@@ -169,24 +150,6 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                     }
                     return null;
                   },
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ListTile(
-                        title: Text('Start Date: ${DateFormat('yyyy-MM-dd').format(startDate)}'),
-                        trailing: Icon(Icons.calendar_today),
-                        onTap: () => _selectDate(context, startDate, true),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListTile(
-                        title: Text('End Date: ${DateFormat('yyyy-MM-dd').format(endDate)}'),
-                        trailing: Icon(Icons.calendar_today),
-                        onTap: () => _selectDate(context, endDate, false),
-                      ),
-                    ),
-                  ],
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,

@@ -1,12 +1,10 @@
-export 'package:propertysmart2/model/estate_model.dart';
+
 export 'package:flutter/material.dart';
 export 'package:stacked/stacked.dart';
-export 'package:propertysmart2/pages/estate_listing/estate_listing_viewmodel.dart';
 export 'package:propertysmart2/pages/intro/intropage_viewmodel.dart';
 export 'package:propertysmart2/pages/intro/intropage_view.dart';
 export 'package:propertysmart2/pages/intro/single_intro/first_intro.dart';
 export 'package:propertysmart2/pages/estate_listing/estate_listing_view.dart';
-export 'package:propertysmart2/data/estate_data.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:propertysmart2/pages/estate_listing/widgets/search.dart';
 export 'package:propertysmart2/pages/estate_listing/widgets/estate_nav.dart';
@@ -30,7 +28,6 @@ export 'package:propertysmart2/screenslandlord/profile_page_landlord.dart';
 export 'package:propertysmart2/screenslandlord/screens_landlord.dart';
 export 'package:propertysmart2/screenslandlord/forgot_password_landlord.dart';
 export 'package:propertysmart2/screenslandlord/landlord_property_listings.dart';
-export 'package:propertysmart2/model/lease_agreement.dart';
 export 'package:propertysmart2/screenslandlord/lease_agreement_page.dart';
 export 'package:propertysmart2/model/messages.dart';
 export 'package:propertysmart2/messages/messagingPage.dart';

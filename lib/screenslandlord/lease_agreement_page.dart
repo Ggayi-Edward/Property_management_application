@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:file_picker/file_picker.dart'; // Import file_picker package
-import 'package:propertysmart2/export/file_exports.dart';
-import 'package:propertysmart2/model/lease_agreement.dart';
+import 'package:propertysmart2/data/addAgreement.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:propertysmart2/export/file_exports.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LeaseAgreementsPage extends StatefulWidget {
   @override
@@ -15,7 +10,7 @@ class LeaseAgreementsPage extends StatefulWidget {
 }
 
 class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
-  List<LeaseAgreement> leaseAgreements = [];
+  List<Map<String, dynamic>> leaseAgreements = [];
 
   @override
   void initState() {
@@ -28,15 +23,12 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
       final querySnapshot = await FirebaseFirestore.instance.collection('lease_agreements').get();
       final agreements = querySnapshot.docs.map((doc) {
         final data = doc.data();
-        return LeaseAgreement(
-          id: doc.id,
-          tenantName: data['tenantName'],
-          propertyAddress: data['propertyAddress'],
-          startDate: DateTime.parse(data['startDate']),
-          endDate: DateTime.parse(data['endDate']),
-          monthlyRent: data['monthlyRent'],
-          documents: List<String>.from(data['documents']), // List of document URLs
-        );
+        return {
+          'id': doc.id,
+          'propertyAddress': data['propertyAddress'] ?? 'Unknown Address',
+          'monthlyRent': data['monthlyRent'] ?? 0.0,
+          'documents': data['documents'] != null ? List<String>.from(data['documents']) : [],
+        };
       }).toList();
 
       setState(() {
@@ -47,7 +39,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
     }
   }
 
-  void _addNewLeaseAgreement(LeaseAgreement lease) {
+  void _addNewLeaseAgreement(Map<String, dynamic> lease) {
     setState(() {
       leaseAgreements.add(lease);
     });
@@ -114,37 +106,36 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
           ),
           leaseAgreements.isEmpty
               ? SliverFillRemaining(
-            child: Center(
-              child: Text(
-                'No agreements here',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            ),
-          )
+                  child: Center(
+                    child: Text(
+                      'No agreements here',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  ),
+                )
               : SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                final lease = leaseAgreements[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: ListTile(
-                    title: Text(lease.tenantName),
-                    subtitle: Text(lease.propertyAddress),
-                    trailing: Text(DateFormat('yyyy-MM-dd').format(lease.endDate)),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LeaseAgreementDetailsPage(leaseAgreement: lease),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final lease = leaseAgreements[index];
+                      return Card(
+                        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: ListTile(
+                          title: Text(lease['propertyAddress']),
+                        
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LeaseAgreementDetailsPage(lease: lease),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
+                    childCount: leaseAgreements.length,
                   ),
-                );
-              },
-              childCount: leaseAgreements.length,
-            ),
-          ),
+                ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -165,9 +156,9 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
 }
 
 class LeaseAgreementDetailsPage extends StatelessWidget {
-  final LeaseAgreement leaseAgreement;
+  final Map<String, dynamic> lease;
 
-  LeaseAgreementDetailsPage({required this.leaseAgreement});
+  LeaseAgreementDetailsPage({required this.lease});
 
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
@@ -181,7 +172,7 @@ class LeaseAgreementDetailsPage extends StatelessWidget {
     final editedLease = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CreateLeaseAgreementPage(leaseAgreement: leaseAgreement),
+        builder: (context) => CreateLeaseAgreementPage(leaseAgreement: lease),
       ),
     );
     if (editedLease != null) {
@@ -204,10 +195,14 @@ class LeaseAgreementDetailsPage extends StatelessWidget {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                // Perform the deletion
-                Navigator.pop(context); // Close the dialog
-                Navigator.pop(context, 'deleted'); // Return a result indicating deletion
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance.collection('lease_agreements').doc(lease['id']).delete();
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context, 'deleted'); // Return a result indicating deletion
+                } catch (e) {
+                  print('Error deleting lease agreement: $e');
+                }
               },
               child: Text('Delete'),
               style: TextButton.styleFrom(backgroundColor: Colors.red),
@@ -234,18 +229,12 @@ class LeaseAgreementDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Tenant: ${leaseAgreement.tenantName}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Property Address: ${leaseAgreement.propertyAddress}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Start Date: ${DateFormat('yyyy-MM-dd').format(leaseAgreement.startDate)}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('End Date: ${DateFormat('yyyy-MM-dd').format(leaseAgreement.endDate)}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Monthly Rent: \$${leaseAgreement.monthlyRent.toStringAsFixed(2)}', style: TextStyle(fontSize: 18)),
+            Text('Property Address: ${lease['propertyAddress']}', style: TextStyle(fontSize: 18)),
+          
+            Text('Monthly Rent: \$${lease['monthlyRent'].toStringAsFixed(2)}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
-            if (leaseAgreement.documents.isNotEmpty)
-              ...leaseAgreement.documents.map((url) => Padding(
+            if (lease['documents'].isNotEmpty)
+              ...lease['documents'].map((url) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
