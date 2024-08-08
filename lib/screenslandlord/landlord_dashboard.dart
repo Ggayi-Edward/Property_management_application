@@ -1,4 +1,5 @@
 import 'package:propertysmart2/export/file_exports.dart';
+import 'package:propertysmart2/messages/tenant_list_page.dart';
 import 'package:propertysmart2/messages/chat_service.dart';
 
 
@@ -70,7 +71,8 @@ class LandlordDashboard extends StatelessWidget {
                     context, Icons.home, 'Properties', PropertyListingsPage()),
                 _buildDashboardItem(
                     context, Icons.assignment, 'Leases', LeaseAgreementsPage()),
-                _buildDashboardItem(context, Icons.message, 'Messages', null), // Change to null for messages
+                _buildDashboardItem(
+                  context, Icons.message, 'Messages', null), // Change to null for messages
               ],
             ),
           ),
@@ -79,21 +81,15 @@ class LandlordDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildDashboardItem(
+   Widget _buildDashboardItem(
       BuildContext context, IconData icon, String title, Widget? page) {
     return GestureDetector(
       onTap: () async {
         if (title == 'Messages') {
-          // Assuming 'tenantId' is the ID of the tenant you want to chat with
-          String tenantId = 'tenantId'; // This should be dynamic based on your logic
-          String chatId = await _chatService.createOrJoinChat(userId, tenantId);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MessagingPage(
-                chatId: chatId,
-                senderId: userId,
-              ),
+              builder: (context) => TenantListPage(landlordId: userId),
             ),
           );
         } else if (page != null) {
