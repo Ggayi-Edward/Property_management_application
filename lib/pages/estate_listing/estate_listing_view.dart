@@ -177,10 +177,8 @@ class EstateListingView extends StatelessWidget {
                                     height: 150,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) =>
-                                        Center(child: CircularProgressIndicator()),
-                                    errorWidget: (context, url, error) =>
-                                        Center(child: Icon(Icons.error, color: Colors.red)),
+                                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
                                   ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -194,6 +192,8 @@ class EstateListingView extends StatelessWidget {
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
+                                        maxLines: 1, // Limit to one line
+                                        overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
                                       ),
                                       const SizedBox(height: 5), // Reduced spacing
                                       Text(
