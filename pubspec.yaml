@@ -52,7 +52,7 @@ dev_dependencies:
   http: ^1.2.2
   app_links: ^6.1.4
   carousel_slider: ^4.2.1
-  
+  flutter_launcher_icons: ^0.13.1
   cached_network_image: ^3.3.1
   smooth_page_indicator: ^1.2.0
   google_fonts: ^6.2.1
@@ -101,9 +101,13 @@ flutter:
   assets:
     - assets/images/
     - assets/images/houses/
-    - assets/svg/
     - assets/images/houses/rooms/
     - assets/images/rob.jpg
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon/icon.png"
     
 
   # An image asset can refer to one or more resolution-specific "variants", see
