@@ -155,11 +155,11 @@ class _FirstIntroState extends State<FirstIntro> {
                           GestureDetector(
                             onTap: widget.onConfirmTap,
                             child: Container(
-                              width: 200,
-                              height: 50,
+                              width: 150, // Reduced width
+                              height: 40, // Reduced height
                               decoration: BoxDecoration(
                                 color: Color(0xFF0D47A1),
-                                borderRadius: BorderRadius.circular(25),
+                                borderRadius: BorderRadius.circular(20), // Adjusted radius for smaller size
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.3),
@@ -171,16 +171,17 @@ class _FirstIntroState extends State<FirstIntro> {
                               ),
                               child: const Center(
                                 child: Text(
-                                  'Get Started',
+                                  'View Properties',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16,
+                                    fontSize: 14, // Reduced font size
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
                             ),
                           ),
+
                         ],
                       ),
                     ),

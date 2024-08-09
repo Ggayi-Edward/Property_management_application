@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
-        // Show success Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Successfully logged in!'),
@@ -37,12 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Navigate to IntroPageView after the Snackbar message disappears
         Future.delayed(Duration(seconds: 2), () {
           Navigator.pushReplacementNamed(context, 'IntroPageView');
         });
       } else {
-        // Show error Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to sign in. Please check your credentials.'),
@@ -52,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      // Show error Snackbar for unexpected errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('An error occurred. Please try again.'),
@@ -71,91 +67,95 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.secondary, // Very Light Blue
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Title
-            Center(
-              child: Text(
-                'Property Smart',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.primary, // Dark Blue
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            if (_errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, 'AccountPage');
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: theme.colorScheme.secondary, // Very Light Blue
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
                 child: Text(
-                  _errorMessage,
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
+                  'Property Smart',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.primary, // Dark Blue
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            // Form Fields and Buttons
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextInputField(
-                  controller: _emailController,
-                  icon: Icons.mail,
-                  hint: 'Email',
-                  inputType: TextInputType.emailAddress,
-                  inputAction: TextInputAction.next,
-                ),
-                SizedBox(height: 16),
-                PasswordInput(
-                  controller: _passwordController,
-                  icon: Icons.lock,
-                  hint: 'Password',
-                  inputType: TextInputType.text,
-                  inputAction: TextInputAction.done,
-                ),
-                SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, 'ForgotPassword'),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
-                    'Forgot Password?',
-                    textAlign: TextAlign.right,
+                    _errorMessage,
                     style: TextStyle(
-                      color: theme.colorScheme.primary, // Dark Blue
+                      color: Colors.red,
                       fontSize: 16,
                     ),
                   ),
                 ),
-                SizedBox(height: 25),
-                _isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : RoundedButton(
-                  buttonName: 'Login',
-                  onPressed: _login,
-                ),
-                SizedBox(height: 25),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, 'CreateAccount'),
-                  child: Container(
-                    alignment: Alignment.center,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextInputField(
+                    controller: _emailController,
+                    icon: Icons.mail,
+                    hint: 'Email',
+                    inputType: TextInputType.emailAddress,
+                    inputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+                  PasswordInput(
+                    controller: _passwordController,
+                    icon: Icons.lock,
+                    hint: 'Password',
+                    inputType: TextInputType.text,
+                    inputAction: TextInputAction.done,
+                  ),
+                  SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, 'ForgotPassword'),
                     child: Text(
-                      'Create New Account',
+                      'Forgot Password?',
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         color: theme.colorScheme.primary, // Dark Blue
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                        fontSize: 16,
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  SizedBox(height: 25),
+                  _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : RoundedButton(
+                    buttonName: 'Login',
+                    onPressed: _login,
+                  ),
+                  SizedBox(height: 25),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, 'CreateAccount'),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Create New Account',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary, // Dark Blue
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
