@@ -142,9 +142,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               }),
           ListTile(
               leading: const Icon(
-                Icons.filter_list,
-                color: Color(0xFF0D47A1), // Thick blue color for the icon
-              ),
+            Icons.filter_list,
+            color: Color(0xFF0D47A1), // Thick blue color for the icon
+          ),
             title: const Text(
                 'Filters',
                 style: TextStyle(

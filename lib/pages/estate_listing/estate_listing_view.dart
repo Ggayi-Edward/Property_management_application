@@ -8,12 +8,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:propertysmart2/pages/estate_details/estate_detail_view.dart';
 import 'package:propertysmart2/widgets/drawer.dart';
 
-class EstateListingView extends StatelessWidget {
+class EstateListingView extends StatefulWidget {
   const EstateListingView({super.key});
+
+  @override
+  _EstateListingViewState createState() => _EstateListingViewState();
+}
+
+class _EstateListingViewState extends State<EstateListingView> {
+  Map<String, dynamic> filters = {};
 
   Future<void> uploadFile(PlatformFile file, String userId) async {
     try {
@@ -55,6 +61,36 @@ class EstateListingView extends StatelessWidget {
     }
   }
 
+  Query<Map<String, dynamic>> _buildQuery() {
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection('properties');
+
+    if (filters.isNotEmpty) {
+      if (filters['priceRange'] != null) {
+        // Parse the price range string and add query filters
+        final priceRange = filters['priceRange'].toString().split(' - ');
+        final minPrice = int.tryParse(priceRange[0].replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+        final maxPrice = priceRange.length > 1
+            ? int.tryParse(priceRange[1].replaceAll('\$', '').replaceAll(',', '')) ?? double.infinity
+            : double.infinity;
+        query = query.where('price', isGreaterThanOrEqualTo: minPrice, isLessThanOrEqualTo: maxPrice);
+      }
+      if (filters['bedrooms'] != null) {
+        query = query.where('bedrooms', isEqualTo: filters['bedrooms']);
+      }
+      if (filters['bathrooms'] != null) {
+        query = query.where('bathrooms', isEqualTo: filters['bathrooms']);
+      }
+      if (filters['swimmingPool'] != null) {
+        query = query.where('swimmingPool', isEqualTo: filters['swimmingPool']);
+      }
+      if (filters['wifi'] != null) {
+        query = query.where('wifi', isEqualTo: filters['wifi']);
+      }
+    }
+
+    return query;
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -67,7 +103,14 @@ class EstateListingView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      drawer: CustomDrawer(),
+      drawer: CustomDrawer(
+        onFilterApplied: (newFilters) {
+          setState(() {
+            filters = newFilters;
+          });
+        },
+        showFilters: true, // Enable filter display in the drawer
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -107,16 +150,14 @@ class EstateListingView extends StatelessWidget {
                     ],
                   ),
                   background: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0D47A1),
-                    ),
+                    color: Color(0xFF0D47A1),
                   ),
                 );
               },
             ),
           ),
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('properties').snapshots(),
+            stream: _buildQuery().snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
                 return SliverFillRemaining(
@@ -164,55 +205,83 @@ class EstateListingView extends StatelessWidget {
                             ),
                           );
                         },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
-                          child: Card(
-                            elevation: 4.0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (mainImage.isNotEmpty)
-                                  CachedNetworkImage(
-                                    imageUrl: mainImage,
-                                    height: 150,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxHeight: 300, // or any other fixed height
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15.0),
+                            child: Card(
+                              elevation: 4.0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (mainImage.isNotEmpty)
+                                    CachedNetworkImage(
+                                      imageUrl: mainImage,
+                                      height: 150,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red)),
+                                    ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: OverflowBox(
+                                        maxHeight: double.infinity,
+                                        alignment: Alignment.topLeft,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              data?['title'] ?? 'No title',
+                                              style: const TextStyle(
+                                                fontSize: 22.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              data?['location'] ?? 'No location',
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              '\$${data?['price'] ?? '0'}',
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              'Bedrooms: ${data?['bedrooms'] ?? '0'}',
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        data?['title'] ?? 'No title',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        maxLines: 1, // Limit to one line
-                                        overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
-                                      ),
-                                      const SizedBox(height: 5), // Reduced spacing
-                                      Text(
-                                        data?['location'] ?? 'No location',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5), // Reduced spacing
-                                      Text(
-                                        '\$${data?['price'] ?? '0'}',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -226,6 +295,7 @@ class EstateListingView extends StatelessWidget {
           ),
         ],
       ),
+    
     );
   }
 }
