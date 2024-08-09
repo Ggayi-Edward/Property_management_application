@@ -122,27 +122,36 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
-            try {
-              await _authService.signOut();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logged out successfully'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-              Navigator.pushReplacementNamed(context, 'LoginScreen');
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Logout failed: $e'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          }),
+                try {
+                  await _authService.signOut();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logged out successfully'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.pushReplacementNamed(context, 'AccountPage');
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logout failed: $e'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }),
           ListTile(
-            leading: const Icon(Icons.filter_list),
-            title: const Text('Filters'),
+              leading: const Icon(
+                Icons.filter_list,
+                color: Color(0xFF0D47A1), // Thick blue color for the icon
+              ),
+            title: const Text(
+                'Filters',
+                style: TextStyle(
+                  color: Color(0xFF0D47A1), // Thick blue color for the text
+                  fontWeight: FontWeight.bold, // Bold text
+                ),
+              ),
             onTap: () {
               setState(() {
                 showFilters = !showFilters; // Toggle filter visibility
@@ -193,13 +202,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      onTap: onTap,
-    );
-  }
-
+  return ListTile(
+    leading: Icon(
+      icon,
+      color: const Color(0xFF0D47A1), // Thick blue color for the icon
+    ),
+    title: Text(
+      title,
+      style: const TextStyle(
+        color: Color(0xFF0D47A1), // Thick blue color for the text
+        fontWeight: FontWeight.bold, // Bold text
+      ),
+    ),
+    onTap: onTap,
+  );
+}
   Widget _buildFilters() {
     return Column(
       children: [

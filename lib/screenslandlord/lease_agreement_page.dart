@@ -34,7 +34,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
         leaseAgreements = agreements;
       });
     } catch (e) {
-      print('Error fetching lease agreements: $e');
+      print('Error fetching agreements: $e');
     }
   }
 
@@ -86,7 +86,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                       ),
                       if (!isCollapsed)
                         Text(
-                          'Lease Agreements',
+                          'Agreements',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             color: Colors.white,

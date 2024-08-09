@@ -244,24 +244,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
             Navigator.pushNamed(context, 'ProfileScreenLandlord');
           }),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
-            try {
-              await _authService.signOut();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logged out successfully'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-              Navigator.pushReplacementNamed(context, 'LoginScreen');
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Logout failed: $e'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          }),
+          try {
+            await _authService.signOut();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Logged out successfully'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Navigator.pushReplacementNamed(context, 'AccountPage');
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Logout failed: $e'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        }),
           _buildThemeSwitch(themeNotifier, isDarkMode),
         ],
       ),
