@@ -118,7 +118,7 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Create Lease Agreement',
+          'Add Agreement',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
