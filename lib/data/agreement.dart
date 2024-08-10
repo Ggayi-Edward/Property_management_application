@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AgreementsPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _AgreementsPageState extends State<AgreementsPage> {
   String? documentUrl;
   String? leaseAgreementId;
   String? userSignatureUrl;
+  bool hasReadAndVerified = false; // Checkbox state
 
   @override
   void initState() {
@@ -22,7 +24,6 @@ class _AgreementsPageState extends State<AgreementsPage> {
     fetchLeaseAgreementDetails(widget.propertyId);
   }
 
-  // Get the leaseAgreementId from the properties collection
   Future<String?> getLeaseAgreementId(String propertyId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> propertyDoc = await FirebaseFirestore.instance
@@ -31,9 +32,6 @@ class _AgreementsPageState extends State<AgreementsPage> {
           .get();
 
       leaseAgreementId = propertyDoc.data()?['leaseAgreementId'];
-      print("Property ID: $propertyId");
-      print("Lease Agreement ID: $leaseAgreementId");
-
       return leaseAgreementId;
     } catch (e) {
       print("Failed to get leaseAgreementId for property ID $propertyId: $e");
@@ -41,7 +39,6 @@ class _AgreementsPageState extends State<AgreementsPage> {
     }
   }
 
-  // Use the leaseAgreementId to get the URL from the lease_agreements collection
   Future<String?> getLeaseAgreementUrl(String leaseAgreementId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> leaseAgreementDoc = await FirebaseFirestore.instance
@@ -49,12 +46,7 @@ class _AgreementsPageState extends State<AgreementsPage> {
           .doc(leaseAgreementId)
           .get();
 
-      print("Lease Agreement Document Data: ${leaseAgreementDoc.data()}");
-
       String? documentUrl = leaseAgreementDoc.data()?['documents']?.first;
-      print("Lease Agreement ID: $leaseAgreementId");
-      print("Document URL: $documentUrl");
-
       return documentUrl;
     } catch (e) {
       print("Failed to get document URL for leaseAgreementId $leaseAgreementId: $e");
@@ -62,17 +54,14 @@ class _AgreementsPageState extends State<AgreementsPage> {
     }
   }
 
-  // Fetch the lease agreement URL and user signature using the propertyId
   Future<void> fetchLeaseAgreementDetails(String propertyId) async {
     try {
       String? leaseAgreementId = await getLeaseAgreementId(propertyId);
-
       if (leaseAgreementId != null) {
         String? documentUrl = await getLeaseAgreementUrl(leaseAgreementId);
         setState(() {
           this.documentUrl = documentUrl;
         });
-
         await fetchUserSignature(leaseAgreementId);
       }
     } catch (e) {
@@ -80,7 +69,6 @@ class _AgreementsPageState extends State<AgreementsPage> {
     }
   }
 
-  // Fetch the user signature URL from the Users collection
   Future<void> fetchUserSignature(String leaseAgreementId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> leaseAgreementDoc = await FirebaseFirestore.instance
@@ -96,17 +84,27 @@ class _AgreementsPageState extends State<AgreementsPage> {
             .get();
 
         String? signatureUrl = userDoc.data()?['signatureUrl'];
-        print("Signature URL from Firestore: $signatureUrl");
-
         setState(() {
           userSignatureUrl = signatureUrl;
         });
-      } else {
-        print("No userId found for leaseAgreementId $leaseAgreementId");
       }
     } catch (e) {
       print("Failed to fetch user signature: $e");
     }
+  }
+
+  void proceedToPayment() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentPage(
+          landlordEmail: 'landlord@example.com', // Replace with actual value
+          estateId: widget.propertyId, // Pass the estateId (or propertyId)
+          amount: '1000', // Replace with actual amount
+          landlordMobileMoneyNumber: '1234567890', price: '', // Replace with actual number
+        ),
+      ),
+    );
   }
 
   @override
@@ -115,54 +113,91 @@ class _AgreementsPageState extends State<AgreementsPage> {
       appBar: AppBar(
         title: Text('Agreements'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (documentUrl != null)
-              Column(
-                children: [
-                  // Display the document image (assuming it's a PDF thumbnail or similar)
-                  Image.network(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (documentUrl != null) ...[
+                Text(
+                  'Lease Agreement Document',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Center(
+                  child: Image.network(
                     documentUrl!,
-                    width: 100,
-                    height: 100,
+                    width: 150,
+                    height: 150,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(height: 10),
-                  Text('Lease Agreement Document'),
-                ],
-              )
-            else
-              CircularProgressIndicator(),
-            SizedBox(height: 20),
-            if (userSignatureUrl != null)
-              Column(
-                children: [
-                  // Display the user's signature image
-                  Image.network(
+                ),
+                SizedBox(height: 10),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      launch(documentUrl!);
+                    },
+                    child: Text(
+                      'View Lease Agreement Document',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+              ] else
+                Center(child: CircularProgressIndicator()),
+
+              if (userSignatureUrl != null) ...[
+                Text(
+                  'User Signature',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Center(
+                  child: Image.network(
                     userSignatureUrl!,
-                    width: 100,
-                    height: 100,
+                    width: 150,
+                    height: 150,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(height: 10),
-                  Text('User Signature'),
-                ],
-              )
-            else
-              CircularProgressIndicator(),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (documentUrl != null) {
-                  // Open the document URL in the browser
-                  launch(documentUrl!);
-                }
-              },
-              child: Text('View Lease Agreement Document'),
-            ),
-          ],
+                ),
+                SizedBox(height: 20),
+                CheckboxListTile(
+                  title: Text(
+                    'I have read the tenant-landlord agreement and verify my signature',
+                  ),
+                  value: hasReadAndVerified,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      hasReadAndVerified = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ] else
+                Center(child: CircularProgressIndicator()),
+
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: hasReadAndVerified ? proceedToPayment : null, // Enable only if checkbox is checked
+                child: Center(
+                  child: Text('Proceed to Payment'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
