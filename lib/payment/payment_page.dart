@@ -7,12 +7,19 @@ class PaymentPage extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantMobileNumberController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _amountController;
+  final TextEditingController _landlordMobileNumberController;
 
   final String landlordEmail; // Use landlord's email to map to subaccount ID
+  final String estateId; // Estate ID
 
-  PaymentPage({required this.landlordEmail, required String landlordMobileMoneyNumber});
+  PaymentPage({
+    required this.landlordEmail,
+    required String landlordMobileMoneyNumber,
+    required String price,
+    required this.estateId,
+  })  : _amountController = TextEditingController(text: price), // Prefill amount
+        _landlordMobileNumberController = TextEditingController(text: landlordMobileMoneyNumber); // Prefill landlord's mobile number
 
   String _selectedNetwork = "VODAFONE"; // Default network
 
@@ -31,7 +38,7 @@ class PaymentPage extends StatelessWidget {
     final subaccountId = getSubaccountId(landlordEmail);
     if (subaccountId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid landlord information')),
+        const SnackBar(content: Text('Invalid landlord information')),
       );
       return;
     }
@@ -55,6 +62,7 @@ class PaymentPage extends StatelessWidget {
       redirectUrl: "propertysmart://payment-confirmation",
       meta: {
         "subaccount_id": subaccountId,
+        "estate_id": estateId, // Include estateId in the meta information
       },
     );
 
@@ -81,10 +89,6 @@ class PaymentPage extends StatelessWidget {
         SnackBar(content: Text('An error occurred: $error')),
       );
     }
-  }
-
-  void _filterEstates() {
-    // Your filter logic here
   }
 
   @override
@@ -147,7 +151,7 @@ class PaymentPage extends StatelessWidget {
                     ),
                     elevation: 8,
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -156,7 +160,7 @@ class PaymentPage extends StatelessWidget {
                             style: theme.textTheme.titleLarge,
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
                             controller: _nameController,
                             decoration: InputDecoration(
@@ -166,15 +170,15 @@ class PaymentPage extends StatelessWidget {
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
                             keyboardType: TextInputType.name,
@@ -186,7 +190,7 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
                             controller: _emailController,
                             decoration: InputDecoration(
@@ -196,15 +200,15 @@ class PaymentPage extends StatelessWidget {
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
                             keyboardType: TextInputType.emailAddress,
@@ -216,7 +220,7 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
                             controller: _tenantMobileNumberController,
                             decoration: InputDecoration(
@@ -226,15 +230,15 @@ class PaymentPage extends StatelessWidget {
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
                             keyboardType: TextInputType.phone,
@@ -246,7 +250,7 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
                             controller: _amountController,
                             decoration: InputDecoration(
@@ -256,15 +260,15 @@ class PaymentPage extends StatelessWidget {
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
                             keyboardType: TextInputType.number,
@@ -276,58 +280,32 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: _selectedNetwork,
-                            onChanged: (String? newValue) {
-                              _selectedNetwork = newValue!;
-                            },
-                            items: <String>['VODAFONE', 'MTN', 'AIRTEL']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(color: Colors.blue[900], fontWeight: FontWeight.w400,fontSize:16),
-                                  // Blue dropdown items
-                                ),
-                              );
-                            }).toList(),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: _landlordMobileNumberController,
                             decoration: InputDecoration(
-                              labelText: 'Select Network',
+                              labelText: 'Landlord Mobile Money Number',
+                              hintText: 'Enter landlord mobile number',
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            icon: Icon(Icons.arrow_drop_down, color: Colors.blue, size: 30),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please select a network';
-                              }
-                              return null;
-                            },
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.done,
+                            enabled: false, // Disable editing since it's prefilled
                           ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _makePayment(context);
-                              }
-                            },
-                            child: Text('Proceed to Confirmation'),
-                          ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 40),
                           ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
@@ -335,9 +313,20 @@ class PaymentPage extends StatelessWidget {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              backgroundColor: Colors.blue,
                             ),
-                            child: Text('Test Payment'),
+                            child: const Text(
+                              'Proceed to Pay',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
