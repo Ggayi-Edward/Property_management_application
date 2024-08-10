@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:propertysmart2/utilities/signatures.dart';
 import 'package:provider/provider.dart';
 import '../constants/theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+ // Import SignaturePad page
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
@@ -51,9 +53,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-
-                color: Color(0xFF0D47A1)
-
+              color: Color(0xFF0D47A1)
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,43 +115,55 @@ class _CustomDrawerState extends State<CustomDrawer> {
             _navigateToProfile(context);
           }),
           _buildDrawerItem(
+            Icons.create,
+            'Signature',
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignaturePad()),
+              );
+            },
+          ),
+        
+
+          _buildDrawerItem(
             themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
             themeNotifier.themeMode == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
-                () {
+            () {
               themeNotifier.toggleTheme(themeNotifier.themeMode != ThemeMode.dark);
             },
           ),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
-                try {
-                  await _authService.signOut();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Logged out successfully'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                  Navigator.pushReplacementNamed(context, 'AccountPage');
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Logout failed: $e'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                }
-              }),
-          ListTile(
-              leading: const Icon(
-            Icons.filter_list,
-            color: Color(0xFF0D47A1), // Thick blue color for the icon
-          ),
-            title: const Text(
-                'Filters',
-                style: TextStyle(
-                  color: Color(0xFF0D47A1), // Thick blue color for the text
-                  fontWeight: FontWeight.bold, // Bold text
+            try {
+              await _authService.signOut();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Logged out successfully'),
+                  duration: Duration(seconds: 2),
                 ),
+              );
+              Navigator.pushReplacementNamed(context, 'AccountPage');
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Logout failed: $e'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          }),
+          ListTile(
+            leading: const Icon(
+              Icons.filter_list,
+              color: Color(0xFF0D47A1), // Thick blue color for the icon
+            ),
+            title: const Text(
+              'Filters',
+              style: TextStyle(
+                color: Color(0xFF0D47A1), // Thick blue color for the text
+                fontWeight: FontWeight.bold, // Bold text
               ),
+            ),
             onTap: () {
               setState(() {
                 showFilters = !showFilters; // Toggle filter visibility
@@ -163,6 +175,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             height: showFilters ? null : 0, // Adjust height to show/hide filters
             child: showFilters ? _buildFilters() : null,
           ),
+          
         ],
       ),
     );
@@ -202,21 +215,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-  return ListTile(
-    leading: Icon(
-      icon,
-      color: const Color(0xFF0D47A1), // Thick blue color for the icon
-    ),
-    title: Text(
-      title,
-      style: const TextStyle(
-        color: Color(0xFF0D47A1), // Thick blue color for the text
-        fontWeight: FontWeight.bold, // Bold text
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: const Color(0xFF0D47A1), // Thick blue color for the icon
       ),
-    ),
-    onTap: onTap,
-  );
-}
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFF0D47A1), // Thick blue color for the text
+          fontWeight: FontWeight.bold, // Bold text
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+
   Widget _buildFilters() {
     return Column(
       children: [
@@ -295,41 +309,41 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
         ),
-        SwitchListTile(
+        ListTile(
           title: const Text('Swimming Pool'),
-          value: swimmingPool ?? false,
-          onChanged: (bool value) {
-            setState(() {
-              swimmingPool = value;
-            });
-          },
-        ),
-        SwitchListTile(
-          title: const Text('WiFi'),
-          value: wifi ?? false,
-          onChanged: (bool value) {
-            setState(() {
-              wifi = value;
-            });
-          },
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              // Apply filters
-              if (widget.onFilterApplied != null) {
-                widget.onFilterApplied!({
-                  'priceRange': selectedPriceRange,
-                  'bedrooms': selectedBedrooms,
-                  'bathrooms': selectedBathrooms,
-                  'swimmingPool': swimmingPool,
-                  'wifi': wifi,
-                });
-              }
+          trailing: Checkbox(
+            value: swimmingPool,
+            onChanged: (bool? newValue) {
+              setState(() {
+                swimmingPool = newValue;
+              });
             },
-            child: const Text('Apply Filters'),
           ),
+        ),
+        ListTile(
+          title: const Text('WiFi'),
+          trailing: Checkbox(
+            value: wifi,
+            onChanged: (bool? newValue) {
+              setState(() {
+                wifi = newValue;
+              });
+            },
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final filters = {
+              'priceRange': selectedPriceRange,
+              'bedrooms': selectedBedrooms,
+              'bathrooms': selectedBathrooms,
+              'swimmingPool': swimmingPool,
+              'wifi': wifi,
+            };
+            widget.onFilterApplied?.call(filters);
+            Navigator.pop(context);
+          },
+          child: const Text('Apply Filters'),
         ),
       ],
     );

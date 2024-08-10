@@ -6,7 +6,7 @@ plugins {
 }
 import java.util.Properties // Import Properties class
 
-ext.kotlin_version = '1.6.10' // Define the Kotlin version here
+ext.kotlin_version = '1.8.22' // Define the Kotlin version here
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -40,6 +40,8 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.debug // Replace with your signing config for release
+            shrinkResources false
+            minifyEnabled false
         }
     }
 }
