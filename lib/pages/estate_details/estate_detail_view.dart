@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:propertysmart2/data/agreement.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
+
 
 class EstateDetailsPage extends StatelessWidget {
   final String estateId;
@@ -39,6 +41,7 @@ class EstateDetailsPage extends StatelessWidget {
           final landlordEmail = data['ownerEmail'] ?? 'default@example.com';
           final landlordPhone = data['ownerPhone'] ?? 'N/A';
           final price = data['price']?.toString() ?? '0';
+          final agreementViewed = data['agreementViewed'] ?? false; // New field
 
           return SingleChildScrollView(
             child: Column(
@@ -189,18 +192,44 @@ class EstateDetailsPage extends StatelessWidget {
                       const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentPage(
-                                  landlordEmail: landlordEmail,
-                                  landlordMobileMoneyNumber: landlordPhone,
-                                  price: price,
-                                  estateId: estateId,
+                          onPressed: () async {
+                            if (!agreementViewed) {
+                              // Navigate to the AgreementsPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AgreementsPage(
+                                    propertyId: estateId,
+                                  ),
                                 ),
-                              ),
-                            );
+                              ).then((_) {
+                                // After viewing the agreement, navigate to the payment page
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentPage(
+                                      landlordEmail: landlordEmail,
+                                      landlordMobileMoneyNumber: landlordPhone,
+                                      price: price,
+                                      estateId: estateId,
+                                    ),
+                                  ),
+                                );
+                              });
+                            } else {
+                              // Directly navigate to the payment page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentPage(
+                                    landlordEmail: landlordEmail,
+                                    landlordMobileMoneyNumber: landlordPhone,
+                                    price: price,
+                                    estateId: estateId,
+                                  ),
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0D47A1), // Button color

@@ -272,20 +272,21 @@ class PaymentPage extends StatelessWidget {
                               ),
                             ),
                             keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
+                            textInputAction: TextInputAction.next,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the amount';
                               }
                               return null;
                             },
+                            enabled: false, // Disable editing
                           ),
                           const SizedBox(height: 20),
                           TextFormField(
                             controller: _landlordMobileNumberController,
                             decoration: InputDecoration(
-                              labelText: 'Landlord Mobile Money Number',
-                              hintText: 'Enter landlord mobile number',
+                              labelText: 'Landlord Mobile Number',
+                              hintText: 'Enter landlord\'s mobile number',
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -302,30 +303,71 @@ class PaymentPage extends StatelessWidget {
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            textInputAction: TextInputAction.done,
-                            enabled: false, // Disable editing since it's prefilled
+                            textInputAction: TextInputAction.next,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter landlord\'s mobile number';
+                              }
+                              return null;
+                            },
+                            enabled: false, // Disable editing
                           ),
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            value: _selectedNetwork,
+                            decoration: InputDecoration(
+                              labelText: 'Select Mobile Money Network',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                            ),
+                            items: <DropdownMenuItem<String>>[
+                              DropdownMenuItem<String>(
+                                value: "MTN",
+                                child: Text('MTN'),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: "AIRTEL",
+                                child: Text('Airtel'),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: "VODAFONE",
+                                child: Text('Vodafone'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                _selectedNetwork = value;
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              if (_formKey.currentState!.validate()) {
+                              if (_formKey.currentState?.validate() ?? false) {
                                 _makePayment(context);
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 16.0), backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              backgroundColor: Colors.blue,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ), // Button background color
                             ),
                             child: const Text(
-                              'Proceed to Pay',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              'Pay Now',
+                              style: TextStyle(fontSize: 18.0, color: Colors.white),
                             ),
                           ),
                         ],

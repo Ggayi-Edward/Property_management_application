@@ -107,7 +107,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     }
   }
 
-  void _saveProperty() async {
+  Future<void> _saveProperty() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isSaving = true;
@@ -150,12 +150,16 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
           'userId': user.uid,
         };
 
+        String? propertyId;
         if (widget.propertyId == null) {
           final docRef = await FirebaseFirestore.instance.collection('properties').add(propertyData);
-          Navigator.pop(context, docRef.id); // Return the document ID
+          propertyId = docRef.id;
+          // Navigate to create lease agreement page
+          _navigateToCreateLeaseAgreementPage(propertyId);
         } else {
-          await FirebaseFirestore.instance.collection('properties').doc(widget.propertyId).update(propertyData);
-          Navigator.pop(context, widget.propertyId); // Return the document ID
+          propertyId = widget.propertyId;
+          await FirebaseFirestore.instance.collection('properties').doc(propertyId).update(propertyData);
+          Navigator.pop(context, propertyId); // Return the document ID
         }
 
         setState(() {

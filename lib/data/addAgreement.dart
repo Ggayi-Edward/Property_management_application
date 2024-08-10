@@ -22,6 +22,7 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
   String propertyAddress = '';
   double monthlyRent = 0.0;
   List<PlatformFile> uploadedDocuments = [];
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -85,6 +86,10 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
 
   Future<void> _saveLeaseAgreement() async {
     if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isSaving = true;
+      });
+
       final documentUrls = await _uploadDocuments(uploadedDocuments);
 
       final newLease = {
@@ -97,18 +102,29 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
       };
 
       try {
+        DocumentReference leaseRef;
         if (widget.leaseAgreement == null) {
-          await FirebaseFirestore.instance.collection('lease_agreements').add(newLease);
+          leaseRef = await FirebaseFirestore.instance.collection('lease_agreements').add(newLease);
         } else {
-          await FirebaseFirestore.instance.collection('lease_agreements').doc(widget.leaseAgreement!['id']).update(newLease);
+          leaseRef = FirebaseFirestore.instance.collection('lease_agreements').doc(widget.leaseAgreement!['id']);
+          await leaseRef.update(newLease);
         }
 
-        Navigator.pop(context, newLease);
+        // Update the property with the lease agreement ID
+        await FirebaseFirestore.instance.collection('properties').doc(widget.propertyId).update({
+          'leaseAgreementId': leaseRef.id,
+        });
+
+        Navigator.pop(context, leaseRef.id);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving lease agreement: $e')),
         );
         print('Error saving lease agreement: $e');
+      } finally {
+        setState(() {
+          _isSaving = false;
+        });
       }
     }
   }
@@ -189,10 +205,12 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                 if (uploadedDocuments.isNotEmpty)
                   ...uploadedDocuments.map((file) => Text('Uploaded: ${file.name}')),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _saveLeaseAgreement,
-                  child: Text('Save'),
-                ),
+                _isSaving
+                    ? Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: _saveLeaseAgreement,
+                        child: Text('Save'),
+                      ),
               ],
             ),
           ),
