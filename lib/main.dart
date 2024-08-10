@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
               'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(userId: ''),
               'PaymentPage': (context) => PaymentPage(
                 landlordEmail: '',
-                landlordMobileMoneyNumber: '', price: '', estateId: '',
+                landlordMobileMoneyNumber: '', price: '', estateId: '', amount: '',
               ),
               'AccountPage': (context) => AccountPage(),
               'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
