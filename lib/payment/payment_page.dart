@@ -28,7 +28,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantMobileNumberController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _landlordMobileNumberController = TextEditingController();
+  final TextEditingController _landlordMobileNumberController = TextEditingController(); // Added controller
 
   final Map<String, String> landlordSubaccounts = {
     'landlord1@example.com': 'RS_FF6A27F50B9A8A6711B582A85A344A79',
@@ -64,7 +64,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
         var data = snapshot.data() as Map<String, dynamic>;
         _amountController.text = data['price'].toString();
-        _landlordMobileNumberController.text = data['ownerPhone'];
+        _landlordMobileNumberController.text = data['ownerPhone']; // Pre-fill landlord mobile number
 
         // Print to confirm values
         print('Fetched price: ${_amountController.text}');
@@ -288,6 +288,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               }
                               return null;
                             },
+                            enabled: true, // Set to false to make it non-editable
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
@@ -316,13 +317,14 @@ class _PaymentPageState extends State<PaymentPage> {
                               }
                               return null;
                             },
+                            enabled: false, // Set to false to make it non-editable
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _landlordMobileNumberController,
                             decoration: InputDecoration(
                               labelText: 'Landlord Mobile Number',
-                              hintText: 'Enter landlord mobile number',
+                              hintText: 'Landlord mobile number',
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -344,6 +346,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               }
                               return null;
                             },
+                            enabled: false, // Set to false to make it non-editable
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
