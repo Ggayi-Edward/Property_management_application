@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:flutterwave_standard/flutterwave.dart';
 import 'confirmation_page.dart';
 
-class PaymentPage extends StatelessWidget {
+class PaymentPage extends StatefulWidget {
+  final String landlordEmail;
+  final String landlordMobileMoneyNumber;
+  final String price;
+  final String estateId; // Estate ID
+  final String amount;
+
+  PaymentPage({
+    required this.landlordEmail,
+    required this.landlordMobileMoneyNumber,
+    required this.price,
+    required this.estateId,
+    required this.amount,
+  });
+
+  @override
+  _PaymentPageState createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends State<PaymentPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantMobileNumberController = TextEditingController();
-  final TextEditingController _amountController;
-  final TextEditingController _landlordMobileNumberController;
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _landlordMobileNumberController = TextEditingController();
 
-  final String landlordEmail; // Use landlord's email to map to subaccount ID
-  final String estateId; // Estate ID
-
-  PaymentPage({
-    required this.landlordEmail,
-    required String landlordMobileMoneyNumber,
-    required String price,
-    required this.estateId,
-  })  : _amountController = TextEditingController(text: price), // Prefill amount
-        _landlordMobileNumberController = TextEditingController(text: landlordMobileMoneyNumber); // Prefill landlord's mobile number
-
-  String _selectedNetwork = "VODAFONE"; // Default network
-
-  // Example data structure to store landlord information
   final Map<String, String> landlordSubaccounts = {
     'landlord1@example.com': 'RS_FF6A27F50B9A8A6711B582A85A344A79',
     'landlord2@example.com': 'RS_1234567890ABCDEFGHIJKL',
@@ -34,8 +40,47 @@ class PaymentPage extends StatelessWidget {
     return landlordSubaccounts[landlordEmail];
   }
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.estateId.isNotEmpty) {
+      _fetchPropertyDetails(); // Fetch the details from Firestore
+    } else {
+      print('Error: estateId is empty or null');
+    }
+  }
+
+  void _fetchPropertyDetails() async {
+    try {
+      print('Fetching details for estateId: ${widget.estateId}');
+      
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(widget.estateId)
+          .get();
+
+      if (snapshot.exists) {
+        print('Document data: ${snapshot.data()}'); // Print the entire document data
+
+        var data = snapshot.data() as Map<String, dynamic>;
+        _amountController.text = data['price'].toString();
+        _landlordMobileNumberController.text = data['ownerPhone'];
+
+        // Print to confirm values
+        print('Fetched price: ${_amountController.text}');
+        print('Fetched ownerPhone: ${_landlordMobileNumberController.text}');
+        
+        setState(() {});
+      } else {
+        print('No such document!');
+      }
+    } catch (e) {
+      print('Error fetching property details: $e');
+    }
+  }
+
   void _makePayment(BuildContext context) async {
-    final subaccountId = getSubaccountId(landlordEmail);
+    final subaccountId = getSubaccountId(widget.landlordEmail);
     if (subaccountId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid landlord information')),
@@ -62,7 +107,7 @@ class PaymentPage extends StatelessWidget {
       redirectUrl: "propertysmart://payment-confirmation",
       meta: {
         "subaccount_id": subaccountId,
-        "estate_id": estateId, // Include estateId in the meta information
+        "estate_id": widget.estateId, // Include estateId in the meta information
       },
     );
 
@@ -145,7 +190,7 @@ class PaymentPage extends StatelessWidget {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: SingleChildScrollView(
                   child: Card(
-                    color: Colors.blue[200], // Set card background color to blue[100]
+                    color: Colors.blue[200],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -181,8 +226,6 @@ class PaymentPage extends StatelessWidget {
                                 borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            keyboardType: TextInputType.name,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your name';
@@ -190,7 +233,7 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _emailController,
                             decoration: InputDecoration(
@@ -211,20 +254,18 @@ class PaymentPage extends StatelessWidget {
                                 borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
+                              if (value == null || value.isEmpty || !RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                                return 'Please enter a valid email address';
                               }
                               return null;
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _tenantMobileNumberController,
                             decoration: InputDecoration(
-                              labelText: 'Tenant Mobile Number',
+                              labelText: 'Mobile Number',
                               hintText: 'Enter your mobile number',
                               filled: true,
                               fillColor: Colors.white,
@@ -241,8 +282,6 @@ class PaymentPage extends StatelessWidget {
                                 borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            keyboardType: TextInputType.phone,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your mobile number';
@@ -250,12 +289,12 @@ class PaymentPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _amountController,
                             decoration: InputDecoration(
                               labelText: 'Amount',
-                              hintText: 'Enter amount to pay',
+                              hintText: 'Enter the amount',
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -271,22 +310,19 @@ class PaymentPage extends StatelessWidget {
                                 borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter the amount';
+                              if (value == null || value.isEmpty || double.tryParse(value) == null) {
+                                return 'Please enter a valid amount';
                               }
                               return null;
                             },
-                            enabled: false, // Disable editing
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _landlordMobileNumberController,
                             decoration: InputDecoration(
                               labelText: 'Landlord Mobile Number',
-                              hintText: 'Enter landlord\'s mobile number',
+                              hintText: 'Enter landlord mobile number',
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -302,73 +338,21 @@ class PaymentPage extends StatelessWidget {
                                 borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                               ),
                             ),
-                            keyboardType: TextInputType.phone,
-                            textInputAction: TextInputAction.next,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter landlord\'s mobile number';
+                                return 'Please enter landlord mobile number';
                               }
                               return null;
                             },
-                            enabled: false, // Disable editing
                           ),
-                          const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: _selectedNetwork,
-                            decoration: InputDecoration(
-                              labelText: 'Select Mobile Money Network',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
-                            items: <DropdownMenuItem<String>>[
-                              DropdownMenuItem<String>(
-                                value: "MTN",
-                                child: Text('MTN'),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "AIRTEL",
-                                child: Text('Airtel'),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "VODAFONE",
-                                child: Text('Vodafone'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                _selectedNetwork = value;
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: () {
-                              if (_formKey.currentState?.validate() ?? false) {
+                              if (_formKey.currentState!.validate()) {
                                 _makePayment(context);
                               }
                             },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16.0), backgroundColor: Colors.blue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ), // Button background color
-                            ),
-                            child: const Text(
-                              'Pay Now',
-                              style: TextStyle(fontSize: 18.0, color: Colors.white),
-                            ),
+                            child: Text('Make Payment'),
                           ),
                         ],
                       ),
