@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../constants/theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
- // Import SignaturePad page
 
 class CustomDrawer extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
@@ -24,8 +23,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   String? selectedPriceRange;
   int? selectedBedrooms;
   int? selectedBathrooms;
-  bool? swimmingPool;
-  bool? wifi;
+  bool swimmingPool = false; // Default value for boolean
+  bool wifi = false; // Default value for boolean
   User? _user;
   final FirebaseAuthService _authService = FirebaseAuthService();
   bool showFilters = false; // Control to show/hide filters
@@ -53,7 +52,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Color(0xFF0D47A1)
+              color: Color(0xFF0D47A1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,8 +123,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             },
           ),
-        
-
           _buildDrawerItem(
             themeNotifier.themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_4,
             themeNotifier.themeMode == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
@@ -175,17 +172,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
             height: showFilters ? null : 0, // Adjust height to show/hide filters
             child: showFilters ? _buildFilters() : null,
           ),
-          
         ],
       ),
     );
   }
 
   void _navigateToHome(BuildContext context) {
-    // Navigate to landlord or tenant home based on user role
     if (_user != null) {
-      // Check for landlord or tenant role and navigate accordingly
-      // Assuming you have a way to determine user role (e.g., user metadata, custom claims, etc.)
       bool isLandlord = _user!.uid == 'landlordUid'; // Replace with actual logic
       if (isLandlord) {
         Navigator.pushReplacement(
@@ -199,9 +192,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   void _navigateToProfile(BuildContext context) {
-    // Navigate to landlord or tenant profile based on user role
     if (_user != null) {
-      // Check for landlord or tenant role and navigate accordingly
       bool isLandlord = _user!.uid == 'landlordUid'; // Replace with actual logic
       if (isLandlord) {
         Navigator.push(
@@ -261,6 +252,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 selectedPriceRange = newValue;
               });
             },
+            dropdownColor: Colors.white,
+            iconEnabledColor: const Color(0xFF0D47A1), // Dropdown icon color
           ),
         ),
         ListTile(
@@ -284,6 +277,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 selectedBedrooms = newValue;
               });
             },
+            dropdownColor: Colors.white,
+            iconEnabledColor: const Color(0xFF0D47A1), // Dropdown icon color
           ),
         ),
         ListTile(
@@ -307,6 +302,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 selectedBathrooms = newValue;
               });
             },
+            dropdownColor: Colors.white,
+            iconEnabledColor: const Color(0xFF0D47A1), // Dropdown icon color
           ),
         ),
         ListTile(
@@ -315,9 +312,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
             value: swimmingPool,
             onChanged: (bool? newValue) {
               setState(() {
-                swimmingPool = newValue;
+                swimmingPool = newValue ?? false; // Provide default value
               });
             },
+            checkColor: Colors.white, // Color of the check mark
+            activeColor: const Color(0xFF0D47A1), // Color of the checkbox when checked
           ),
         ),
         ListTile(
@@ -326,9 +325,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
             value: wifi,
             onChanged: (bool? newValue) {
               setState(() {
-                wifi = newValue;
+                wifi = newValue ?? false; // Provide default value
               });
             },
+            checkColor: Colors.white, // Color of the check mark
+            activeColor: const Color(0xFF0D47A1), // Color of the checkbox when checked
           ),
         ),
         ElevatedButton(

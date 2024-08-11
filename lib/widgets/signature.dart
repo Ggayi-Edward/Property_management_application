@@ -49,6 +49,10 @@ class _SignaturePadState extends State<SignaturePad> {
                     if (data != null) {
                       await _saveSignature(data);
                     }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Please provide a signature first!'),
+                    ));
                   }
                 },
                 child: Text('Save'),
@@ -64,7 +68,10 @@ class _SignaturePadState extends State<SignaturePad> {
     try {
       // Get the current user's UID
       final User? user = FirebaseAuth.instance.currentUser;
-      final String userId = user!.uid;
+      if (user == null) {
+        throw 'User not logged in';
+      }
+      final String userId = user.uid;
 
       // Create a reference to Firebase Storage
       final storageRef = FirebaseStorage.instance
@@ -82,15 +89,24 @@ class _SignaturePadState extends State<SignaturePad> {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
-          .update({'signatureURL': downloadURL});
+          .set({'signatureURL': downloadURL}, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Signature saved successfully!'),
       ));
+
+      // Close the SignaturePad and return to the previous screen
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error saving signature: $e'),
       ));
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
