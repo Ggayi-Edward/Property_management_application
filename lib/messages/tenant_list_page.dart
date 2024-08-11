@@ -1,72 +1,90 @@
 import 'package:flutter/material.dart';
-import 'package:propertysmart2/messages/chat_service.dart';
-import 'package:propertysmart2/messages/messagingPage.dart';
-import 'package:propertysmart2/model/tenant.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'landlord_messaging_page.dart';
 
 class TenantListPage extends StatelessWidget {
   final String landlordId;
-  final ChatService _chatService = ChatService();
 
-  TenantListPage({required this.landlordId});
+  const TenantListPage({Key? key, required this.landlordId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Tenant Messages',
-          style: TextStyle(fontSize: 25),
-        ),
-        backgroundColor: const Color(0xFF0D47A1),
+        title: const Text("Tenants List"),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: FutureBuilder<List<Tenant>>(
-        future: _chatService.getTenantsWhoSentMessages(landlordId),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('chats')
+            .where('participants', arrayContains: landlordId)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading tenants'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No messages from tenants'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final tenant = snapshot.data![index];
-                return FutureBuilder<Map<String, dynamic>?>(
-                  future: _chatService.getUserDetails(tenant.name), // Assuming tenant.name is userId
-                  builder: (context, userSnapshot) {
-                    if (!userSnapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
-                    final userData = userSnapshot.data!;
-                    return ListTile(
-                      title: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Text(userData['name']),
-                      ),
-                      subtitle: Text(tenant.email),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MessagingPage(
-                              chatId: tenant.chatId,
-                              senderId: landlordId,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            );
           }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No messages yet.'));
+          }
+
+          final chats = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: chats.length,
+            itemBuilder: (context, index) {
+              final chatData = chats[index].data() as Map<String, dynamic>;
+              final participants = List<String>.from(chatData['participants']);
+              final tenantId = participants.firstWhere((id) => id != landlordId, orElse: () => 'Unknown');
+              final lastMessage = chatData['lastMessage'] ?? 'No message';
+              final tenantUsername = chatData['tenantUsername'] ?? 'Unknown Tenant';
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LandlordMessagingPage(
+                        landlordId: landlordId,
+                        tenantId: tenantId,
+                        chatId: chats[index].id, senderId: '', estateId: '',
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tenantUsername,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        lastMessage,
+                        style: const TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
     );

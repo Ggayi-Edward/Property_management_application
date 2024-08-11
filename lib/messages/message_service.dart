@@ -1,32 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'message.dart';
 
 class MessageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendMessage(String chatId, String senderId, String senderName, String messageText) async {
-    await _firestore.collection('chats').doc(chatId).collection('messages').add({
-      'senderId': senderId,
-      'senderName': senderName, // Include senderName
+    final messageData = {
       'messageText': messageText,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+      'senderId': senderId,
+      'senderName': senderName,
+      'timestamp': Timestamp.now(),
+    };
 
-    // Update the last message in the chat document
-    await _firestore.collection('chats').doc(chatId).update({
+    final chatRef = _firestore.collection('chats').doc(chatId);
+    await chatRef.collection('messages').add(messageData);
+    await chatRef.update({
       'lastMessage': messageText,
-      'lastTimestamp': FieldValue.serverTimestamp(),
+      'timestamp': Timestamp.now(),
     });
   }
 
-  Stream<List<Message>> getMessages(String chatId) {
+  Stream<List<Map<String, dynamic>>> getMessages(String chatId) {
     return _firestore
         .collection('chats')
         .doc(chatId)
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Message.fromFirestore(doc.data() as Map<String, dynamic>)).toList());
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 }

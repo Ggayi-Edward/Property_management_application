@@ -22,7 +22,8 @@ import 'package:propertysmart2/screens/profile_page.dart';
 
 import 'data/addAgreement.dart';
 import 'data/addProperty.dart';
-import 'messages/messagingPage.dart';
+import 'messages/tenant_messaging_page.dart';
+import 'messages/landlord_messaging_page.dart';
 
 
 
@@ -82,7 +83,8 @@ class MyApp extends StatelessWidget {
               ),
               'AccountPage': (context) => AccountPage(),
               'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
-              'MessagingPage': (context) => MessagingPage(chatId: '', senderId: ''),
+              'TenantMessagingPage': (context) => TenantMessagingPage(chatId: '', senderId: '', landlordId: '', tenantId: '', estateId: '',),
+              'LandlordMessagingPage': (context) => LandlordMessagingPage(chatId: '', senderId: '', landlordId: '', tenantId: '', estateId: '',),
               'LandlordDashboard': (context) => LandlordDashboard(userId: ''),
               'AddPropertyPage': (context) => AddPropertyPage(),
               'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(propertyId: '',),
