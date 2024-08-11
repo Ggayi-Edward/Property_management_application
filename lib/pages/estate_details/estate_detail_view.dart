@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // Update import path
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:propertysmart2/data/agreement.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
+import 'package:propertysmart2/screens/fullscreen.dart'; // Import the new page
 
 class EstateDetailsPage extends StatelessWidget {
   final String estateId;
@@ -46,15 +47,25 @@ class EstateDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (mainImage.isNotEmpty)
-                  ClipPath(
-                    clipper: SingleArcClipper(),
-                    child: CachedNetworkImage(
-                      imageUrl: mainImage,
-                      height: 250,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FullScreenImagePage(imageUrl: mainImage),
+                        ),
+                      );
+                    },
+                    child: ClipPath(
+                      clipper: SingleArcClipper(),
+                      child: CachedNetworkImage(
+                        imageUrl: mainImage,
+                        height: 300, // Increased height
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                      ),
                     ),
                   ),
                 const SizedBox(height: 10),
@@ -169,16 +180,26 @@ class EstateDetailsPage extends StatelessWidget {
                                 itemCount: roomImages.length,
                                 itemBuilder: (context, index) {
                                   final imageUrl = roomImages[index];
-                                  return Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: CachedNetworkImage(
-                                        imageUrl: imageUrl,
-                                        width: 150,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FullScreenImagePage(imageUrl: imageUrl),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: CachedNetworkImage(
+                                          imageUrl: imageUrl,
+                                          width: 150,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                                        ),
                                       ),
                                     ),
                                   );
