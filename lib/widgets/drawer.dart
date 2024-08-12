@@ -230,11 +230,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
           trailing: DropdownButton<String>(
             value: selectedPriceRange,
             items: <String>[
-              '\$0 - \$100,000',
-              '\$100,000 - \$200,000',
-              '\$200,000 - \$300,000',
-              '\$300,000 - \$400,000',
-              '\$400,000+',
+              '\UGX0 - \UGX100,000',
+              '\UGX100,000 - \UGX200,000',
+              '\UGX200,000 - \UGX300,000',
+              '\UGX300,000 - \UGX400,000',
+              '\UGX400,000+',
             ].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,

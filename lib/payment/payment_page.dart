@@ -101,7 +101,7 @@ class _PaymentPageState extends State<PaymentPage> {
           MaterialPageRoute(
             builder: (context) => ConfirmationPage(
               transactionId: response.transactionId ?? "N/A",
-              amount: _amountController.text,
+              amount: _amountController.text, landlordPhoneNumber: '',
             ),
           ),
         

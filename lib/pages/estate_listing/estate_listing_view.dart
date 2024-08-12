@@ -290,7 +290,7 @@ class _EstateListingViewState extends State<EstateListingView> {
                                             ),
                                             const SizedBox(height: 5),
                                             Text(
-                                              '\$${data?['price'] ?? '0'}',
+                                              '\UGX${data?['price'] ?? '0'}',
                                               style: const TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.black,

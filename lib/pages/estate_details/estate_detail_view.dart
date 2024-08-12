@@ -130,7 +130,7 @@ class EstateDetailsPage extends StatelessWidget {
                           const Icon(Icons.attach_money, color: Color(0xFF0D47A1)),
                           const SizedBox(width: 8),
                           Text(
-                            'Price: \$${data['price'] ?? '0'}',
+                            'Price: \UGX${data['price'] ?? '0'}',
                             style: const TextStyle(fontSize: 18, color: Colors.black),
                           ),
                         ],

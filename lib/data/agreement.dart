@@ -136,49 +136,51 @@ class _AgreementsPageState extends State<AgreementsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Agreement',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text(
+        'Agreement',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (documentUrl != null) ...[
-                _buildDocumentSection(),
-              ] else
-                const Center(child: CircularProgressIndicator()),
-
-              const SizedBox(height: 20),
-
-              if (userSignatureUrl != null) ...[
-                _buildSignatureSection(),
-              ] else ...[
-                _buildNoSignatureSection(),
-              ],
-
-              const SizedBox(height: 20),
-
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (documentUrl != null) ...[
+              _buildDocumentSection(),
+            ] else
               Center(
-                child: ElevatedButton(
-                  onPressed: hasReadAndVerified ? proceedToPayment : null,
-                  child: const Text('Proceed to Payment'),
+                child: SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: CircularProgressIndicator(), // Smaller loader
                 ),
               ),
+            const SizedBox(height: 20),
+            if (userSignatureUrl != null) ...[
+              _buildSignatureSection(),
+            ] else ...[
+              _buildNoSignatureSection(),
             ],
-          ),
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: hasReadAndVerified ? proceedToPayment : null,
+                child: const Text('Proceed to Payment'),
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildDocumentSection() {
     try {
