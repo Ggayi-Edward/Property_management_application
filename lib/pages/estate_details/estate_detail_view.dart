@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:propertysmart2/data/agreement.dart';
 import 'package:propertysmart2/messages/chat_service.dart';
 import 'package:propertysmart2/messages/tenant_messaging_page.dart';
+import 'package:propertysmart2/messages/tenant_msing.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screens/fullscreen.dart'; // Import the new page
 
@@ -12,7 +13,8 @@ class EstateDetailsPage extends StatelessWidget {
 
   const EstateDetailsPage({Key? key, required this.estateId}) : super(key: key);
 
-  Future<String> _getOrCreateChatId(String landlordId, String tenantId, String estateId) async {
+  Future<String> _getOrCreateChatId(
+      String landlordId, String tenantId, String estateId) async {
     final chatRef = FirebaseFirestore.instance.collection('chats');
 
     // Check if a chat already exists
@@ -39,7 +41,6 @@ class EstateDetailsPage extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +52,12 @@ class EstateDetailsPage extends StatelessWidget {
             fontSize: 20,
           ),
         ),
-      
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('properties').doc(estateId).get(),
+        future: FirebaseFirestore.instance
+            .collection('properties')
+            .doc(estateId)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -83,7 +86,8 @@ class EstateDetailsPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FullScreenImagePage(imageUrl: mainImage),
+                          builder: (context) =>
+                              FullScreenImagePage(imageUrl: mainImage),
                         ),
                       );
                     },
@@ -94,8 +98,10 @@ class EstateDetailsPage extends StatelessWidget {
                         height: 300, // Increased height
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) => const Center(
+                            child: Icon(Icons.error, color: Colors.red)),
                       ),
                     ),
                   ),
@@ -116,22 +122,26 @@ class EstateDetailsPage extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Icon(Icons.location_on, color: Color(0xFF0D47A1)),
+                          const Icon(Icons.location_on,
+                              color: Color(0xFF0D47A1)),
                           const SizedBox(width: 8),
                           Text(
                             'Location: ${data['location'] ?? 'No location'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Icon(Icons.attach_money, color: Color(0xFF0D47A1)),
+                          const Icon(Icons.attach_money,
+                              color: Color(0xFF0D47A1)),
                           const SizedBox(width: 8),
                           Text(
                             'Price: \UGX${data['price'] ?? '0'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -142,7 +152,8 @@ class EstateDetailsPage extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'Bedrooms: ${data['bedrooms'] ?? 'N/A'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -153,7 +164,8 @@ class EstateDetailsPage extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'Bathrooms: ${data['bathrooms'] ?? 'N/A'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -164,7 +176,8 @@ class EstateDetailsPage extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'WiFi: ${data['wifi'] ?? false ? 'Yes' : 'No'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -175,7 +188,8 @@ class EstateDetailsPage extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'Swimming Pool: ${data['swimmingPool'] ?? false ? 'Yes' : 'No'}',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -186,7 +200,8 @@ class EstateDetailsPage extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'Owner Phone: $landlordPhone',
-                            style: const TextStyle(fontSize: 18, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.black),
                           ),
                         ],
                       ),
@@ -216,7 +231,9 @@ class EstateDetailsPage extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => FullScreenImagePage(imageUrl: imageUrl),
+                                          builder: (context) =>
+                                              FullScreenImagePage(
+                                                  imageUrl: imageUrl),
                                         ),
                                       );
                                     },
@@ -228,8 +245,14 @@ class EstateDetailsPage extends StatelessWidget {
                                           imageUrl: imageUrl,
                                           width: 150,
                                           fit: BoxFit.cover,
-                                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                          errorWidget: (context, url, error) => const Center(child: Icon(Icons.error, color: Colors.red)),
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              const Center(
+                                                  child: Icon(Icons.error,
+                                                      color: Colors.red)),
                                         ),
                                       ),
                                     ),
@@ -246,12 +269,14 @@ class EstateDetailsPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AgreementsPage(propertyId: estateId),
+                                builder: (context) =>
+                                    AgreementsPage(propertyId: estateId),
                               ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0D47A1), // Button color
+                            backgroundColor:
+                                const Color(0xFF0D47A1), // Button color
                           ),
                           child: const Text(
                             'Checkout',
@@ -259,20 +284,19 @@ class EstateDetailsPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                        const SizedBox(height: 10),
-                        Center(
-                    child:ElevatedButton(
-  onPressed: () async {
-    String landlordId = 'someLandlordId';
-    String tenantId = 'someTenantId';
-  
-     _navigateToMessagingPage(context, landlordId, tenantId, estateId);
-  },
-  child: const Text('Send a Message'),
-),
-                        ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            String landlordId = 'someLandlordId';
+                            String tenantId = 'someTenantId';
 
-                      
+                            _navigateToMessagingPage(
+                                context, landlordId, tenantId, estateId);
+                          },
+                          child: const Text('Send a Message'),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -285,24 +309,26 @@ class EstateDetailsPage extends StatelessWidget {
   }
 }
 
-void _navigateToMessagingPage(BuildContext context, String landlordId, String tenantId, String estateId) async {
-    final chatService = ChatService();
-    final chatId = await chatService.getOrCreateChatId(landlordId, tenantId, estateId);
+void _navigateToMessagingPage(BuildContext context, String landlordId,
+    String tenantId, String estateId) async {
+  final chatService = ChatService();
+  final chatId =
+      await chatService.getOrCreateChatId(landlordId, tenantId, estateId);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TenantMessagingPage(
-          landlordId: landlordId,
-          tenantId: tenantId,
-          estateId: estateId,
-          chatId: chatId,  // Pass the actual chat ID
-          senderId: tenantId, // Assume tenant is the sender
-         // Add actual landlord email if needed
-        ),
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => TenantMessagingPage(
+        landlordId: landlordId,
+        tenantId: tenantId,
+        estateId: estateId,
+        chatId: chatId, // Pass the actual chat ID
+        // senderId: tenantId, // Assume tenant is the sender
+        // Add actual landlord email if needed
       ),
-    );
-  }
+    ),
+  );
+}
 
 // Custom clipper class for creating a single outward arc
 class SingleArcClipper extends CustomClipper<Path> {
@@ -314,7 +340,8 @@ class SingleArcClipper extends CustomClipper<Path> {
     final controlPoint = Offset(size.width / 2, size.height + 50);
     final endPoint = Offset(size.width, size.height - 50);
 
-    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    path.quadraticBezierTo(
+        controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
     path.lineTo(size.width, 0);
     path.close();
 

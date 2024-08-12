@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:propertysmart2/messages/tenant_msing.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
 import 'package:propertysmart2/screenslandlord/landlord_property_listings.dart';
@@ -25,8 +26,6 @@ import 'data/addAgreement.dart';
 import 'data/addProperty.dart';
 import 'messages/tenant_messaging_page.dart';
 import 'messages/landlord_messaging_page.dart';
-
-
 
 // Background message handler for Firebase Messaging
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -65,30 +64,48 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: lightTheme, // Use light theme
             darkTheme: darkTheme, // Use dark theme
-            themeMode: themeNotifier.themeMode, // Control theme mode dynamically
+            themeMode:
+                themeNotifier.themeMode, // Control theme mode dynamically
             home: const SplashScreen(), // Set the initial screen
             routes: {
               'LoginScreen': (context) => const LoginScreen(),
               'CreateAccount': (context) => const CreateNewAccount(),
               'ForgotPassword': (context) => const ForgotPassword(),
               'IntroPageView': (context) => const IntroPageView(),
-              'EstateListingView': (context) =>  EstateListingView(),
+              'EstateListingView': (context) => EstateListingView(),
               'ProfileScreen': (context) => const ProfileScreen(),
-              'CreateNewAccountLandlord': (context) => const CreateNewAccountLandlord(),
-              'ForgotPasswordLandlord': (context) => const ForgotPasswordLandlord(),
+              'CreateNewAccountLandlord': (context) =>
+                  const CreateNewAccountLandlord(),
+              'ForgotPasswordLandlord': (context) =>
+                  const ForgotPasswordLandlord(),
               'LoginScreenLandlord': (context) => const LoginScreenLandlord(),
-              'ProfileScreenLandlord': (context) => const ProfileScreenLandlord(userId: ''),
+              'ProfileScreenLandlord': (context) =>
+                  const ProfileScreenLandlord(userId: ''),
               'PaymentPage': (context) => PaymentPage(
-                landlordEmail: '',
-                landlordMobileMoneyNumber: '', price: '', estateId: '', amount: '',
-              ),
+                    landlordEmail: '',
+                    landlordMobileMoneyNumber: '',
+                    price: '',
+                    estateId: '',
+                    amount: '',
+                  ),
               'AccountPage': (context) => AccountPage(),
               'LeaseAgreementsPage': (context) => LeaseAgreementsPage(),
-              'TenantMessagingPage': (context) => TenantMessagingPage(chatId: '', senderId: '', landlordId: '', tenantId: '', estateId: '',),
-              'LandlordMessagingPage': (context) => LandlordMessagingPage(chatId: '', senderId: '', landlordId: '', tenantId: '', estateId: '',),
+              'TenantMessagingPage': (context) => TenantMessagingPage(
+                    chatId: '',
+                    landlordId: '',
+                    tenantId: '',
+                    estateId: '',
+                  ),
+              'LandlordMessagingPage': (context) => LandlordMessagingPage(
+                    chatId: '',
+                    landlordId: '',
+                    tenantId: '',
+                  ),
               'LandlordDashboard': (context) => LandlordDashboard(userId: ''),
               'AddPropertyPage': (context) => AddPropertyPage(),
-              'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(propertyId: '',),
+              'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(
+                    propertyId: '',
+                  ),
               'PropertyListingsPage': (context) => PropertyListingsPage(),
               '/propertyListings': (context) => PropertyListingsPage(),
             },
