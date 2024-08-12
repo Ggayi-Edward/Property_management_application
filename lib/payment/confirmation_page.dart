@@ -1,20 +1,29 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-
-import 'package:propertysmart2/payment/Receipt_page.dart';   // Adjusted import path
+import 'package:propertysmart2/payment/receipt_page.dart'; // Adjusted import path
 
 class ConfirmationPage extends StatelessWidget {
-  const ConfirmationPage({super.key}); // Corrected constructor syntax
+  final String transactionId;
+  final String amount;
+
+  const ConfirmationPage({
+    super.key,
+    required this.transactionId,
+    required this.amount,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey[50], // Background color for the entire screen
       appBar: AppBar(
-        title: Text('Confirmation'),
-        backgroundColor: Colors.blue, // Adjusted app bar background color
+        title: const Text(
+          'Confirmation',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Color(0xFF0D47A1), // Adjusted app bar background color
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0), // Padding around the body content
@@ -30,23 +39,28 @@ class ConfirmationPage extends StatelessWidget {
               ),
               SizedBox(height: 20.0),
               Text(
-                'Welcome to the Confirmation Page',
-                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.blue),
+                'Payment Successful!',
+                style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0D47A1),
+                ),
                 textAlign: TextAlign.center, // Center-align the text
               ),
               SizedBox(height: 20.0),
               Text(
-                'Payment Successful!',
-                style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-              SizedBox(height: 20.0),
-              Text(
-                'Transaction ID: 1234567890',
-                style: TextStyle(fontSize: 18.0, color: Colors.black),
+                'Transaction ID: $transactionId',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                ),
               ),
               Text(
-                'Amount Paid: \$50.00',
-                style: TextStyle(fontSize: 18.0, color: Colors.black),
+                'Amount Paid: $amount',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                ),
               ),
               SizedBox(height: 40.0),
               ElevatedButton(
@@ -54,7 +68,7 @@ class ConfirmationPage extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Adjusted button background color
+                  backgroundColor: Color(0xFF0D47A1), // Adjusted button background color
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
