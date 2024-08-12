@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LeaseAgreementsPage extends StatefulWidget {
@@ -19,7 +20,17 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
 
   Future<void> _fetchLeaseAgreements() async {
     try {
-      final querySnapshot = await FirebaseFirestore.instance.collection('lease_agreements').get();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('User not authenticated');
+        return;
+      }
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('lease_agreements')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+      
       final agreements = querySnapshot.docs.map((doc) {
         final data = doc.data();
         return {
@@ -47,7 +58,6 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
   }
 
   Future<void> _deleteLeaseAgreement(String leaseId) async {
-    // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -204,7 +214,6 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                 ),
         ],
       ),
-      
     );
   }
 }

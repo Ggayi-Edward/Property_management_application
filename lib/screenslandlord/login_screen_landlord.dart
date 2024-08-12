@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreenLandlord extends StatefulWidget {
   const LoginScreenLandlord({super.key});
@@ -30,6 +31,9 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
       );
 
       if (user != null) {
+        // Check and create user document
+        await _checkAndCreateUserDocument(user);
+
         // Show success Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -39,7 +43,7 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
           ),
         );
 
-        // Navigate to IntroPageView after the Snackbar message disappears
+        // Navigate to LandlordDashboard after the Snackbar message disappears
         Future.delayed(Duration(seconds: 2), () {
           Navigator.pushReplacementNamed(context, 'LandlordDashboard');
         });
@@ -66,6 +70,25 @@ class _LoginScreenLandlordState extends State<LoginScreenLandlord> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _checkAndCreateUserDocument(User user) async {
+    try {
+      final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userDoc = await userDocRef.get();
+
+      if (!userDoc.exists) {
+        // Create a default user document if it does not exist
+        await userDocRef.set({
+          'name': user.displayName ?? 'New User',
+          'email': user.email,
+          'createdAt': FieldValue.serverTimestamp(),
+          // Add other default fields if necessary
+        });
+      }
+    } catch (e) {
+      print('Error checking or creating user document: $e');
     }
   }
 

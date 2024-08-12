@@ -1,12 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 
 class SignaturePad extends StatefulWidget {
   @override
@@ -22,6 +21,7 @@ class _SignaturePadState extends State<SignaturePad> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _isUploading = false;
 
   @override
   void dispose() {
@@ -36,11 +36,11 @@ class _SignaturePadState extends State<SignaturePad> {
         title: const Text(
           'Signature Pad',
           style: TextStyle(
-            color: Colors.white, // Set the text color to white
-            fontSize: 18,        // Set a smaller font size
+            color: Colors.white,
+            fontSize: 18,
           ),
         ),
-        backgroundColor: const Color(0xFF0D47A1), // Optional: Set AppBar background color
+        backgroundColor: const Color(0xFF0D47A1),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -61,19 +61,22 @@ class _SignaturePadState extends State<SignaturePad> {
               backgroundColor: Colors.grey[200]!,
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _controller.clear(),
-                  child: const Text('Clear'),
-                ),
-                ElevatedButton(
-                  onPressed: _saveSignature,
-                  child: const Text('Save'),
-                ),
-              ],
-            ),
+            if (_isUploading)
+              const CircularProgressIndicator(),
+            if (!_isUploading)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _controller.clear(),
+                    child: const Text('Clear'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _saveSignature,
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -83,7 +86,11 @@ class _SignaturePadState extends State<SignaturePad> {
   Future<void> _saveSignature() async {
     if (_controller.isNotEmpty) {
       try {
-        var data = await _controller.toPngBytes();
+        setState(() {
+          _isUploading = true;
+        });
+
+        Uint8List? data = await _controller.toPngBytes();
         if (data != null) {
           await _saveImageToFirebase(data);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -94,6 +101,10 @@ class _SignaturePadState extends State<SignaturePad> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving signature: $e')),
         );
+      } finally {
+        setState(() {
+          _isUploading = false;
+        });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -105,22 +116,35 @@ class _SignaturePadState extends State<SignaturePad> {
   Future<void> _saveImageToFirebase(Uint8List data) async {
     // Request storage permissions
     var status = await Permission.storage.request();
-    if (!status.isGranted) return;
+    if (!status.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Storage permission is required to save the signature.')),
+      );
+      return;
+    }
 
     // Get the current user
     User? user = _auth.currentUser;
     if (user == null) return;
 
-    // Upload the signature to Firebase Storage
-    String filePath = 'signatures/${user.uid}/signature.png';
-    Reference storageRef = FirebaseStorage.instance.ref().child(filePath);
-    UploadTask uploadTask = storageRef.putData(data);
-    TaskSnapshot snapshot = await uploadTask;
-    String downloadUrl = await snapshot.ref.getDownloadURL();
+    try {
+      // Create a unique filename for the signature
+      String fileName = '${Uuid().v4()}.png';
+      String filePath = 'signatures/${user.uid}/$fileName';
+      Reference storageRef = FirebaseStorage.instance.ref().child(filePath);
+      UploadTask uploadTask = storageRef.putData(data);
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
 
-    // Save the download URL to Firestore under the user's document
-    await _firestore.collection('users').doc(user.uid).set({
-      'signatureUrl': downloadUrl,
-    }, SetOptions(merge: true));
+      // Save the download URL to Firestore under the user's document
+      await _firestore.collection('users').doc(user.uid).set({
+        'signatureUrl': downloadUrl,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error uploading and saving signature: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving signature to Firestore: $e')),
+      );
+    }
   }
 }

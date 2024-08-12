@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:propertysmart2/payment/receipt_page.dart'; // Adjusted import path
 
 class ConfirmationPage extends StatelessWidget {
   final String transactionId;
@@ -80,25 +79,7 @@ class ConfirmationPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ReceiptPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Adjusted button background color
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'View Receipt',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
+              
             ],
           ),
         ),

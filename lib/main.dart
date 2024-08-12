@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screenslandlord/landlord_dashboard.dart';
+import 'package:propertysmart2/screenslandlord/landlord_property_listings.dart';
 import 'package:propertysmart2/screenslandlord/lease_agreement_page.dart';
 import 'package:propertysmart2/screenslandlord/profile_page_landlord.dart';
 import 'package:provider/provider.dart';
@@ -88,6 +89,8 @@ class MyApp extends StatelessWidget {
               'LandlordDashboard': (context) => LandlordDashboard(userId: ''),
               'AddPropertyPage': (context) => AddPropertyPage(),
               'CreateLeaseAgreementPage': (context) => CreateLeaseAgreementPage(propertyId: '',),
+              'PropertyListingsPage': (context) => PropertyListingsPage(),
+              '/propertyListings': (context) => PropertyListingsPage(),
             },
           );
         },

@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:propertysmart2/widgets/widgets.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 
@@ -28,6 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
+        // Check and create user document
+        await _checkAndCreateUserDocument(user);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Successfully logged in!'),
@@ -60,6 +66,25 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _checkAndCreateUserDocument(User user) async {
+    try {
+      final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userDoc = await userDocRef.get();
+
+      if (!userDoc.exists) {
+        // Create a default user document if it does not exist
+        await userDocRef.set({
+          'name': user.displayName ?? 'New User',
+          'email': user.email,
+          'createdAt': FieldValue.serverTimestamp(),
+          // Add other default fields if necessary
+        });
+      }
+    } catch (e) {
+      print('Error checking or creating user document: $e');
     }
   }
 
