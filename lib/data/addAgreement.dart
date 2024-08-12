@@ -63,10 +63,8 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
 
         UploadTask uploadTask;
         if (kIsWeb) {
-          // Web platform - use file.bytes
           uploadTask = ref.putData(file.bytes!, SettableMetadata(contentType: file.extension));
         } else {
-          // Mobile/Desktop platforms - use file.path
           final localFile = File(file.path!);
           uploadTask = ref.putFile(localFile);
         }
@@ -90,18 +88,18 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
         _isSaving = true;
       });
 
-      final documentUrls = await _uploadDocuments(uploadedDocuments);
-
-      final newLease = {
-        'title': title,
-        'propertyAddress': propertyAddress,
-        'monthlyRent': monthlyRent,
-        'documents': documentUrls,
-        'userId': FirebaseAuth.instance.currentUser!.uid,
-        'propertyId': widget.propertyId,
-      };
-
       try {
+        final documentUrls = await _uploadDocuments(uploadedDocuments);
+
+        final newLease = {
+          'title': title,
+          'propertyAddress': propertyAddress,
+          'monthlyRent': monthlyRent,
+          'documents': documentUrls,
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'propertyId': widget.propertyId,
+        };
+
         DocumentReference leaseRef;
         if (widget.leaseAgreement == null) {
           leaseRef = await FirebaseFirestore.instance.collection('lease_agreements').add(newLease);
@@ -110,12 +108,12 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
           await leaseRef.update(newLease);
         }
 
-        // Update the property with the lease agreement ID
         await FirebaseFirestore.instance.collection('properties').doc(widget.propertyId).update({
           'leaseAgreementId': leaseRef.id,
         });
 
-        Navigator.pop(context, leaseRef.id);
+        // Navigate to PropertyListingsPage
+        Navigator.pushReplacementNamed(context, '/propertyListings');  // Ensure '/propertyListings' is the route name for PropertyListingsPage
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving lease agreement: $e')),
