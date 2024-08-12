@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:propertysmart2/constants/theme_notifier.dart';
 import 'package:propertysmart2/export/file_exports.dart';
 import 'package:propertysmart2/main.dart';
@@ -14,6 +15,8 @@ class LandlordDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       drawer: CustomDrawer(), // Include the CustomDrawer
       body: CustomScrollView(
@@ -50,9 +53,11 @@ class LandlordDashboard extends StatelessWidget {
                     ],
                   ),
                   background: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                        colors: isDarkMode
+                            ? [Colors.blueGrey[900]!, Colors.blueGrey[700]!]
+                            : [Color(0xFF0D47A1), Color(0xFF1976D2)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -83,8 +88,10 @@ class LandlordDashboard extends StatelessWidget {
     );
   }
 
-   Widget _buildDashboardItem(
+  Widget _buildDashboardItem(
       BuildContext context, IconData icon, String title, Widget? page) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () async {
         if (title == 'Messages') {
@@ -105,7 +112,9 @@ class LandlordDashboard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.blueAccent.withOpacity(0.3)],
+            colors: isDarkMode
+                ? [Colors.blueGrey[800]!, Colors.blueGrey[600]!]
+                : [Colors.white, Colors.blueAccent.withOpacity(0.3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -124,7 +133,7 @@ class LandlordDashboard extends StatelessWidget {
             Icon(
               icon,
               size: 50,
-              color: Color(0xFF0D47A1),
+              color: isDarkMode ? Colors.blueGrey[300] : Color(0xFF0D47A1),
             ),
             SizedBox(height: 10),
             Text(
@@ -132,7 +141,7 @@ class LandlordDashboard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0D47A1),
+                color: isDarkMode ? Colors.white : Color(0xFF0D47A1),
               ),
             ),
           ],
@@ -141,7 +150,6 @@ class LandlordDashboard extends StatelessWidget {
     );
   }
 }
-
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -179,7 +187,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
           DrawerHeader(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                colors: isDarkMode
+                    ? [Colors.blueGrey[900]!, Colors.blueGrey[700]!]
+                    : [Color(0xFF0D47A1), Color(0xFF1976D2)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -244,24 +254,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
             Navigator.pushNamed(context, 'ProfileScreenLandlord');
           }),
           _buildDrawerItem(Icons.logout, 'Logout', () async {
-          try {
-            await _authService.signOut();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Logged out successfully'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-            Navigator.pushReplacementNamed(context, 'AccountPage');
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Logout failed: $e'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-        }),
+            try {
+              await _authService.signOut();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Logged out successfully'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              Navigator.pushReplacementNamed(context, 'AccountPage');
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Logout failed: $e'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          }),
           _buildThemeSwitch(themeNotifier, isDarkMode),
         ],
       ),

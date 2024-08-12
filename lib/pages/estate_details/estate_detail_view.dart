@@ -51,6 +51,7 @@ class EstateDetailsPage extends StatelessWidget {
             fontSize: 20,
           ),
         ),
+      
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance.collection('properties').doc(estateId).get(),

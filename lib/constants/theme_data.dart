@@ -38,14 +38,14 @@ final ThemeData darkTheme = ThemeData(
   colorScheme: ColorScheme.dark(
     primary: Colors.blueGrey[900]!, // Dark Blue Grey for top
     secondary: Colors.blueGrey[700]!, // Light Blue Grey for bottom
-    background: Colors.black,
+    background: Colors.blueGrey[500],
   ),
   appBarTheme: AppBarTheme(
     color: Colors.blueGrey[900], // Dark Blue Grey for AppBar
     iconTheme: IconThemeData(color: Colors.white),
     elevation: 4,
   ),
-  scaffoldBackgroundColor: Colors.black,
+  scaffoldBackgroundColor: Colors.blueGrey[500],
   textTheme: TextTheme(
     titleLarge: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
     titleMedium: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w600),
