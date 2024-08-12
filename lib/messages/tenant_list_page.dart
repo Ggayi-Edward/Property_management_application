@@ -116,8 +116,13 @@ class TenantListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tenants List"),
-        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          'Messages',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
       ),
       body: ListView.builder(
         itemCount: tenants.length,
