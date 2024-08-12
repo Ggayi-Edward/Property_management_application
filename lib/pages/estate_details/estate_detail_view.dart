@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:propertysmart2/data/agreement.dart';
+import 'package:propertysmart2/messages/chat_service.dart';
+import 'package:propertysmart2/messages/tenant_messaging_page.dart';
 import 'package:propertysmart2/payment/payment_page.dart';
 import 'package:propertysmart2/screens/fullscreen.dart'; // Import the new page
 
@@ -9,6 +11,34 @@ class EstateDetailsPage extends StatelessWidget {
   final String estateId;
 
   const EstateDetailsPage({Key? key, required this.estateId}) : super(key: key);
+
+  Future<String> _getOrCreateChatId(String landlordId, String tenantId, String estateId) async {
+    final chatRef = FirebaseFirestore.instance.collection('chats');
+
+    // Check if a chat already exists
+    final existingChat = await chatRef
+        .where('landlordId', isEqualTo: landlordId)
+        .where('tenantId', isEqualTo: tenantId)
+        .where('estateId', isEqualTo: estateId)
+        .limit(1)
+        .get();
+
+    if (existingChat.docs.isNotEmpty) {
+      // Return existing chatId
+      return existingChat.docs.first.id;
+    } else {
+      // Create a new chat document and return its ID
+      final newChatDoc = chatRef.doc();
+      await newChatDoc.set({
+        'landlordId': landlordId,
+        'tenantId': tenantId,
+        'estateId': estateId,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      return newChatDoc.id;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -228,6 +258,20 @@ class EstateDetailsPage extends StatelessWidget {
                           ),
                         ),
                       ),
+                        const SizedBox(height: 10),
+                        Center(
+                    child:ElevatedButton(
+  onPressed: () async {
+    String landlordId = 'someLandlordId';
+    String tenantId = 'someTenantId';
+  
+     _navigateToMessagingPage(context, landlordId, tenantId, estateId);
+  },
+  child: const Text('Send a Message'),
+),
+                        ),
+
+                      
                     ],
                   ),
                 ),
@@ -239,6 +283,25 @@ class EstateDetailsPage extends StatelessWidget {
     );
   }
 }
+
+void _navigateToMessagingPage(BuildContext context, String landlordId, String tenantId, String estateId) async {
+    final chatService = ChatService();
+    final chatId = await chatService.getOrCreateChatId(landlordId, tenantId, estateId);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TenantMessagingPage(
+          landlordId: landlordId,
+          tenantId: tenantId,
+          estateId: estateId,
+          chatId: chatId,  // Pass the actual chat ID
+          senderId: tenantId, // Assume tenant is the sender
+         // Add actual landlord email if needed
+        ),
+      ),
+    );
+  }
 
 // Custom clipper class for creating a single outward arc
 class SingleArcClipper extends CustomClipper<Path> {

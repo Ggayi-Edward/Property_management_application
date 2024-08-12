@@ -6,7 +6,7 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Create or join a chat between two users
-  Future<String> createOrJoinChat(String userId1, String userId2) async {
+  Future<String> createOrJoinChat(String userId1, String userId2, {String? estateId}) async {
     final chatCollection = _firestore.collection('chats');
 
     // Check if chat already exists
@@ -17,6 +17,7 @@ class ChatService {
     for (var doc in existingChats.docs) {
       final participants = List<String>.from(doc['participants']);
       if (participants.contains(userId2)) {
+        // Return existing chatId if both participants are found
         return doc.id;
       }
     }
@@ -24,11 +25,43 @@ class ChatService {
     // If chat doesn't exist, create a new one
     final chatDoc = await chatCollection.add({
       'participants': [userId1, userId2],
+      if (estateId != null) 'estateId': estateId,
       'lastMessage': '',
       'lastTimestamp': FieldValue.serverTimestamp(),
     });
 
     return chatDoc.id;
+  }
+
+  // Get or create a chat ID between a landlord and a tenant for a specific estate
+  Future<String> getOrCreateChatId(String landlordId, String tenantId, String estateId) async {
+    final chatRef = _firestore.collection('chats');
+
+    // Check if a chat already exists for the specific landlord, tenant, and estate
+    final existingChat = await chatRef
+        .where('landlordId', isEqualTo: landlordId)
+        .where('tenantId', isEqualTo: tenantId)
+        .where('estateId', isEqualTo: estateId)
+        .limit(1)
+        .get();
+
+    if (existingChat.docs.isNotEmpty) {
+      // Return existing chatId
+      return existingChat.docs.first.id;
+    } else {
+      // Create a new chat document and return its ID
+      final newChatDoc = chatRef.doc();
+      await newChatDoc.set({
+        'landlordId': landlordId,
+        'tenantId': tenantId,
+        'estateId': estateId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'participants': [landlordId, tenantId],
+        'lastMessage': '',
+        'lastTimestamp': FieldValue.serverTimestamp(),
+      });
+      return newChatDoc.id;
+    }
   }
 
   // Get a list of tenants who have sent messages to a landlord
@@ -87,12 +120,6 @@ class ChatService {
     }
 
     return landlordList;
-  }
-
-  // Get user details by userId
-  Future<Map<String, dynamic>?> getUserDetails(String userId) async {
-    final userDoc = await _firestore.collection('users').doc(userId).get();
-    return userDoc.exists ? userDoc.data() : null;
   }
 
   // Stream of messages for a given chat
