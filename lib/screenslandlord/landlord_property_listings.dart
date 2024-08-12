@@ -225,7 +225,7 @@ class PropertyListingsPage extends StatelessWidget {
                                   SizedBox(height: 10),
                                   Text(data?['location'] ?? 'No location'),
                                   SizedBox(height: 10),
-                                  Text('\$${data?['price'] ?? '0'}'),
+                                  Text('\UGX${data?['price'] ?? '0'}'),
                                 ],
                               ),
                             ),

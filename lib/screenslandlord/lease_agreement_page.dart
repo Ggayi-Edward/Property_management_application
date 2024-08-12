@@ -165,7 +165,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Text('Monthly Rent: \$${lease['monthlyRent'].toStringAsFixed(2)}'),
+                              Text('Monthly Rent: \UGX${lease['monthlyRent'].toStringAsFixed(2)}'),
                               SizedBox(height: 10),
                               if (lease['documents'].isNotEmpty)
                                 Column(
