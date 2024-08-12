@@ -30,16 +30,6 @@ class _PaymentPageState extends State<PaymentPage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _landlordMobileNumberController = TextEditingController(); // Added controller
 
-  final Map<String, String> landlordSubaccounts = {
-    'landlord1@example.com': 'RS_FF6A27F50B9A8A6711B582A85A344A79',
-    'landlord2@example.com': 'RS_1234567890ABCDEFGHIJKL',
-    // Add more landlords as needed
-  };
-
-  String? getSubaccountId(String landlordEmail) {
-    return landlordSubaccounts[landlordEmail];
-  }
-
   @override
   void initState() {
     super.initState();
@@ -80,61 +70,56 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _makePayment(BuildContext context) async {
-    final subaccountId = getSubaccountId(widget.landlordEmail);
-    if (subaccountId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid landlord information')),
-      );
-      return;
-    }
-
-    final Customer customer = Customer(
+  final Flutterwave flutterwave = Flutterwave(
+    context: context,
+    publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X", // Replace with your actual public key
+    currency: "UGX",
+    amount: _amountController.text,
+    customer: Customer(
       name: _nameController.text,
       phoneNumber: _tenantMobileNumberController.text,
       email: _emailController.text,
-    );
+    ),
+    paymentOptions: "mobilemoneyuganda",
+    customization: Customization(title: "House Rental Payment"),
+    isTestMode: true,
+    txRef: DateTime.now().millisecondsSinceEpoch.toString(),
+    redirectUrl: "propertysmart://payment-confirmation",
+    meta: {
+      "estate_id": widget.estateId,
+      "landlord_mobile_number": _landlordMobileNumberController.text,
+    },
+  );
 
-    final Flutterwave flutterwave = Flutterwave(
-      context: context,
-      publicKey: "FLWPUBK_TEST",
-      currency: "UGX",
-      amount: _amountController.text,
-      customer: customer,
-      paymentOptions: "mobilemoneyuganda",
-      customization: Customization(title: "House Rental Payment"),
-      isTestMode: true,
-      txRef: DateTime.now().millisecondsSinceEpoch.toString(),
-      redirectUrl: "propertysmart://payment-confirmation",
-      meta: {
-        "subaccount_id": subaccountId,
-        "estate_id": widget.estateId, // Include estateId in the meta information
-      },
-    );
-
-    try {
-      final ChargeResponse response = await flutterwave.charge();
-      if (response != null) {
-        print(response.toJson());
-        if (response.status == "successful") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ConfirmationPage()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Payment failed: ${response.status ?? 'Unknown error'}')),
-          );
-        }
+  try {
+    final ChargeResponse response = await flutterwave.charge();
+    if (response != null) {
+      print(response.toJson());
+      if (response.status == "successful") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConfirmationPage(
+              transactionId: response.transactionId ?? "N/A",
+              amount: _amountController.text,
+            ),
+          ),
+        );
       } else {
-        print("Transaction failed");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment failed: ${response.status ?? 'Unknown error'}')),
+        );
       }
-    } catch (error) {
-      print("An error occurred: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $error')),
-      );
+    } else {
+      print("Transaction failed");
     }
+  } catch (error) {
+    print("An error occurred: $error");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An error occurred: $error')),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
