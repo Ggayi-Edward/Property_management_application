@@ -47,6 +47,29 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
   }
 
   Future<void> _deleteLeaseAgreement(String leaseId) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this lease agreement? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
     try {
       await FirebaseFirestore.instance.collection('lease_agreements').doc(leaseId).delete();
       setState(() {

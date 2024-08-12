@@ -12,7 +12,6 @@ import 'package:propertysmart2/data/addAgreement.dart';
 import 'package:propertysmart2/data/addProperty.dart';
 import 'package:propertysmart2/screenslandlord/editproperty.dart'; // Import the Edit Property Page
 
-
 class PropertyListingsPage extends StatelessWidget {
   Future<void> uploadFile(PlatformFile file, String userId) async {
     try {
@@ -43,14 +42,37 @@ class PropertyListingsPage extends StatelessWidget {
     }
   }
 
-  Future<void> deleteProperty(String propertyId, String mainImageUrl) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        print('User not authenticated');
-        return;
-      }
+  Future<void> deleteProperty(BuildContext context, String propertyId, String mainImageUrl) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print('User not authenticated');
+      return;
+    }
 
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this property? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
       Future<void> deleteImage(String imageUrl) async {
         if (imageUrl.isEmpty) return;
         final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
@@ -204,7 +226,6 @@ class PropertyListingsPage extends StatelessWidget {
                                   Text(data?['location'] ?? 'No location'),
                                   SizedBox(height: 10),
                                   Text('\$${data?['price'] ?? '0'}'),
-                                  
                                 ],
                               ),
                             ),
@@ -227,29 +248,10 @@ class PropertyListingsPage extends StatelessWidget {
                                   style: TextStyle(color: Color(0xFF0D47A1)),
                                 ),
                               ),
-                              // Add Agreement button
+                              // Delete button with confirmation dialog
                               TextButton(
                                 onPressed: () {
-                                  // Navigate to Create Lease Agreement Page
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CreateLeaseAgreementPage(propertyId: property.id),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  'Add Agreement',
-                                  style: TextStyle(color: Color(0xFF0D47A1)),
-                                ),
-                              ),
-                              // Delete button
-                              TextButton(
-                                onPressed: () {
-                                  deleteProperty(
-                                    property.id,
-                                    mainImage,
-                                  );
+                                  deleteProperty(context, property.id, mainImage);
                                 },
                                 child: Text(
                                   'Delete',
