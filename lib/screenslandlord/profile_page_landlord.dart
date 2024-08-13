@@ -84,7 +84,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'),
+                    child: const Text('OK'),
                   ),
                 ],
               );
@@ -179,7 +179,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to upload photo: $e'),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       print('Error uploading image: $e'); // Log error
@@ -219,7 +219,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to update profile: $e'),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -236,12 +236,9 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(
+      appBar: AppBar(
+        title: const Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -250,7 +247,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
           },
         ),
       ),
-      backgroundColor: Colors.blue[100], // Use a thin blue background color
+      backgroundColor: theme.colorScheme.background, // Use theme background color
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -272,7 +269,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                             ),
                             child: CircleAvatar(
                               radius: size.width * 0.14,
-                              backgroundColor: Colors.grey[500]?.withOpacity(0.5),
+                              backgroundColor: theme.colorScheme.onSurface.withOpacity(0.5),
                               backgroundImage: kIsWeb
                                   ? (_webProfileImage != null
                                       ? MemoryImage(_webProfileImage!)
@@ -302,7 +299,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: theme.colorScheme.onPrimary, width: 2),
                             ),
                             child: const Icon(
                               Icons.add,
@@ -316,8 +313,7 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                   const SizedBox(height: 20),
                   Text(
                     _userController.text,
-                    style: TextStyle(
-                      fontSize: 24,
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary,
                     ),
@@ -325,9 +321,8 @@ class _ProfileScreenLandlordState extends State<ProfileScreenLandlord> {
                   const SizedBox(height: 5),
                   Text(
                     _emailController.text,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: theme.colorScheme.onPrimary,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 20),

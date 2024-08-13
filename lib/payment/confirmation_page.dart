@@ -5,13 +5,13 @@ import 'dart:convert';
 class ConfirmationPage extends StatelessWidget {
   final String transactionId;
   final String amount;
-  final String landlordPhoneNumber; // Add landlordPhoneNumber as a parameter
+  final String landlordPhoneNumber;
 
   const ConfirmationPage({
     super.key,
     required this.transactionId,
     required this.amount,
-    required this.landlordPhoneNumber, // Initialize landlordPhoneNumber
+    required this.landlordPhoneNumber,
   });
 
   Future<void> _sendNotification() async {
@@ -46,11 +46,14 @@ class ConfirmationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     // Send notification when page is built
     _sendNotification();
 
     return Scaffold(
-      backgroundColor: Colors.blueGrey[50], // Background color for the entire screen
+      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.blueGrey[50], // Dark mode background color
       appBar: AppBar(
         title: const Text(
           'Confirmation',
@@ -59,10 +62,10 @@ class ConfirmationPage extends StatelessWidget {
             fontSize: 20,
           ),
         ),
-        backgroundColor: Color(0xFF0D47A1), // Adjusted app bar background color
+        backgroundColor: isDarkMode ? Colors.blueGrey[800] : Color(0xFF0D47A1), // Dark mode app bar color
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Padding around the body content
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +74,7 @@ class ConfirmationPage extends StatelessWidget {
               Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                size: 120.0, // Increased size of the check circle icon
+                size: 120.0,
               ),
               SizedBox(height: 20.0),
               Text(
@@ -79,23 +82,23 @@ class ConfirmationPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0D47A1),
+                  color: isDarkMode ? Colors.white : Color(0xFF0D47A1), // Text color based on theme
                 ),
-                textAlign: TextAlign.center, // Center-align the text
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 20.0),
               Text(
                 'Transaction ID: $transactionId',
                 style: TextStyle(
                   fontSize: 18.0,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.white70 : Colors.black,
                 ),
               ),
               Text(
                 'Amount Paid: UGX $amount',
                 style: TextStyle(
                   fontSize: 18.0,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.white70 : Colors.black,
                 ),
               ),
               SizedBox(height: 40.0),

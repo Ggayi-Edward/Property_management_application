@@ -19,17 +19,22 @@ class _SignaturePadState extends State<SignaturePad> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Here'),
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : theme.appBarTheme.backgroundColor,
       ),
+      backgroundColor: isDarkMode ? Colors.blueGrey[800] : Colors.grey[200],
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Signature(
             controller: _controller,
             height: 300,
-            backgroundColor: Colors.grey[200]!,
+            backgroundColor: isDarkMode ? Colors.blueGrey[700]! : Colors.grey[100]!,
           ),
           SizedBox(height: 20),
           Row(
@@ -39,6 +44,9 @@ class _SignaturePadState extends State<SignaturePad> {
                 onPressed: () {
                   _controller.clear();
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isDarkMode ? Colors.blueGrey[600] : Colors.blue,
+                ),
                 child: Text('Clear'),
               ),
               SizedBox(width: 20),
@@ -55,6 +63,9 @@ class _SignaturePadState extends State<SignaturePad> {
                     ));
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isDarkMode ? Colors.blueGrey[600] : Colors.blue,
+                ),
                 child: Text('Save'),
               ),
             ],

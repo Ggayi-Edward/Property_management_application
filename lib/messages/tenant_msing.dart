@@ -68,11 +68,15 @@ class _TenantMessagingPageState extends State<TenantMessagingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tenant Messaging"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.blueAccent,
       ),
+      backgroundColor: isDarkMode ? Colors.blueGrey[800] : Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -87,18 +91,29 @@ class _TenantMessagingPageState extends State<TenantMessagingPage> {
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
                       color: message['senderId'] == widget.tenantId
-                          ? Colors.blue[100] // Tenant message color
-                          : Colors.grey[300], // Landlord message color
+                          ? (isDarkMode ? Colors.blueGrey[700] : Colors.blue[100]) // Tenant message color
+                          : (isDarkMode ? Colors.grey[700] : Colors.grey[300]), // Landlord message color
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Text(message['messageText']),
+                    child: Text(
+                      message['messageText'],
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
                   ),
                   subtitle: Text(
                     message['senderName'] ?? 'Unknown',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
                   ),
                   trailing: Text(
                     DateFormat('HH:mm').format(message['timestamp']),
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
                   ),
                 );
               },
@@ -113,9 +128,18 @@ class _TenantMessagingPageState extends State<TenantMessagingPage> {
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: 'Enter your message',
+                      hintStyle: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                      fillColor: isDarkMode ? Colors.blueGrey[700] : Colors.grey[200],
+                      filled: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
                       ),
+                    ),
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
@@ -129,7 +153,7 @@ class _TenantMessagingPageState extends State<TenantMessagingPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: isDarkMode ? Colors.blueGrey[700] : Colors.blueAccent,
                   ),
                 ),
               ],

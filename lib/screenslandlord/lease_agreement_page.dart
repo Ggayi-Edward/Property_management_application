@@ -94,6 +94,8 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -110,7 +112,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                     children: [
                       Text(
                         'PropertySmart',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           fontSize: 20,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -120,7 +122,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                       if (!isCollapsed)
                         Text(
                           'Agreements',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             color: Colors.white,
                           ),
@@ -129,8 +131,8 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                     ],
                   ),
                   background: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0D47A1),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
                     ),
                   ),
                 );
@@ -142,7 +144,10 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                   child: Center(
                     child: Text(
                       'No agreements here',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 18,
+                        color: theme.colorScheme.onBackground.withOpacity(0.6),
+                      ),
                     ),
                   ),
                 )
@@ -159,13 +164,16 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                             children: [
                               Text(
                                 lease['propertyAddress'] ?? 'Unknown Address',
-                                style: TextStyle(
+                                style: theme.textTheme.titleMedium?.copyWith(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Text('Monthly Rent: \UGX${lease['monthlyRent'].toStringAsFixed(2)}'),
+                              Text(
+                                'Monthly Rent: UGX${lease['monthlyRent'].toStringAsFixed(2)}',
+                                style: theme.textTheme.bodyMedium,
+                              ),
                               SizedBox(height: 10),
                               if (lease['documents'].isNotEmpty)
                                 Column(
@@ -179,6 +187,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                                             child: Text(
                                               'Tenant Agreement: $url',
                                               overflow: TextOverflow.ellipsis,
+                                              style: theme.textTheme.bodyMedium,
                                             ),
                                           ),
                                           IconButton(
@@ -186,6 +195,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                                             onPressed: () {
                                               _launchURL(url);
                                             },
+                                            color: theme.colorScheme.primary,
                                           ),
                                         ],
                                       ),
@@ -199,7 +209,7 @@ class _LeaseAgreementsPageState extends State<LeaseAgreementsPage> {
                                     onPressed: () => _deleteLeaseAgreement(lease['id']),
                                     child: Text(
                                       'Delete',
-                                      style: TextStyle(color: Colors.red),
+                                      style: TextStyle(color: theme.colorScheme.error),
                                     ),
                                   ),
                                 ],

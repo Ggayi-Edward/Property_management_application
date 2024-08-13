@@ -70,62 +70,65 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _makePayment(BuildContext context) async {
-  final Flutterwave flutterwave = Flutterwave(
-    context: context,
-    publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X", // Replace with your actual public key
-    currency: "UGX",
-    amount: _amountController.text,
-    customer: Customer(
-      name: _nameController.text,
-      phoneNumber: _tenantMobileNumberController.text,
-      email: _emailController.text,
-    ),
-    paymentOptions: "mobilemoneyuganda",
-    customization: Customization(title: "House Rental Payment"),
-    isTestMode: true,
-    txRef: DateTime.now().millisecondsSinceEpoch.toString(),
-    redirectUrl: "propertysmart://payment-confirmation",
-    meta: {
-      "estate_id": widget.estateId,
-      "landlord_mobile_number": _landlordMobileNumberController.text,
-    },
-  );
-
-  try {
-    final ChargeResponse response = await flutterwave.charge();
-    if (response != null) {
-      print(response.toJson());
-      if (response.status == "successful") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ConfirmationPage(
-              transactionId: response.transactionId ?? "N/A",
-              amount: _amountController.text, landlordPhoneNumber: '',
-            ),
-          ),
-        
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Payment failed: ${response.status ?? 'Unknown error'}')),
-        );
-      }
-    } else {
-      print("Transaction failed");
-    }
-  } catch (error) {
-    print("An error occurred: $error");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('An error occurred: $error')),
+    final Flutterwave flutterwave = Flutterwave(
+      context: context,
+      publicKey: "FLWPUBK_TEST-585048afbc3e1f37a181cd178c26df20-X", // Replace with your actual public key
+      currency: "UGX",
+      amount: _amountController.text,
+      customer: Customer(
+        name: _nameController.text,
+        phoneNumber: _tenantMobileNumberController.text,
+        email: _emailController.text,
+      ),
+      paymentOptions: "mobilemoneyuganda",
+      customization: Customization(title: "House Rental Payment"),
+      isTestMode: true,
+      txRef: DateTime.now().millisecondsSinceEpoch.toString(),
+      redirectUrl: "propertysmart://payment-confirmation",
+      meta: {
+        "estate_id": widget.estateId,
+        "landlord_mobile_number": _landlordMobileNumberController.text,
+      },
     );
+
+    try {
+      final ChargeResponse response = await flutterwave.charge();
+      if (response != null) {
+        print(response.toJson());
+        if (response.status == "successful") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ConfirmationPage(
+                transactionId: response.transactionId ?? "N/A",
+                amount: _amountController.text, landlordPhoneNumber: '',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment failed: ${response.status ?? 'Unknown error'}')),
+          );
+        }
+      } else {
+        print("Transaction failed");
+      }
+    } catch (error) {
+      print("An error occurred: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $error')),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
+            
+      backgroundColor: isDarkMode ? Colors.blueGrey[800] : Colors.white,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -160,8 +163,8 @@ class _PaymentPageState extends State<PaymentPage> {
                     ],
                   ),
                   background: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0D47A1),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.blueGrey[900] : Colors.blueAccent,
                     ),
                   ),
                 );
@@ -176,7 +179,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: SingleChildScrollView(
                   child: Card(
-                    color: Colors.blue[200],
+                    color: isDarkMode ? Colors.blueGrey[700] : Colors.blue[200],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -188,30 +191,17 @@ class _PaymentPageState extends State<PaymentPage> {
                         children: [
                           Text(
                             'Enter Payment Details',
-                            style: theme.textTheme.titleLarge,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
-                          TextFormField(
+                          _buildTextFormField(
                             controller: _nameController,
-                            decoration: InputDecoration(
-                              labelText: 'Name',
-                              hintText: 'Enter your name',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
+                            label: 'Name',
+                            hint: 'Enter your name',
+                            isDarkMode: isDarkMode,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your name';
@@ -220,26 +210,11 @@ class _PaymentPageState extends State<PaymentPage> {
                             },
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
+                          _buildTextFormField(
                             controller: _emailController,
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              hintText: 'Enter your email',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
+                            label: 'Email',
+                            hint: 'Enter your email',
+                            isDarkMode: isDarkMode,
                             validator: (value) {
                               if (value == null || value.isEmpty || !RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
                                 return 'Please enter a valid email address';
@@ -248,91 +223,46 @@ class _PaymentPageState extends State<PaymentPage> {
                             },
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
+                          _buildTextFormField(
                             controller: _tenantMobileNumberController,
-                            decoration: InputDecoration(
-                              labelText: 'Mobile Number',
-                              hintText: 'Enter your mobile number',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
+                            label: 'Mobile Number',
+                            hint: 'Enter your mobile number',
+                            isDarkMode: isDarkMode,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your mobile number';
                               }
                               return null;
                             },
-                            enabled: true, // Set to false to make it non-editable
+                            enabled: true,
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
+                          _buildTextFormField(
                             controller: _amountController,
-                            decoration: InputDecoration(
-                              labelText: 'Amount',
-                              hintText: 'Enter the amount',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
+                            label: 'Amount',
+                            hint: 'Enter the amount',
+                            isDarkMode: isDarkMode,
                             validator: (value) {
                               if (value == null || value.isEmpty || double.tryParse(value) == null) {
                                 return 'Please enter a valid amount';
                               }
                               return null;
                             },
-                            enabled: false, // Set to false to make it non-editable
+                            enabled: false,
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
+                          _buildTextFormField(
                             controller: _landlordMobileNumberController,
-                            decoration: InputDecoration(
-                              labelText: 'Landlord Mobile Number',
-                              hintText: 'Landlord mobile number',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                            ),
+                            label: 'Landlord Mobile Number',
+                            hint: 'Landlord mobile number',
+                            isDarkMode: isDarkMode,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter landlord mobile number';
                               }
                               return null;
                             },
-                            enabled: false, // Set to false to make it non-editable
+                            enabled: false,
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
@@ -342,6 +272,12 @@ class _PaymentPageState extends State<PaymentPage> {
                               }
                             },
                             child: Text('Make Payment'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDarkMode ? Colors.blueGrey[700] : Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -353,6 +289,48 @@ class _PaymentPageState extends State<PaymentPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required bool isDarkMode,
+    required String? Function(String?) validator,
+    bool enabled = true,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        filled: true,
+        fillColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.white30 : Colors.blue,
+            width: 2.0,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.white30 : Colors.blue,
+            width: 2.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.white : Colors.blue,
+            width: 2.0,
+          ),
+        ),
+      ),
+      validator: validator,
+      enabled: enabled,
     );
   }
 }

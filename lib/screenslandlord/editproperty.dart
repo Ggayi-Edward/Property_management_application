@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:propertysmart2/constants/theme_data.dart';
 
 class EditPropertyPage extends StatefulWidget {
   final String propertyId;
@@ -118,13 +119,16 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final appBarColor = isDarkMode ? Theme.of(context).appBarTheme.backgroundColor : Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Edit Property',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
         ),
-        backgroundColor: Color(0xFF0D47A1),
+        backgroundColor: appBarColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -134,7 +138,12 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
             children: [
               TextFormField(
                 initialValue: title,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  labelStyle: theme.inputDecorationTheme.labelStyle,
+                  border: theme.inputDecorationTheme.border,
+                  focusedBorder: theme.inputDecorationTheme.focusedBorder,
+                ),
                 onChanged: (value) => setState(() => title = value),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter a title';
@@ -143,7 +152,12 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
               ),
               TextFormField(
                 initialValue: location,
-                decoration: InputDecoration(labelText: 'Location'),
+                decoration: InputDecoration(
+                  labelText: 'Location',
+                  labelStyle: theme.inputDecorationTheme.labelStyle,
+                  border: theme.inputDecorationTheme.border,
+                  focusedBorder: theme.inputDecorationTheme.focusedBorder,
+                ),
                 onChanged: (value) => setState(() => location = value),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter a location';
@@ -153,7 +167,12 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
               TextFormField(
                 initialValue: price.toString(),
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Price'),
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  labelStyle: theme.inputDecorationTheme.labelStyle,
+                  border: theme.inputDecorationTheme.border,
+                  focusedBorder: theme.inputDecorationTheme.focusedBorder,
+                ),
                 onChanged: (value) => setState(() => price = double.tryParse(value) ?? 0.0),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter a price';
@@ -161,14 +180,13 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
                   return null;
                 },
               ),
-         
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickMainImage,
                 child: Text('Pick Main Image'),
                 style: ElevatedButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Control padding
+                  backgroundColor: theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}) ?? theme.primaryColor,
+                                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
               ),
               SizedBox(height: 10),
@@ -180,9 +198,9 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
               ElevatedButton(
                 onPressed: _pickRoomImages,
                 child: Text('Pick Room Images'),
-                              style: ElevatedButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Control padding
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}) ?? theme.primaryColor,
+                                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
               ),
               SizedBox(height: 10),
@@ -215,9 +233,9 @@ class _EditPropertyPageState extends State<EditPropertyPage> {
                 onPressed: _saveProperty,
                 child: Text('Save'),
                 style: ElevatedButton.styleFrom(
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Control padding
-                    ),
+                  backgroundColor: theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}) ?? theme.primaryColor,
+                                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
               ),
             ],
           ),

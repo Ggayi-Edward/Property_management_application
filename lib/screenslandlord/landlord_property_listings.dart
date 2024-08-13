@@ -49,7 +49,6 @@ class PropertyListingsPage extends StatelessWidget {
       return;
     }
 
-    // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -115,6 +114,8 @@ class PropertyListingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     if (user == null) {
       return Scaffold(
         body: Center(child: Text('Please log in to view your properties.')),
@@ -156,8 +157,8 @@ class PropertyListingsPage extends StatelessWidget {
                     ],
                   ),
                   background: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0D47A1),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.blueGrey[900] : Color(0xFF0D47A1),
                     ),
                   ),
                 );
@@ -217,38 +218,40 @@ class PropertyListingsPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     data?['title'] ?? 'No title',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.titleMedium,
                                   ),
                                   SizedBox(height: 10),
                                   Text(data?['location'] ?? 'No location'),
                                   SizedBox(height: 10),
-                                  Text('\UGX${data?['price'] ?? '0'}'),
+                                  Text(
+                                    '\UGX${data?['price'] ?? '0'}',
+                                    style: Theme.of(context).textTheme.titleSmall,
+                                  ),
                                 ],
                               ),
                             ),
                           ),
                           Column(
                             children: [
-                              // Edit button
                               TextButton(
                                 onPressed: () {
-                                  // Navigate to Edit Property Page
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EditPropertyPage(propertyId: property.id, propertyData: data),
+                                      builder: (context) => EditPropertyPage(
+                                        propertyId: property.id,
+                                        propertyData: data,
+                                      ),
                                     ),
                                   );
                                 },
                                 child: Text(
                                   'Edit',
-                                  style: TextStyle(color: Color(0xFF0D47A1)),
+                                  style: TextStyle(
+                                    color: isDarkMode ? Colors.blueGrey[300] : Color(0xFF0D47A1),
+                                  ),
                                 ),
                               ),
-                              // Delete button with confirmation dialog
                               TextButton(
                                 onPressed: () {
                                   deleteProperty(context, property.id, mainImage);
@@ -279,7 +282,7 @@ class PropertyListingsPage extends StatelessWidget {
           );
         },
         child: Icon(Icons.add),
-        backgroundColor: Color(0xFF0D47A1),
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Color(0xFF0D47A1),
       ),
     );
   }

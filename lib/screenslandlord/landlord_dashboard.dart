@@ -186,13 +186,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDarkMode
-                    ? [Colors.blueGrey[900]!, Colors.blueGrey[700]!]
-                    : [Color(0xFF0D47A1), Color(0xFF1976D2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: isDarkMode ? Colors.blueGrey[900] : Color(0xFF0D47A1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,12 +273,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF0D47A1)),
+      leading: Icon(icon, color: isDarkMode ? Colors.white : Color(0xFF0D47A1)),
       title: Text(
         title,
         style: TextStyle(
-          color: Color(0xFF0D47A1),
+          color: isDarkMode ? Colors.white : Color(0xFF0D47A1),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -296,12 +292,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return ListTile(
       leading: Icon(
         isDarkMode ? Icons.dark_mode : Icons.light_mode,
-        color: Color(0xFF0D47A1),
+        color: isDarkMode ? Colors.white : Color(0xFF0D47A1),
       ),
       title: Text(
         isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme',
         style: TextStyle(
-          color: Color(0xFF0D47A1),
+          color: isDarkMode ? Colors.white : Color(0xFF0D47A1),
           fontWeight: FontWeight.bold,
         ),
       ),

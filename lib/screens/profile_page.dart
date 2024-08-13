@@ -161,12 +161,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(
+      appBar: AppBar(
+        title: const Text(
           'Profile',
           style: TextStyle(
-            color: Colors.white,
             fontSize: 20,
           ),
         ),
@@ -176,8 +177,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.of(context).pop();
           },
         ),
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.blueAccent,
       ),
-      backgroundColor: Colors.blue[100], // Use a thin blue background color
+      backgroundColor: isDarkMode ? Colors.blueGrey[800] : Colors.blue[100],
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -199,13 +201,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             child: CircleAvatar(
                               radius: size.width * 0.14,
-                              backgroundColor: Colors.grey[500]?.withOpacity(0.5),
+                              backgroundColor: isDarkMode
+                                  ? Colors.grey[700]?.withOpacity(0.5)
+                                  : Colors.grey[500]?.withOpacity(0.5),
                               backgroundImage: _profileImage != null
                                   ? FileImage(_profileImage!) as ImageProvider
                                   : (_user?.photoURL != null
-                                  ? NetworkImage(_user!.photoURL!)
-                                  : const AssetImage('assets/images/default_avatar.jfif')
-                              as ImageProvider),
+                                      ? NetworkImage(_user!.photoURL!)
+                                      : const AssetImage('assets/images/default_avatar.jfif')
+                                  as ImageProvider),
                               onBackgroundImageError: (_, __) {
                                 // Handle image loading error
                                 setState(() {
@@ -222,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: size.width * 0.12,
                             width: size.width * 0.12,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
+                              color: isDarkMode ? Colors.blueGrey[600] : theme.colorScheme.primary,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
@@ -241,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
+                      color: isDarkMode ? Colors.white : theme.colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -249,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _emailController.text,
                     style: TextStyle(
                       fontSize: 16,
-                      color: theme.colorScheme.onPrimary,
+                      color: isDarkMode ? Colors.white70 : theme.colorScheme.onPrimary,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -259,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     hint: 'Name',
                     inputType: TextInputType.name,
                     inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
+                    color: isDarkMode ? theme.colorScheme.primary : theme.colorScheme.primary,
                   ),
                   TextInputField(
                     controller: _emailController,
@@ -267,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     hint: 'Email',
                     inputType: TextInputType.emailAddress,
                     inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
+                    color: isDarkMode ? theme.colorScheme.primary : theme.colorScheme.primary,
                   ),
                   TextInputField(
                     controller: _bioController,
@@ -275,7 +279,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     hint: 'Bio',
                     inputType: TextInputType.multiline,
                     inputAction: TextInputAction.newline,
-                    color: theme.colorScheme.primary,
+                    color: isDarkMode ? theme.colorScheme.primary : theme.colorScheme.primary,
                   ),
                   TextInputField(
                     controller: _phoneController,
@@ -283,13 +287,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     hint: 'Phone',
                     inputType: TextInputType.phone,
                     inputAction: TextInputAction.next,
-                    color: theme.colorScheme.primary,
+                    color: isDarkMode ? theme.colorScheme.primary : theme.colorScheme.primary,
                   ),
                   const SizedBox(height: 20),
                   RoundedButton(
                     buttonName: 'Save',
                     onPressed: _handleSave,
-                    color: theme.colorScheme.secondary,
+                    color: isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.secondary,
                   ),
                   const SizedBox(height: 10),
                   TextButton(
@@ -300,7 +304,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Text(
                       'Sign Out',
                       style: TextStyle(
-                        color: theme.colorScheme.error,
+                        color: isDarkMode ? theme.colorScheme.error : theme.colorScheme.error,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),

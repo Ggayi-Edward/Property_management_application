@@ -129,16 +129,18 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final appBarColor = isDarkMode ? Theme.of(context).appBarTheme.backgroundColor : Theme.of(context).colorScheme.primary;
+    final labelColor = isDarkMode ? Theme.of(context).inputDecorationTheme.labelStyle?.color : Theme.of(context).colorScheme.onBackground;
+    final buttonColor = isDarkMode ? Theme.of(context).elevatedButtonTheme.style?.backgroundColor : Theme.of(context).colorScheme.primary;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Add Agreement',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
         ),
-        backgroundColor: Color(0xFF0D47A1),
+        backgroundColor: appBarColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -149,7 +151,11 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Title'),
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    labelStyle: TextStyle(color: labelColor),
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: (value) {
                     setState(() {
                       title = value;
@@ -163,7 +169,11 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Property Address'),
+                  decoration: InputDecoration(
+                    labelText: 'Property Address',
+                    labelStyle: TextStyle(color: labelColor),
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: (value) {
                     setState(() {
                       propertyAddress = value;
@@ -178,7 +188,11 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Monthly Rent'),
+                  decoration: InputDecoration(
+                    labelText: 'Monthly Rent',
+                    labelStyle: TextStyle(color: labelColor),
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: (value) {
                     setState(() {
                       monthlyRent = double.tryParse(value) ?? 0.0;
@@ -198,6 +212,9 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                 ElevatedButton(
                   onPressed: _pickFiles,
                   child: Text('Upload Documents'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 SizedBox(height: 10),
                 if (uploadedDocuments.isNotEmpty)
@@ -208,6 +225,9 @@ class _CreateLeaseAgreementPageState extends State<CreateLeaseAgreementPage> {
                     : ElevatedButton(
                         onPressed: _saveLeaseAgreement,
                         child: Text('Save'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
               ],
             ),

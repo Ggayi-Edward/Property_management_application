@@ -191,7 +191,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.w400),
+          labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
           border: OutlineInputBorder(),
         ),
         keyboardType: keyboardType,
@@ -205,11 +205,18 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
     );
   }
 
-  Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildCheckboxRow(String label, bool value, ValueChanged<bool?> onChanged) {
     return Row(
       children: [
-        Text(label, style: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.w400)),
-        Switch(value: value, onChanged: onChanged),
+        Checkbox(
+          value: value,
+          onChanged: onChanged,
+          activeColor: Theme.of(context).colorScheme.primary,
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+        ),
       ],
     );
   }
@@ -219,7 +226,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       children: [
         Text(
           label,
-          style: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.w400),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
         ),
         SizedBox(width: 20),
         DropdownButton<int>(
@@ -229,7 +236,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                     value: e,
                     child: Text(
                       '$e',
-                      style: TextStyle(color: Color(0xFF0D47A1), fontSize: 16),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
                     ),
                   ))
               .toList(),
@@ -246,7 +253,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF0D47A1),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -266,7 +273,7 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
       height: 100,
       margin: EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFF0D47A1)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Image(
@@ -277,17 +284,16 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
   }
 
   @override
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           widget.propertyId == null ? 'Add Property' : 'Edit Property',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
         ),
-        backgroundColor: Color(0xFF0D47A1),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -301,8 +307,8 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                 _buildTextFormField('Location', _locationController),
                 _buildTextFormField('Price', _priceController, TextInputType.number),
                 _buildTextFormField('Owner Phone', _ownerPhoneController),
-                _buildSwitchRow('WiFi', _wifi, (value) => setState(() => _wifi = value)),
-                _buildSwitchRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value)),
+                _buildCheckboxRow('WiFi', _wifi, (value) => setState(() => _wifi = value!)),
+                _buildCheckboxRow('Swimming Pool', _swimmingPool, (value) => setState(() => _swimmingPool = value!)),
                 _buildDropdownRow('Bedrooms', _bedrooms, (value) => setState(() => _bedrooms = value!), 1, 10),
                 _buildDropdownRow('Bathrooms', _bathrooms, (value) => setState(() => _bathrooms = value!), 1, 10),
                 SizedBox(height: 20),
@@ -311,13 +317,13 @@ class _AddPropertyPageState extends State<AddPropertyPage> {
                 _buildImagePicker('Upload Room Images', () => _pickImage(false), null, _roomImages),
                 SizedBox(height: 20),
                 _isSaving
-                    ? Center(child: CircularProgressIndicator(),)
+                    ? Center(child: CircularProgressIndicator())
                     : Center(
                         child: ElevatedButton(
                           onPressed: _saveProperty,
                           child: Text(widget.propertyId == null ? 'Save Property' : 'Update Property'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0D47A1),
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
